@@ -406,6 +406,57 @@
     /* ── SCROLL PADDING ── */
     .pb-tab { padding-bottom: 90px; }
 
+    /* ═══ SCHEDULE SCREEN ═══ */
+    .week-strip {
+      display: flex; padding: 0 16px 16px; gap: 6px;
+    }
+    .week-day {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+      padding: 10px 4px;
+      border-radius: 14px;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .week-day.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .week-day.today .day-num { color: var(--accent); }
+    .week-day.active .day-num,
+    .week-day.active .day-label { color: white; }
+    .day-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .day-num { font-size: 17px; font-weight: 800; color: var(--text); }
+    .day-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent3); }
+    .week-day.active .day-dot { background: rgba(255,255,255,0.7); }
+    .week-day.empty .day-dot { opacity: 0; }
+
+    .schedule-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+    .schedule-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px 16px;
+      display: flex; align-items: center; gap: 14px;
+      cursor: pointer;
+    }
+    .schedule-item:active { border-color: var(--accent); }
+    .schedule-time-col { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; width: 42px; }
+    .schedule-time { font-size: 13px; font-weight: 800; color: var(--text); }
+    .schedule-dur { font-size: 10px; color: var(--muted); }
+    .schedule-line { width: 2px; flex: 1; min-height: 20px; background: var(--border); border-radius: 1px; }
+    .schedule-info { flex: 1; min-width: 0; }
+    .schedule-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .schedule-client { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .schedule-tag {
+      font-size: 11px; font-weight: 700; padding: 3px 9px;
+      border-radius: 20px; flex-shrink: 0;
+    }
+    .empty-day {
+      text-align: center; padding: 48px 16px;
+      color: var(--muted); font-size: 14px; line-height: 1.6;
+    }
+
     /* ═══ WORKOUT SCREEN ═══ */
     .exercise-block {
       margin: 0 16px 12px;
@@ -999,22 +1050,10 @@
 
     <!-- TAB BAR -->
     <div class="tab-bar">
-      <div class="tab active">
-        <div class="tab-icon">👥</div>
-        <div class="tab-label">Клиенты</div>
-      </div>
-      <div class="tab">
-        <div class="tab-icon">📅</div>
-        <div class="tab-label">Расписание</div>
-      </div>
-      <div class="tab">
-        <div class="tab-icon">📊</div>
-        <div class="tab-label">Аналитика</div>
-      </div>
-      <div class="tab">
-        <div class="tab-icon">⚙️</div>
-        <div class="tab-label">Профиль</div>
-      </div>
+      <div class="tab active" onclick="showTab('clients')"><div class="tab-icon">👥</div><div class="tab-label">Клиенты</div></div>
+      <div class="tab" onclick="showTab('schedule')"><div class="tab-icon">📅</div><div class="tab-label">Расписание</div></div>
+      <div class="tab" onclick="showTab('analytics')"><div class="tab-icon">📊</div><div class="tab-label">Аналитика</div></div>
+      <div class="tab" onclick="showTab('profile')"><div class="tab-icon">⚙️</div><div class="tab-label">Профиль</div></div>
     </div>
   </div>
 
@@ -1604,6 +1643,28 @@
     </div>
   </div>
 
+  <!-- ═══════════ SCREEN: SCHEDULE ═══════════ -->
+  <div class="screen" id="screen-schedule">
+    <div class="nav-bar">
+      <h1>Расписание</h1>
+      <div class="subtitle">Июнь 2026</div>
+    </div>
+
+    <!-- week strip -->
+    <div class="week-strip" id="week-strip"></div>
+
+    <div class="screen-scroll pb-tab" id="schedule-scroll">
+      <div class="schedule-list" id="schedule-list"></div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab" onclick="showTab('clients')"><div class="tab-icon">👥</div><div class="tab-label">Клиенты</div></div>
+      <div class="tab active" onclick="showTab('schedule')"><div class="tab-icon">📅</div><div class="tab-label">Расписание</div></div>
+      <div class="tab" onclick="showTab('analytics')"><div class="tab-icon">📊</div><div class="tab-label">Аналитика</div></div>
+      <div class="tab" onclick="showTab('profile')"><div class="tab-icon">⚙️</div><div class="tab-label">Профиль</div></div>
+    </div>
+  </div>
+
   <!-- ═══════════ SCREEN 3: CHAT ═══════════ -->
   <div class="screen" id="screen-chat">
     <div class="nav-row">
@@ -1968,6 +2029,97 @@
       e.target.classList.add('active');
     }
   });
+
+  /* ── TABS ── */
+  function showTab(tab) {
+    document.getElementById('screen-clients').classList.remove('active');
+    document.getElementById('screen-schedule').classList.remove('active');
+    if (tab === 'clients') document.getElementById('screen-clients').classList.add('active');
+    if (tab === 'schedule') { document.getElementById('screen-schedule').classList.add('active'); initSchedule(); }
+  }
+
+  /* ── SCHEDULE ── */
+  const SCHEDULE_DATA = {
+    0: [], // воскресенье
+    1: [ // понедельник
+      { time: '09:00', dur: '60 мин', name: 'Силовая A — Ноги', client: 'Алиса Козлова', color: '#ff6b6b', tag: 'Силовая', tagBg: 'rgba(255,107,107,0.15)' },
+      { time: '11:00', dur: '45 мин', name: 'Кардио — Зона 2', client: 'Игорь Петров', color: '#6c63ff', tag: 'Кардио', tagBg: 'rgba(108,99,255,0.15)' },
+      { time: '18:00', dur: '60 мин', name: 'Силовая B — Верх', client: 'Михаил Воронов', color: '#f5a623', tag: 'Силовая', tagBg: 'rgba(245,166,35,0.15)' },
+    ],
+    2: [ // вторник
+      { time: '10:00', dur: '55 мин', name: 'Рельеф — Верх', client: 'Дарья Смирнова', color: '#43e97b', tag: 'Силовая', tagBg: 'rgba(67,233,123,0.15)' },
+      { time: '19:00', dur: '45 мин', name: 'HIIT', client: 'Наталья Лебедева', color: '#00c6fb', tag: 'Кардио', tagBg: 'rgba(0,198,251,0.15)' },
+    ],
+    3: [ // среда
+      { time: '09:00', dur: '60 мин', name: 'Силовая A — Ноги', client: 'Артём Морозов', color: '#f093fb', tag: 'Силовая', tagBg: 'rgba(240,147,251,0.15)' },
+      { time: '11:30', dur: '50 мин', name: 'Функциональная', client: 'Алиса Козлова', color: '#ff6b6b', tag: 'Функц.', tagBg: 'rgba(255,107,107,0.15)' },
+    ],
+    4: [ // четверг
+      { time: '10:00', dur: '45 мин', name: 'Кардио — Бег', client: 'Игорь Петров', color: '#6c63ff', tag: 'Кардио', tagBg: 'rgba(108,99,255,0.15)' },
+      { time: '17:00', dur: '60 мин', name: 'Силовая — Спина', client: 'Михаил Воронов', color: '#f5a623', tag: 'Силовая', tagBg: 'rgba(245,166,35,0.15)' },
+      { time: '19:30', dur: '55 мин', name: 'Пилатес', client: 'Дарья Смирнова', color: '#43e97b', tag: 'Растяжка', tagBg: 'rgba(67,233,123,0.15)' },
+    ],
+    5: [ // пятница
+      { time: '09:00', dur: '60 мин', name: 'Силовая B — Верх', client: 'Алиса Козлова', color: '#ff6b6b', tag: 'Силовая', tagBg: 'rgba(255,107,107,0.15)' },
+      { time: '18:00', dur: '45 мин', name: 'Кардио — Велосипед', client: 'Артём Морозов', color: '#f093fb', tag: 'Кардио', tagBg: 'rgba(240,147,251,0.15)' },
+    ],
+    6: [ // суббота
+      { time: '11:00', dur: '70 мин', name: 'Силовая A — Ноги', client: 'Алиса Козлова', color: '#ff6b6b', tag: 'Силовая', tagBg: 'rgba(255,107,107,0.15)' },
+      { time: '13:00', dur: '60 мин', name: 'Силовая — Ноги', client: 'Наталья Лебедева', color: '#00c6fb', tag: 'Силовая', tagBg: 'rgba(0,198,251,0.15)' },
+    ],
+  };
+
+  const DAY_NAMES = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  let selectedDay = new Date().getDay();
+
+  function initSchedule() {
+    renderWeekStrip();
+    renderDaySchedule(selectedDay);
+  }
+
+  function renderWeekStrip() {
+    const strip = document.getElementById('week-strip');
+    const today = new Date().getDay();
+    strip.innerHTML = DAY_NAMES.map((name, i) => {
+      const date = 9 + ((i - 1 + 7) % 7); // dates 9-15 june
+      const hasEvents = SCHEDULE_DATA[i] && SCHEDULE_DATA[i].length > 0;
+      const isActive = i === selectedDay;
+      const isToday = i === today;
+      return `<div class="week-day ${isActive ? 'active' : ''} ${isToday ? 'today' : ''} ${!hasEvents ? 'empty' : ''}" onclick="selectDay(${i})">
+        <div class="day-label">${name}</div>
+        <div class="day-num">${date}</div>
+        <div class="day-dot"></div>
+      </div>`;
+    }).join('');
+  }
+
+  function selectDay(day) {
+    selectedDay = day;
+    renderWeekStrip();
+    renderDaySchedule(day);
+  }
+
+  function renderDaySchedule(day) {
+    const list = document.getElementById('schedule-list');
+    const items = SCHEDULE_DATA[day] || [];
+    if (!items.length) {
+      list.innerHTML = `<div class="empty-day">Тренировок нет<br><span style="font-size:12px">Свободный день — можно запланировать</span></div>`;
+      return;
+    }
+    list.innerHTML = items.map((item, i) => `
+      <div class="schedule-item" onclick="showClient('alice')">
+        <div class="schedule-time-col">
+          <div class="schedule-time">${item.time}</div>
+          ${i < items.length - 1 ? '<div class="schedule-line"></div>' : ''}
+        </div>
+        <div style="width:4px;height:4px;border-radius:50%;background:${item.color};flex-shrink:0;margin-top:2px"></div>
+        <div class="schedule-info">
+          <div class="schedule-name">${item.name}</div>
+          <div class="schedule-client">${item.client} · ${item.dur}</div>
+        </div>
+        <div class="schedule-tag" style="background:${item.tagBg};color:${item.color}">${item.tag}</div>
+      </div>`).join('');
+  }
 
   /* ── EXERCISE BUILDER ── */
   function openExerciseBuilder() {
