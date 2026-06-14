@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CoachSpace — Тренер</title>
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --card: #16161d;
+      --card2: #1c1c26;
+      --border: #2a2a38;
+      --accent: #6c63ff;
+      --accent2: #ff6b6b;
+      --accent3: #43e97b;
+      --text: #e8e8f0;
+      --muted: #7a7a96;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    }
+
+    /* ── PHONE SHELL ── */
+    .phone {
+      width: 100%;
+      max-width: 390px;
+      height: 100vh;
+      max-height: 844px;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 420px) {
+      body { background: #111; }
+      .phone {
+        border-radius: 44px;
+        box-shadow: 0 0 0 1px #333, 0 40px 80px rgba(0,0,0,0.8);
+        height: 844px;
+      }
+    }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      height: 44px;
+      padding: 14px 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .status-time { font-size: 15px; font-weight: 700; color: var(--text); }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .status-icons svg { fill: var(--text); }
+
+    /* ── SCREEN ── */
+    .screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+    }
+    .screen.active { display: flex; }
+
+    .screen-scroll {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .screen-scroll::-webkit-scrollbar { display: none; }
+
+    /* ── NAV BAR ── */
+    .nav-bar {
+      padding: 16px 24px 8px;
+      flex-shrink: 0;
+    }
+    .nav-bar h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .nav-bar .subtitle { font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+    .nav-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 24px 8px;
+      flex-shrink: 0;
+    }
+    .nav-back {
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .nav-back svg { stroke: var(--text); }
+    .nav-title { font-size: 18px; font-weight: 700; color: var(--text); }
+
+    /* ── SEARCH ── */
+    .search-wrap { padding: 8px 24px 16px; flex-shrink: 0; }
+    .search {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 14px;
+      display: flex; gap: 8px; align-items: center;
+    }
+    .search input {
+      background: none; border: none; outline: none;
+      color: var(--text); font-size: 15px; flex: 1;
+    }
+    .search input::placeholder { color: var(--muted); }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 24px 10px;
+    }
+
+    /* ── CLIENT LIST ── */
+    .clients-list { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; padding-bottom: 100px; }
+
+    .client-row {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .client-row:active { border-color: var(--accent); background: var(--card2); }
+
+    .avatar {
+      width: 48px; height: 48px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800;
+      flex-shrink: 0;
+      color: white;
+    }
+    .client-info { flex: 1; min-width: 0; }
+    .client-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .client-meta { font-size: 12px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .client-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .badge {
+      font-size: 11px; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px;
+    }
+    .badge.green { background: rgba(67,233,123,0.15); color: #43e97b; }
+    .badge.orange { background: rgba(245,166,35,0.15); color: #f5a623; }
+    .badge.red { background: rgba(255,107,107,0.15); color: var(--accent2); }
+    .badge.purple { background: rgba(108,99,255,0.15); color: var(--accent); }
+    .time-ago { font-size: 11px; color: var(--muted); }
+
+    /* ── ALERT CARD ── */
+    .alert-card {
+      margin: 0 16px 16px;
+      background: rgba(108,99,255,0.12);
+      border: 1px solid rgba(108,99,255,0.35);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .alert-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .alert-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+    .alert-text strong { color: var(--accent); }
+
+    /* ── TABS ── */
+    .tab-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(15,15,19,0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      padding: 8px 0 20px;
+    }
+    .tab {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      cursor: pointer;
+      padding: 6px 0;
+    }
+    .tab-icon { font-size: 22px; line-height: 1; }
+    .tab-label { font-size: 10px; font-weight: 600; color: var(--muted); }
+    .tab.active .tab-label { color: var(--accent); }
+    .tab.active .tab-icon { filter: drop-shadow(0 0 6px var(--accent)); }
+
+    /* ═══ CLIENT CARD SCREEN ═══ */
+    .client-header {
+      padding: 0 24px 20px;
+      display: flex; gap: 16px; align-items: center;
+    }
+    .avatar-lg {
+      width: 64px; height: 64px;
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 800; color: white;
+      flex-shrink: 0;
+    }
+    .client-header-info h2 { font-size: 22px; font-weight: 800; color: var(--text); }
+    .client-header-info p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 24px 20px; }
+    .chip {
+      font-size: 12px; padding: 5px 12px; border-radius: 20px;
+      border: 1px solid var(--border); color: #ccc;
+      background: var(--card2);
+    }
+    .chip.accent { background: rgba(108,99,255,0.15); color: var(--accent); border-color: rgba(108,99,255,0.3); }
+
+    /* stats row */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; padding: 0 16px 20px;
+    }
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat-box .val {
+      font-size: 20px; font-weight: 800;
+      background: linear-gradient(135deg, #fff, var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-box .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* wearable block */
+    .section-card {
+      margin: 0 16px 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .section-card-header {
+      padding: 14px 16px 10px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .section-card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .section-card-action { font-size: 12px; color: var(--accent); font-weight: 600; }
+
+    .wearable-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1px; background: var(--border);
+    }
+    .wearable-cell {
+      background: var(--card);
+      padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .wearable-icon { font-size: 22px; flex-shrink: 0; }
+    .wearable-val { font-size: 16px; font-weight: 700; color: var(--text); line-height: 1; }
+    .wearable-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* AI tip */
+    .ai-tip {
+      margin: 0 16px 14px;
+      background: linear-gradient(135deg, rgba(108,99,255,0.18), rgba(67,233,123,0.08));
+      border: 1px solid rgba(108,99,255,0.4);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .ai-tip-header { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .ai-tip-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); }
+    .ai-tip-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+    .ai-tip-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-small {
+      flex: 1; padding: 9px; border-radius: 12px; border: none;
+      font-size: 13px; font-weight: 700; cursor: pointer; text-align: center;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-ghost { background: rgba(255,255,255,0.07); color: var(--text); }
+
+    /* workout list */
+    .workout-row {
+      padding: 12px 16px;
+      display: flex; gap: 12px; align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .workout-row:last-child { border-bottom: none; }
+    .workout-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0; margin-top: 3px;
+    }
+    .workout-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .workout-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .workout-right { margin-left: auto; text-align: right; flex-shrink: 0; white-space: nowrap; }
+    .workout-date { font-size: 12px; color: var(--muted); }
+    .workout-score { font-size: 12px; font-weight: 700; color: var(--accent3); }
+    .workout-detail { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; }
+
+    /* ═══ CHAT SCREEN ═══ */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 16px;
+    }
+    .chat-messages::-webkit-scrollbar { display: none; }
+
+    .msg { max-width: 78%; display: flex; flex-direction: column; gap: 3px; }
+    .msg.out { align-self: flex-end; align-items: flex-end; }
+    .msg.in { align-self: flex-start; }
+
+    .bubble {
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .msg.out .bubble {
+      background: var(--accent);
+      border-radius: 18px 18px 4px 18px;
+    }
+    .msg.in .bubble {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 18px 18px 18px 4px;
+    }
+    .msg-time { font-size: 11px; color: var(--muted); }
+
+    .msg-data {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display: flex; gap: 10px; align-items: center;
+      max-width: 220px;
+    }
+    .msg-data-icon { font-size: 24px; }
+    .msg-data-val { font-size: 15px; font-weight: 700; color: var(--text); }
+    .msg-data-lbl { font-size: 11px; color: var(--muted); }
+
+    .chat-input-wrap {
+      padding: 10px 16px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+    .chat-quick { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+    .chat-quick::-webkit-scrollbar { display: none; }
+    .quick-btn {
+      white-space: nowrap;
+      font-size: 12px; font-weight: 600;
+      padding: 6px 12px; border-radius: 20px;
+      background: rgba(108,99,255,0.15);
+      border: 1px solid rgba(108,99,255,0.3);
+      color: var(--accent); cursor: pointer;
+    }
+    .chat-row { display: flex; gap: 8px; align-items: flex-end; }
+    .chat-field {
+      flex: 1;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 10px 16px;
+      font-size: 15px; color: var(--text);
+      outline: none; resize: none;
+      font-family: inherit;
+      max-height: 100px;
+    }
+    .chat-field::placeholder { color: var(--muted); }
+    .send-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── SCROLL PADDING ── */
+    .pb-tab { padding-bottom: 90px; }
+
+    /* ═══ WORKOUT SCREEN ═══ */
+    .exercise-block {
+      margin: 0 16px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .exercise-header {
+      padding: 14px 16px;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer;
+    }
+    .exercise-num {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: rgba(108,99,255,0.2);
+      color: var(--accent);
+      font-size: 13px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .exercise-name-input {
+      flex: 1; background: none; border: none; outline: none;
+      font-size: 15px; font-weight: 700; color: var(--text);
+      font-family: inherit;
+    }
+    .exercise-name-input::placeholder { color: var(--muted); font-weight: 400; }
+    .exercise-chevron {
+      font-size: 12px; color: var(--muted);
+      transition: transform 0.2s;
+    }
+    .exercise-chevron.open { transform: rotate(180deg); }
+
+    .sets-table {
+      border-top: 1px solid var(--border);
+    }
+    .sets-header {
+      display: grid;
+      grid-template-columns: 32px 1fr 1fr;
+      gap: 0;
+      padding: 8px 14px;
+      background: var(--card2);
+    }
+    .sets-header span {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted); text-align: center;
+    }
+    .sets-header span:first-child { text-align: left; }
+
+    .set-row {
+      display: grid;
+      grid-template-columns: 32px 1fr 1fr;
+      gap: 0;
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+      align-items: center;
+    }
+    .set-num { font-size: 13px; color: var(--muted); font-weight: 600; }
+    .set-cell {
+      text-align: center;
+    }
+    .set-input {
+      width: 100%; max-width: 64px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 4px;
+      text-align: center;
+      font-size: 15px; font-weight: 700;
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    .set-input::-webkit-inner-spin-button,
+    .set-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .set-input:focus { border-color: var(--accent); }
+
+    .add-set-btn {
+      width: 100%;
+      padding: 11px;
+      background: none;
+      border: none;
+      border-top: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 14px; font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .exercise-rest {
+      padding: 8px 16px;
+      display: flex; align-items: center; gap: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .rest-label { font-size: 12px; color: var(--muted); }
+    .rest-chips { display: flex; gap: 6px; }
+    .rest-chip {
+      font-size: 12px; font-weight: 600;
+      padding: 4px 10px; border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--muted); cursor: pointer;
+      background: none;
+    }
+    .rest-chip.active { background: rgba(108,99,255,0.15); color: var(--accent); border-color: rgba(108,99,255,0.35); }
+
+    .exercise-note {
+      padding: 0 16px 12px;
+      border-top: 1px solid var(--border);
+    }
+    .exercise-note textarea {
+      width: 100%; background: none; border: none;
+      outline: none; color: var(--muted);
+      font-size: 13px; font-family: inherit;
+      resize: none; padding-top: 10px;
+    }
+    .exercise-note textarea::placeholder { color: var(--border); }
+
+    .add-exercise-btn {
+      margin: 0 16px 16px;
+      width: calc(100% - 32px);
+      padding: 14px;
+      background: var(--card);
+      border: 1.5px dashed var(--border);
+      border-radius: 18px;
+      color: var(--muted);
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .add-exercise-btn:active { border-color: var(--accent); color: var(--accent); }
+
+    .workout-meta-row {
+      padding: 0 16px 16px;
+      display: flex; gap: 10px;
+    }
+    .workout-meta-input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 14px; font-family: inherit;
+      outline: none;
+    }
+    .workout-meta-input:focus { border-color: var(--accent); }
+    .workout-meta-input::placeholder { color: var(--muted); }
+
+    .save-workout-btn {
+      margin: 0 16px 32px;
+      width: calc(100% - 32px);
+      padding: 16px;
+      background: var(--accent);
+      border: none; border-radius: 16px;
+      color: white; font-size: 16px; font-weight: 800;
+      cursor: pointer; font-family: inherit;
+    }
+    .save-workout-btn:active { opacity: 0.85; }
+
+    /* ═══ REPORT SCREEN ═══ */
+    .report-generating {
+      margin: 0 16px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px 16px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 16px;
+      text-align: center;
+    }
+    .report-section {
+      margin: 0 16px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .report-section-header {
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card2);
+    }
+    .report-section-icon { font-size: 16px; }
+    .report-section-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .report-section-body {
+      padding: 14px 16px;
+      font-size: 14px; color: var(--text);
+      line-height: 1.6;
+    }
+    .report-editable {
+      width: 100%; background: none; border: none; outline: none;
+      font-size: 14px; color: var(--text); line-height: 1.6;
+      font-family: inherit; resize: none; min-height: 80px;
+    }
+    .report-stat-row {
+      display: flex; gap: 0;
+    }
+    .report-stat {
+      flex: 1; text-align: center; padding: 12px 8px;
+      border-right: 1px solid var(--border);
+    }
+    .report-stat:last-child { border-right: none; }
+    .report-stat-val { font-size: 20px; font-weight: 800; color: var(--text); }
+    .report-stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .send-btn-wrap { padding: 0 16px 16px; }
+    .send-btn-main {
+      width: 100%; padding: 16px;
+      background: var(--accent3); color: #000;
+      border: none; border-radius: 16px;
+      font-size: 16px; font-weight: 800;
+      cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .send-btn-main:active { opacity: 0.85; }
+    .report-hint {
+      text-align: center; font-size: 12px; color: var(--muted);
+      padding: 0 16px 32px;
+    }
+
+    /* ── AI INPUT ── */
+    .ai-input-block {
+      margin: 0 16px 16px;
+      background: linear-gradient(135deg, rgba(108,99,255,0.12), rgba(67,233,123,0.06));
+      border: 1px solid rgba(108,99,255,0.35);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .ai-input-header {
+      padding: 12px 16px 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ai-input-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); }
+    .ai-input-row {
+      padding: 0 12px 12px;
+      display: flex; gap: 8px; align-items: flex-end;
+    }
+    .ai-textarea {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(108,99,255,0.25);
+      border-radius: 14px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px; font-family: inherit;
+      outline: none; resize: none;
+      line-height: 1.5;
+    }
+    .ai-textarea::placeholder { color: var(--muted); font-size: 13px; }
+    .ai-textarea:focus { border-color: var(--accent); }
+    .voice-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(108,99,255,0.2);
+      border: 1px solid rgba(108,99,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      font-size: 20px;
+      transition: all 0.2s;
+    }
+    .voice-btn.recording {
+      background: rgba(255,107,107,0.25);
+      border-color: var(--accent2);
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    .ai-parse-btn {
+      width: calc(100% - 24px);
+      margin: 0 12px 12px;
+      padding: 11px;
+      background: var(--accent);
+      border: none; border-radius: 12px;
+      color: white; font-size: 14px; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .ai-thinking {
+      padding: 10px 16px 14px;
+      font-size: 13px; color: var(--accent);
+      display: none; align-items: center; gap: 8px;
+    }
+    .dots span {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: dot-bounce 1.2s infinite;
+    }
+    .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dot-bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ── EXERCISE PICKER ── */
+    .picker-overlay {
+      display: none;
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      align-items: flex-end;
+      overflow: hidden;
+      border-radius: inherit;
+    }
+    .picker-overlay.open { display: flex; }
+    .picker-sheet {
+      width: 100%;
+      background: #1a1a24;
+      border-radius: 24px 24px 0 0;
+      max-height: 75%;
+      display: flex; flex-direction: column;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .picker-handle {
+      width: 36px; height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 12px auto 0;
+    }
+    .picker-header {
+      padding: 12px 16px 10px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .picker-title { font-size: 16px; font-weight: 700; color: var(--text); }
+    .picker-close {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--card2); border: none; cursor: pointer;
+      color: var(--muted); font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .picker-search {
+      margin: 0 16px 10px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 9px 14px;
+      display: flex; gap: 8px; align-items: center;
+    }
+    .picker-search input {
+      background: none; border: none; outline: none;
+      color: var(--text); font-size: 14px; flex: 1; font-family: inherit;
+    }
+    .picker-search input::placeholder { color: var(--muted); }
+    .picker-cats {
+      display: flex; gap: 6px;
+      padding: 0 16px 12px;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .picker-cats::-webkit-scrollbar { display: none; }
+    .picker-cat {
+      white-space: nowrap; font-size: 12px; font-weight: 700;
+      padding: 6px 14px; border-radius: 20px;
+      border: 1px solid var(--border); color: var(--muted);
+      background: none; cursor: pointer; font-family: inherit;
+    }
+    .picker-cat.active {
+      background: rgba(108,99,255,0.2);
+      color: var(--accent); border-color: rgba(108,99,255,0.4);
+    }
+    .picker-list {
+      overflow-y: auto; flex: 1;
+      padding: 0 16px 24px;
+      display: flex; flex-direction: column; gap: 4px;
+      scrollbar-width: none;
+    }
+    .picker-list::-webkit-scrollbar { display: none; }
+    .picker-item {
+      padding: 12px 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer;
+    }
+    .picker-item:active { border-color: var(--accent); background: var(--card2); }
+    .picker-item-name { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
+    .picker-item-cat { font-size: 11px; color: var(--muted); }
+
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div class="status-time">9:41</div>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.3"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity="0.5"/><rect x="9" y="0" width="3" height="12" rx="1" opacity="0.8"/><rect x="13.5" y="0" width="2.5" height="12" rx="1"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 2.4C5.6 2.4 3.4 3.4 1.8 5L0 3.2C2.1 1.2 4.9 0 8 0s5.9 1.2 8 3.2L14.2 5C12.6 3.4 10.4 2.4 8 2.4z" opacity="0.3"/><path d="M8 5.6c-1.6 0-3 .6-4.1 1.7L2.1 5.5C3.6 4 5.7 3 8 3s4.4 1 5.9 2.5l-1.8 1.8C11 6.2 9.6 5.6 8 5.6z" opacity="0.6"/><path d="M8 8.8c-.8 0-1.5.3-2 .8L8 12l2-2.4c-.5-.5-1.2-.8-2-.8z"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0" y="1" width="22" height="10" rx="3.5" stroke="white" stroke-width="1.2" fill="none" opacity="0.35"/><rect x="23" y="4" width="2" height="4" rx="1" fill="white" opacity="0.4"/><rect x="1.5" y="2.5" width="17" height="7" rx="2" fill="white"/></svg>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCREEN 1: CLIENTS ═══════════ -->
+  <div class="screen active" id="screen-clients">
+    <div class="nav-bar">
+      <h1>Мои клиенты</h1>
+      <div class="subtitle">6 активных · Июнь 2026</div>
+    </div>
+
+    <div class="search-wrap">
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7a7a96" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Найти клиента..." />
+      </div>
+    </div>
+
+    <div class="screen-scroll pb-tab">
+
+      <!-- AI-alert -->
+      <div class="alert-card">
+        <div class="alert-icon alice-icon"></div>
+        <div class="alert-text"><strong>Алиса:</strong> У Алисы ЧСС покоя выросло на 8 уд/мин за неделю — возможно перетренированность. Рекомендую снизить нагрузку.</div>
+      </div>
+
+      <div class="section-label">Требуют внимания</div>
+      <div class="clients-list">
+
+        <div class="client-row" onclick="showClient('alice')">
+          <div class="avatar" style="background:linear-gradient(135deg,#ff6b6b,#c0143c)">АК</div>
+          <div class="client-info">
+            <div class="client-name">Алиса Козлова</div>
+            <div class="client-meta">❤️ ЧСС покоя: 74 уд/мин ↑ · Тренировка сегодня</div>
+          </div>
+          <div class="client-right">
+            <span class="badge orange">Риск</span>
+            <span class="time-ago">2 мин</span>
+          </div>
+        </div>
+
+        <div class="client-row" onclick="showChat('mike')">
+          <div class="avatar" style="background:linear-gradient(135deg,#f5a623,#c47d00)">МВ</div>
+          <div class="client-info">
+            <div class="client-name">Михаил Воронов</div>
+            <div class="client-meta">💬 Новое сообщение: «Можно заменить...»</div>
+          </div>
+          <div class="client-right">
+            <span class="badge purple">1 сообщ.</span>
+            <span class="time-ago">14 мин</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="section-label" style="margin-top:8px">Все клиенты</div>
+      <div class="clients-list">
+
+        <div class="client-row" onclick="showClient('daria')">
+          <div class="avatar" style="background:linear-gradient(135deg,#43e97b,#0a7c34)">ДС</div>
+          <div class="client-info">
+            <div class="client-name">Дарья Смирнова</div>
+            <div class="client-meta">✅ Выполнила план на 100% · Garmin</div>
+          </div>
+          <div class="client-right">
+            <span class="badge green">Отлично</span>
+            <span class="time-ago">1 ч</span>
+          </div>
+        </div>
+
+        <div class="client-row">
+          <div class="avatar" style="background:linear-gradient(135deg,#6c63ff,#3a2fa0)">ИП</div>
+          <div class="client-info">
+            <div class="client-name">Игорь Петров</div>
+            <div class="client-meta">🏃 Бег 12 км · Пульс зона 2</div>
+          </div>
+          <div class="client-right">
+            <span class="badge green">В форме</span>
+            <span class="time-ago">3 ч</span>
+          </div>
+        </div>
+
+        <div class="client-row">
+          <div class="avatar" style="background:linear-gradient(135deg,#00c6fb,#005bea)">НЛ</div>
+          <div class="client-info">
+            <div class="client-name">Наталья Лебедева</div>
+            <div class="client-meta">😴 Пропустила 2 тренировки подряд</div>
+          </div>
+          <div class="client-right">
+            <span class="badge red">Пропуск</span>
+            <span class="time-ago">2 дня</span>
+          </div>
+        </div>
+
+        <div class="client-row">
+          <div class="avatar" style="background:linear-gradient(135deg,#f093fb,#a834b3)">АМ</div>
+          <div class="client-info">
+            <div class="client-name">Артём Морозов</div>
+            <div class="client-meta">💪 Силовая · Новый рекорд в приседе!</div>
+          </div>
+          <div class="client-right">
+            <span class="badge green">PR 🎉</span>
+            <span class="time-ago">5 ч</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+      <div class="tab active">
+        <div class="tab-icon">👥</div>
+        <div class="tab-label">Клиенты</div>
+      </div>
+      <div class="tab">
+        <div class="tab-icon">📅</div>
+        <div class="tab-label">Расписание</div>
+      </div>
+      <div class="tab">
+        <div class="tab-icon">📊</div>
+        <div class="tab-label">Аналитика</div>
+      </div>
+      <div class="tab">
+        <div class="tab-icon">⚙️</div>
+        <div class="tab-label">Профиль</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCREEN 2: CLIENT CARD ═══════════ -->
+  <div class="screen" id="screen-client">
+    <div class="nav-row">
+      <div class="nav-back" onclick="goBack()">
+        <svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1L1 7l6 6"/></svg>
+      </div>
+      <div class="nav-title" id="client-screen-title">Алиса Козлова</div>
+      <div id="nav-client-avatar" onclick="showChat('alice')" style="margin-left:auto;width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#ff6b6b,#c0143c);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:white;cursor:pointer;flex-shrink:0">АК</div>
+    </div>
+
+    <div class="screen-scroll">
+      <!-- header -->
+
+      <div style="padding: 0 24px 20px; display:flex; align-items:center; gap:8px">
+        <span style="font-size:15px">🎯</span>
+        <span style="font-size:14px; color:var(--muted)">Цель: <span style="color:var(--text); font-weight:600">похудеть с 60 до 55 кг к сентябрю</span></span>
+      </div>
+
+      <!-- stats -->
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="val">18</div>
+          <div class="lbl">Тренировок</div>
+        </div>
+        <div class="stat-box">
+          <div class="val">87%</div>
+          <div class="lbl">Выполнение</div>
+        </div>
+        <div class="stat-box">
+          <div class="val">−2.1</div>
+          <div class="lbl">кг за мес.</div>
+        </div>
+      </div>
+
+      <!-- AI tip -->
+      <div class="ai-tip">
+        <div class="ai-tip-header">
+          <span class="alice-icon"></span>
+          <span class="ai-tip-label">Алиса</span>
+        </div>
+        <div class="ai-tip-text">ЧСС покоя Алисы выросло с 66 до 74 уд/мин за неделю. Сон — 5.8 ч (норма 7–8). Рекомендую заменить силовую в пятницу на восстановительную кардио-сессию и добавить день отдыха.</div>
+      </div>
+
+      <!-- wearable -->
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-card-title">⌚ Apple Watch · Сегодня</div>
+          <div class="section-card-action">История →</div>
+        </div>
+        <div class="wearable-grid">
+          <div class="wearable-cell">
+            <div class="wearable-icon">❤️</div>
+            <div>
+              <div class="wearable-val">74 <span style="font-size:12px;color:var(--accent2)">↑</span></div>
+              <div class="wearable-lbl">ЧСС покоя</div>
+            </div>
+          </div>
+          <div class="wearable-cell">
+            <div class="wearable-icon">😴</div>
+            <div>
+              <div class="wearable-val">5.8 ч</div>
+              <div class="wearable-lbl">Сон</div>
+            </div>
+          </div>
+          <div class="wearable-cell">
+            <div class="wearable-icon">🔥</div>
+            <div>
+              <div class="wearable-val">1 840</div>
+              <div class="wearable-lbl">Ккал активно</div>
+            </div>
+          </div>
+          <div class="wearable-cell">
+            <div class="wearable-icon">🦶</div>
+            <div>
+              <div class="wearable-val">8 430</div>
+              <div class="wearable-lbl">Шагов</div>
+            </div>
+          </div>
+          <div class="wearable-cell">
+            <div class="wearable-icon">🫁</div>
+            <div>
+              <div class="wearable-val">96%</div>
+              <div class="wearable-lbl">SpO₂</div>
+            </div>
+          </div>
+          <div class="wearable-cell">
+            <div class="wearable-icon">⚡</div>
+            <div>
+              <div class="wearable-val" style="color:#f5a623">62%</div>
+              <div class="wearable-lbl">Восст.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- workout history -->
+      <!-- upcoming -->
+      <div class="section-card" style="margin-bottom:14px">
+        <div class="section-card-header">
+          <div class="section-card-title">📅 Предстоит</div>
+          <div class="section-card-action" onclick="showNewWorkout()" style="cursor:pointer">+ Добавить</div>
+        </div>
+
+        <div class="workout-row" onclick="showWorkout()" style="cursor:pointer">
+          <div class="workout-dot" style="background:var(--accent)"></div>
+          <div>
+            <div class="workout-name">Силовая B — Верх</div>
+            <div class="workout-detail">Жим лёжа · Тяга · Плечи · ~55 мин</div>
+          </div>
+          <div class="workout-right">
+            <div class="workout-date" style="color:var(--accent);font-weight:600">Завтра</div>
+            <div class="workout-score" style="color:var(--muted);font-weight:400;font-size:11px">10:00</div>
+          </div>
+        </div>
+
+        <div class="workout-row">
+          <div class="workout-dot" style="background:var(--muted)"></div>
+          <div>
+            <div class="workout-name">Кардио — Зона 2</div>
+            <div class="workout-detail">Бег 5 км · пульс 130–145</div>
+          </div>
+          <div class="workout-right">
+            <div class="workout-date">Чт</div>
+            <div class="workout-score" style="color:var(--muted);font-weight:400;font-size:11px">09:00</div>
+          </div>
+        </div>
+
+        <div class="workout-row">
+          <div class="workout-dot" style="background:var(--muted)"></div>
+          <div>
+            <div class="workout-name">Силовая A — Ноги</div>
+            <div class="workout-detail">Присед · Жим ногами · Румынская тяга</div>
+          </div>
+          <div class="workout-right">
+            <div class="workout-date">Сб</div>
+            <div class="workout-score" style="color:var(--muted);font-weight:400;font-size:11px">11:00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- history -->
+      <div class="section-card" style="margin-bottom:24px">
+        <div class="section-card-header">
+          <div class="section-card-title">📋 История</div>
+          <div class="section-card-action">Все →</div>
+        </div>
+
+        <div class="workout-row" onclick="showWorkout()" style="cursor:pointer">
+          <div class="workout-dot" style="background:#43e97b"></div>
+          <div>
+            <div class="workout-name">Силовая A — Ноги</div>
+            <div class="workout-detail">Присед 4×8 · Жим ногами 3×12 · 58 мин</div>
+          </div>
+          <div class="workout-right">
+            <div class="workout-date">Сегодня</div>
+            <div class="workout-score">✅ Выполнено</div>
+          </div>
+        </div>
+        <div class="workout-row">
+          <div class="workout-dot" style="background:#43e97b"></div>
+          <div>
+            <div class="workout-name">Кардио — Интервалы</div>
+            <div class="workout-detail">5 км · 28:14 · ЧСС ср. 158</div>
+          </div>
+          <div class="workout-right">
+            <div class="workout-date">Вчера</div>
+            <div class="workout-score">✅ Выполнено</div>
+          </div>
+        </div>
+        <div class="workout-row">
+          <div class="workout-dot" style="background:#f5a623"></div>
+          <div>
+            <div class="workout-name">Силовая B — Верх</div>
+            <div class="workout-detail">Жим лёжа 3×8 · Тяга в наклоне 3×10</div>
+          </div>
+          <div class="workout-right">
+            <div class="workout-date">Пн</div>
+            <div class="workout-score" style="color:#f5a623">⚠️ Частично</div>
+          </div>
+        </div>
+        <div class="workout-row">
+          <div class="workout-dot" style="background:#ff6b6b"></div>
+          <div>
+            <div class="workout-name">Кардио — Бег</div>
+            <div class="workout-detail">Запланировано 6 км</div>
+          </div>
+          <div class="workout-right">
+            <div class="workout-date">Вс</div>
+            <div class="workout-score" style="color:#ff6b6b">✗ Пропущено</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCREEN 4: WORKOUT ═══════════ -->
+  <div class="screen" id="screen-workout">
+    <div class="nav-row">
+      <div class="nav-back" onclick="goBackFromWorkout()">
+        <svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1L1 7l6 6"/></svg>
+      </div>
+      <div>
+        <div class="nav-title">Силовая A — Ноги</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px">Алиса Козлова · Сегодня</div>
+      </div>
+      <div style="margin-left:auto;font-size:11px;font-weight:700;color:var(--accent3)" id="offline-badge">● Оффлайн</div>
+    </div>
+
+    <div class="screen-scroll">
+
+      <!-- AI input -->
+      <div class="ai-input-block" id="ai-input-block">
+        <div class="ai-input-header">
+          <span class="alice-icon"></span>
+          <span class="ai-input-label">Алиса</span>
+        </div>
+        <div style="padding: 0 12px 4px">
+          <textarea class="ai-textarea" id="ai-textarea" rows="3" placeholder="Опишите тренировку словами:&#10;«присед 4х8 60 кг, жим лёжа 3х10 50 кг»" style="width:100%"></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;padding:0 12px 12px">
+          <button class="voice-btn" id="voice-btn" onclick="toggleVoice()">🎙</button>
+          <button onclick="parseWorkout()" style="width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+        <div class="ai-thinking" id="ai-thinking">
+          <div class="dots"><span></span><span></span><span></span></div>
+          Алиса разбирает тренировку...
+        </div>
+      </div>
+
+      <!-- workout name -->
+      <div style="padding: 0 16px 12px">
+        <input class="workout-meta-input" placeholder="Название тренировки" value="Силовая A — Ноги" style="width:100%"/>
+      </div>
+
+      <!-- exercises -->
+      <div id="exercises-container">
+
+        <!-- Exercise 1 -->
+        <div class="exercise-block" data-ex="0">
+          <div class="exercise-header" onclick="toggleEx(this)">
+            <div class="exercise-num">1</div>
+            <input class="exercise-name-input" value="Присед со штангой" placeholder="Упражнение..." />
+            <div class="exercise-chevron open">▼</div>
+          </div>
+          <div class="sets-table">
+            <div class="sets-header">
+              <span>#</span>
+              <span>Повт.</span>
+              <span>Вес, кг</span>
+            </div>
+            <div class="set-row">
+              <div class="set-num">1</div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="8" /></div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="60" /></div>
+            </div>
+            <div class="set-row">
+              <div class="set-num">2</div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="8" /></div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="60" /></div>
+            </div>
+            <div class="set-row">
+              <div class="set-num">3</div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="8" /></div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="65" /></div>
+            </div>
+            <div class="set-row">
+              <div class="set-num">4</div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="6" /></div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="70" /></div>
+            </div>
+            <button class="add-set-btn" onclick="addSet(this)">+ Добавить сет</button>
+          </div>
+          <div class="exercise-rest">
+            <span class="rest-label">Отдых:</span>
+            <div class="rest-chips">
+              <button class="rest-chip">60с</button>
+              <button class="rest-chip active">90с</button>
+              <button class="rest-chip">120с</button>
+              <button class="rest-chip">180с</button>
+            </div>
+          </div>
+          <div class="exercise-note">
+            <textarea rows="1" placeholder="Заметка тренера (техника, акцент…)">Следить за глубиной — ниже параллели</textarea>
+          </div>
+        </div>
+
+        <!-- Exercise 2 -->
+        <div class="exercise-block" data-ex="1">
+          <div class="exercise-header" onclick="toggleEx(this)">
+            <div class="exercise-num">2</div>
+            <input class="exercise-name-input" value="Жим ногами" placeholder="Упражнение..." />
+            <div class="exercise-chevron open">▼</div>
+          </div>
+          <div class="sets-table">
+            <div class="sets-header">
+              <span>#</span>
+              <span>Повт.</span>
+              <span>Вес, кг</span>
+            </div>
+            <div class="set-row">
+              <div class="set-num">1</div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="12" /></div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="100" /></div>
+            </div>
+            <div class="set-row">
+              <div class="set-num">2</div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="12" /></div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="110" /></div>
+            </div>
+            <div class="set-row">
+              <div class="set-num">3</div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="10" /></div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="120" /></div>
+            </div>
+            <button class="add-set-btn" onclick="addSet(this)">+ Добавить сет</button>
+          </div>
+          <div class="exercise-rest">
+            <span class="rest-label">Отдых:</span>
+            <div class="rest-chips">
+              <button class="rest-chip active">60с</button>
+              <button class="rest-chip">90с</button>
+              <button class="rest-chip">120с</button>
+              <button class="rest-chip">180с</button>
+            </div>
+          </div>
+          <div class="exercise-note">
+            <textarea rows="1" placeholder="Заметка тренера…"></textarea>
+          </div>
+        </div>
+
+        <!-- Exercise 3 -->
+        <div class="exercise-block" data-ex="2">
+          <div class="exercise-header" onclick="toggleEx(this)">
+            <div class="exercise-num">3</div>
+            <input class="exercise-name-input" value="Румынская тяга" placeholder="Упражнение..." />
+            <div class="exercise-chevron open">▼</div>
+          </div>
+          <div class="sets-table">
+            <div class="sets-header">
+              <span>#</span>
+              <span>Повт.</span>
+              <span>Вес, кг</span>
+            </div>
+            <div class="set-row">
+              <div class="set-num">1</div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="10" /></div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="40" /></div>
+            </div>
+            <div class="set-row">
+              <div class="set-num">2</div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="10" /></div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="45" /></div>
+            </div>
+            <div class="set-row">
+              <div class="set-num">3</div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="8" /></div>
+              <div class="set-cell"><input type="number" class="set-input plan-input" value="50" /></div>
+            </div>
+            <button class="add-set-btn" onclick="addSet(this)">+ Добавить сет</button>
+          </div>
+          <div class="exercise-rest">
+            <span class="rest-label">Отдых:</span>
+            <div class="rest-chips">
+              <button class="rest-chip">60с</button>
+              <button class="rest-chip active">90с</button>
+              <button class="rest-chip">120с</button>
+              <button class="rest-chip">180с</button>
+            </div>
+          </div>
+          <div class="exercise-note">
+            <textarea rows="1" placeholder="Заметка тренера…">Спина прямая, без округления</textarea>
+          </div>
+        </div>
+
+      </div><!-- /exercises-container -->
+
+      <button class="add-exercise-btn" onclick="openPicker()">
+        <span style="font-size:18px">＋</span> Добавить упражнение
+      </button>
+
+      <div style="height:1px;background:var(--border);margin:4px 16px 16px"></div>
+
+      <div style="padding: 0 16px 16px; display:flex; flex-direction:column; gap:8px">
+        <input class="workout-meta-input" placeholder="Длительность (мин)" type="number" style="width:100%" />
+        <input class="workout-meta-input" placeholder="Заметка к тренировке" style="width:100%" />
+      </div>
+
+      <button class="save-workout-btn" onclick="saveWorkout()">Сохранить тренировку</button>
+
+    </div><!-- /screen-scroll -->
+
+    <!-- exercise picker sheet -->
+    <div class="picker-overlay" id="picker-overlay" onclick="closePicker(event)">
+      <div class="picker-sheet">
+        <div class="picker-handle"></div>
+        <div class="picker-header">
+          <div class="picker-title">Добавить упражнение</div>
+          <button class="picker-close" onclick="closePicker()">✕</button>
+        </div>
+        <div class="picker-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7a7a96" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="picker-search-input" placeholder="Найти упражнение..." oninput="filterExercises()" />
+        </div>
+        <div class="picker-cats" id="picker-cats">
+          <button class="picker-cat active" onclick="setCat(this,'all')">Все</button>
+          <button class="picker-cat" onclick="setCat(this,'legs')">Ноги</button>
+          <button class="picker-cat" onclick="setCat(this,'chest')">Грудь</button>
+          <button class="picker-cat" onclick="setCat(this,'back')">Спина</button>
+          <button class="picker-cat" onclick="setCat(this,'shoulders')">Плечи</button>
+          <button class="picker-cat" onclick="setCat(this,'arms')">Руки</button>
+          <button class="picker-cat" onclick="setCat(this,'core')">Кор</button>
+          <button class="picker-cat" onclick="setCat(this,'cardio')">Кардио</button>
+        </div>
+        <div class="picker-list" id="picker-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════ SCREEN 5: REPORT ═══════════ -->
+  <div class="screen" id="screen-report">
+    <div class="nav-row">
+      <div class="nav-back" onclick="goBackFromReport()">
+        <svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1L1 7l6 6"/></svg>
+      </div>
+      <div>
+        <div class="nav-title">Отчёт для клиента</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px">Алиса Козлова · Сегодня</div>
+      </div>
+      <div id="report-nav-avatar" style="margin-left:auto;width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#ff6b6b,#c0143c);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:white">АК</div>
+    </div>
+
+    <!-- generating state -->
+    <div class="report-generating" id="report-generating">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <div style="font-size:14px;color:var(--muted)">Алиса составляет отчёт...</div>
+    </div>
+
+    <!-- report content (hidden while generating) -->
+    <div id="report-content" style="display:none;flex:1;overflow-y:auto;scrollbar-width:none">
+
+      <!-- ai badge -->
+      <div style="padding:0 16px 14px;display:flex;align-items:center;gap:8px">
+        <div style="background:rgba(108,99,255,0.15);border:1px solid rgba(108,99,255,0.3);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px"><span class="alice-icon" style="width:16px;height:16px;display:inline-flex"></span>Алиса · черновик, можно редактировать</div>
+      </div>
+
+      <!-- workout summary stats -->
+      <div class="report-section">
+        <div class="report-section-header">
+          <span class="report-section-icon">📊</span>
+          <span class="report-section-title">Итоги тренировки</span>
+        </div>
+        <div class="report-stat-row" id="report-stats">
+          <div class="report-stat">
+            <div class="report-stat-val" id="rep-exercises">3</div>
+            <div class="report-stat-lbl">Упражнения</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-val" id="rep-sets">10</div>
+            <div class="report-stat-lbl">Сетов</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-val" id="rep-volume">2 800</div>
+            <div class="report-stat-lbl">Тоннаж, кг</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- main report text -->
+      <div class="report-section">
+        <div class="report-section-header">
+          <span class="report-section-icon">✍️</span>
+          <span class="report-section-title">Текст отчёта</span>
+        </div>
+        <div class="report-section-body">
+          <textarea class="report-editable" id="report-text" rows="6">Алиса, отличная работа сегодня! 💪
+
+Сделали силовую на ноги: присед 4×8, жим ногами 3×12 и румынскую тягу 3×10. Держала хорошую технику, особенно в приседе — заметный прогресс по сравнению с прошлой неделей.
+
+Общий тоннаж: 2 800 кг. Это на 12% больше, чем в прошлый раз.</textarea>
+        </div>
+      </div>
+
+      <!-- wearable note -->
+      <div class="report-section">
+        <div class="report-section-header">
+          <span class="report-section-icon">⌚</span>
+          <span class="report-section-title">Данные трекера</span>
+        </div>
+        <div class="report-section-body">
+          <textarea class="report-editable" id="report-wearable" rows="3">Сегодня учли, что ЧСС покоя немного повышен (74 уд/мин) и сон был короче обычного. Поэтому снизили интенсивность кардио-блока — правильное решение.</textarea>
+        </div>
+      </div>
+
+      <!-- next session -->
+      <div class="report-section" style="margin-bottom:16px">
+        <div class="report-section-header">
+          <span class="report-section-icon">🎯</span>
+          <span class="report-section-title">Следующая тренировка</span>
+        </div>
+        <div class="report-section-body">
+          <textarea class="report-editable" id="report-next" rows="3">В четверг — кардио в зоне 2, 30 минут. Фокус на восстановление. В субботу вернёмся к силовым с небольшим повышением веса в приседе.</textarea>
+        </div>
+      </div>
+
+      <!-- send button -->
+      <div class="send-btn-wrap">
+        <button class="send-btn-main" onclick="sendReport()">
+          Отправить Алисе
+        </button>
+      </div>
+      <div class="report-hint">Отчёт придёт клиенту в приложение и на почту</div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════ SCREEN 3: CHAT ═══════════ -->
+  <div class="screen" id="screen-chat">
+    <div class="nav-row">
+      <div class="nav-back" onclick="goBackFromChat()">
+        <svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1L1 7l6 6"/></svg>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:13px;background:linear-gradient(135deg,#ff6b6b,#c0143c)" id="chat-avatar">АК</div>
+        <div>
+          <div class="nav-title" id="chat-name" style="font-size:16px">Алиса Козлова</div>
+          <div style="font-size:11px;color:#43e97b;margin-top:1px">онлайн</div>
+        </div>
+      </div>
+      <div style="margin-left:auto;font-size:20px">📞</div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+
+      <!-- system -->
+      <div style="text-align:center;font-size:11px;color:var(--muted);padding:4px 0">Сегодня, 9:15</div>
+
+      <!-- wearable card from watch -->
+      <div class="msg in">
+        <div class="msg-data">
+          <div class="msg-data-icon">⌚</div>
+          <div>
+            <div class="msg-data-val">ЧСС покоя: 74</div>
+            <div class="msg-data-lbl">Apple Watch · только что</div>
+          </div>
+        </div>
+        <div class="msg-time">9:15</div>
+      </div>
+
+      <div class="msg in">
+        <div class="bubble">Привет! Готова к тренировке 💪 Правда что-то спала плохо, 6 часов всего</div>
+        <div class="msg-time">9:22</div>
+      </div>
+
+      <div class="msg out">
+        <div class="bubble">Вижу по часам — ЧСС немного выше нормы. Давай сегодня сделаем чуть полегче? Заменим HIIT на 30 мин в зоне 2</div>
+        <div class="msg-time">9:31</div>
+      </div>
+
+      <div class="msg in">
+        <div class="bubble">Да, звучит хорошо. Можно вопрос по питанию — можно заменить творог на протеиновый коктейль после тренировки?</div>
+        <div class="msg-time">9:34</div>
+      </div>
+
+      <div class="msg out">
+        <div class="bubble">Да, можно! Изолят на воде — примерно такой же профиль: 25–30г белка. Главное в течение 40 минут после.</div>
+        <div class="msg-time">9:36</div>
+      </div>
+
+      <div style="text-align:center;font-size:11px;color:var(--muted);padding:4px 0">Только что</div>
+
+      <div class="msg in">
+        <div class="bubble">Отлично, спасибо! Иду тренироваться 🏃‍♀️</div>
+        <div class="msg-time">9:40</div>
+      </div>
+
+    </div>
+
+    <div class="chat-input-wrap">
+      <div class="chat-quick">
+        <div class="quick-btn">📋 Обновить план</div>
+        <div class="quick-btn">💪 Отправить тренировку</div>
+        <div class="quick-btn">📊 Показать прогресс</div>
+        <div class="quick-btn">✅ Подтвердить замену</div>
+      </div>
+      <div class="chat-row">
+        <textarea class="chat-field" placeholder="Написать Алисе..." rows="1" id="chat-input"></textarea>
+        <button class="send-btn" onclick="sendMessage()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let chatFrom = 'clients';
+
+  function showClient(id) {
+    document.getElementById('screen-clients').classList.remove('active');
+    const s = document.getElementById('screen-client');
+    s.classList.add('active');
+    if (id === 'daria') {
+      document.getElementById('client-screen-title').textContent = 'Дарья Смирнова';
+      document.getElementById('nav-client-avatar').style.background = 'linear-gradient(135deg,#43e97b,#0a7c34)';
+      document.getElementById('nav-client-avatar').textContent = 'ДС';
+      document.getElementById('nav-client-avatar').onclick = () => showChat('daria');
+    } else {
+      document.getElementById('client-screen-title').textContent = 'Алиса Козлова';
+      document.getElementById('nav-client-avatar').style.background = 'linear-gradient(135deg,#ff6b6b,#c0143c)';
+      document.getElementById('nav-client-avatar').textContent = 'АК';
+      document.getElementById('nav-client-avatar').onclick = () => showChat('alice');
+    }
+  }
+
+  function showChat(id) {
+    chatFrom = (document.getElementById('screen-client').classList.contains('active')) ? 'client' : 'clients';
+    document.getElementById('screen-clients').classList.remove('active');
+    document.getElementById('screen-client').classList.remove('active');
+    document.getElementById('screen-chat').classList.add('active');
+    if (id === 'mike') {
+      document.getElementById('chat-name').textContent = 'Михаил Воронов';
+      document.getElementById('chat-avatar').style.background = 'linear-gradient(135deg,#f5a623,#c47d00)';
+      document.getElementById('chat-avatar').textContent = 'МВ';
+    } else {
+      document.getElementById('chat-name').textContent = 'Алиса Козлова';
+      document.getElementById('chat-avatar').style.background = 'linear-gradient(135deg,#ff6b6b,#c0143c)';
+      document.getElementById('chat-avatar').textContent = 'АК';
+    }
+    scrollChat();
+  }
+
+  function goBack() {
+    document.getElementById('screen-client').classList.remove('active');
+    document.getElementById('screen-clients').classList.add('active');
+  }
+
+  function goBackFromChat() {
+    document.getElementById('screen-chat').classList.remove('active');
+    if (chatFrom === 'client') {
+      document.getElementById('screen-client').classList.add('active');
+    } else {
+      document.getElementById('screen-clients').classList.add('active');
+    }
+  }
+
+  function scrollChat() {
+    setTimeout(() => {
+      const c = document.getElementById('chat-messages');
+      c.scrollTop = c.scrollHeight;
+    }, 50);
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const messages = document.getElementById('chat-messages');
+    const now = new Date();
+    const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    const msg = document.createElement('div');
+    msg.className = 'msg out';
+    msg.innerHTML = `<div class="bubble">${text}</div><div class="msg-time">${time}</div>`;
+    messages.appendChild(msg);
+
+    input.value = '';
+    input.style.height = 'auto';
+    scrollChat();
+  }
+
+  // Alice icon SVG
+  const ALICE_ICON = `<svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="alice-g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#9B59F5"/><stop offset="100%" style="stop-color:#6B2FD9"/></linearGradient></defs><circle cx="12" cy="12" r="12" fill="url(#alice-g)"/><path d="M12 5.5 C9 5.5 6.5 8 6.5 11 C6.5 14.5 9.5 17.5 12 18.5 C14.5 17.5 17.5 14.5 17.5 11 C17.5 8 15 5.5 12 5.5Z" fill="white"/></svg>`;
+  document.querySelectorAll('.alice-icon').forEach(el => el.innerHTML = ALICE_ICON);
+
+  document.getElementById('ai-textarea').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); parseWorkout(); }
+  });
+
+  document.getElementById('chat-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  document.getElementById('chat-input').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+  });
+
+  scrollChat();
+
+  /* ── WORKOUT SCREEN ── */
+  function showWorkout() {
+    document.getElementById('screen-client').classList.remove('active');
+    document.getElementById('screen-workout').classList.add('active');
+  }
+
+  function showNewWorkout() {
+    document.querySelector('#screen-workout .nav-title').textContent = 'Новая тренировка';
+    document.querySelector('#screen-workout input.workout-meta-input').value = '';
+
+    document.getElementById('exercises-container').innerHTML = '';
+
+    // reset AI block
+    const aiBlock = document.getElementById('ai-input-block');
+    aiBlock.style.display = '';
+    document.getElementById('ai-textarea').value = '';
+    document.getElementById('ai-thinking').style.display = 'none';
+
+    document.getElementById('screen-client').classList.remove('active');
+    document.getElementById('screen-workout').classList.add('active');
+
+    setTimeout(() => document.getElementById('ai-textarea').focus(), 100);
+  }
+
+  function goBackFromWorkout() {
+    document.getElementById('screen-workout').classList.remove('active');
+    document.getElementById('screen-client').classList.add('active');
+  }
+
+  function toggleEx(header) {
+    const table = header.nextElementSibling;
+    const chevron = header.querySelector('.exercise-chevron');
+    const open = table.style.display !== 'none';
+    table.style.display = open ? 'none' : '';
+    let el = table.nextElementSibling;
+    while (el) { el.style.display = open ? 'none' : ''; el = el.nextElementSibling; }
+    chevron.classList.toggle('open', !open);
+  }
+
+  function addSet(btn) {
+    const table = btn.closest('.sets-table');
+    const rows = table.querySelectorAll('.set-row');
+    const num = rows.length + 1;
+    const lastRow = rows[rows.length - 1];
+    const lastReps = lastRow.querySelectorAll('.set-input')[0].value;
+    const lastWeight = lastRow.querySelectorAll('.set-input')[1].value;
+    const row = document.createElement('div');
+    row.className = 'set-row';
+    row.innerHTML = `
+      <div class="set-num">${num}</div>
+      <div class="set-cell"><input type="number" class="set-input" value="${lastReps}" /></div>
+      <div class="set-cell"><input type="number" class="set-input" value="${lastWeight}" /></div>`;
+    table.insertBefore(row, btn);
+  }
+
+  function addExercise(name = '') {
+    const container = document.getElementById('exercises-container');
+    const num = container.querySelectorAll('.exercise-block').length + 1;
+    const block = document.createElement('div');
+    block.className = 'exercise-block';
+    block.innerHTML = `
+      <div class="exercise-header" onclick="toggleEx(this)">
+        <div class="exercise-num">${num}</div>
+        <input class="exercise-name-input" value="${name}" placeholder="Упражнение..." />
+        <div class="exercise-chevron open">▼</div>
+      </div>
+      <div class="sets-table">
+        <div class="sets-header">
+          <span>#</span><span>Повт.</span><span>Вес, кг</span>
+        </div>
+        <div class="set-row">
+          <div class="set-num">1</div>
+          <div class="set-cell"><input type="number" class="set-input" placeholder="—"/></div>
+          <div class="set-cell"><input type="number" class="set-input" placeholder="—"/></div>
+        </div>
+        <button class="add-set-btn" onclick="addSet(this)">+ Добавить сет</button>
+      </div>
+      <div class="exercise-rest">
+        <span class="rest-label">Отдых:</span>
+        <div class="rest-chips">
+          <button class="rest-chip">60с</button>
+          <button class="rest-chip active">90с</button>
+          <button class="rest-chip">120с</button>
+          <button class="rest-chip">180с</button>
+        </div>
+      </div>
+      <div class="exercise-note">
+        <textarea rows="1" placeholder="Заметка тренера…"></textarea>
+      </div>`;
+    container.appendChild(block);
+    block.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  /* ── EXERCISE PICKER ── */
+  const CAT_STYLE = {
+    legs:      { bg: 'rgba(108,99,255,0.2)',  color: '#a78bfa', label: 'НОГ' },
+    chest:     { bg: 'rgba(255,107,107,0.2)', color: '#ff6b6b', label: 'ГРУ' },
+    back:      { bg: 'rgba(67,233,123,0.2)',  color: '#43e97b', label: 'СПИ' },
+    shoulders: { bg: 'rgba(245,166,35,0.2)',  color: '#f5a623', label: 'ПЛЕ' },
+    arms:      { bg: 'rgba(0,198,251,0.2)',   color: '#4fc3f7', label: 'РУК' },
+    core:      { bg: 'rgba(240,147,251,0.2)', color: '#f093fb', label: 'КОР' },
+    cardio:    { bg: 'rgba(67,233,123,0.15)', color: '#43e97b', label: 'КАР' },
+  };
+
+  const EXERCISES = [
+    { name: 'Присед со штангой',    cat: 'legs'      },
+    { name: 'Жим ногами',           cat: 'legs'      },
+    { name: 'Румынская тяга',       cat: 'legs'      },
+    { name: 'Выпады',               cat: 'legs'      },
+    { name: 'Сгибание ног',         cat: 'legs'      },
+    { name: 'Разгибание ног',       cat: 'legs'      },
+    { name: 'Жим лёжа',            cat: 'chest'     },
+    { name: 'Жим гантелей лёжа',   cat: 'chest'     },
+    { name: 'Разводка гантелей',    cat: 'chest'     },
+    { name: 'Отжимания',            cat: 'chest'     },
+    { name: 'Тяга штанги в наклоне',cat: 'back'      },
+    { name: 'Подтягивания',         cat: 'back'      },
+    { name: 'Тяга верхнего блока',  cat: 'back'      },
+    { name: 'Тяга нижнего блока',   cat: 'back'      },
+    { name: 'Становая тяга',        cat: 'back'      },
+    { name: 'Жим штанги стоя',      cat: 'shoulders' },
+    { name: 'Жим гантелей сидя',    cat: 'shoulders' },
+    { name: 'Разводка в стороны',   cat: 'shoulders' },
+    { name: 'Тяга к подбородку',    cat: 'shoulders' },
+    { name: 'Сгибание на бицепс',   cat: 'arms'      },
+    { name: 'Молоток',              cat: 'arms'      },
+    { name: 'Французский жим',      cat: 'arms'      },
+    { name: 'Разгибание на трицепс',cat: 'arms'      },
+    { name: 'Планка',               cat: 'core'      },
+    { name: 'Скручивания',          cat: 'core'      },
+    { name: 'Подъём ног',           cat: 'core'      },
+    { name: 'Бег',                  cat: 'cardio'    },
+    { name: 'Велотренажёр',         cat: 'cardio'    },
+    { name: 'Прыжки со скакалкой',  cat: 'cardio'    },
+    { name: 'Эллипс',               cat: 'cardio'    },
+  ];
+
+  let currentCat = 'all';
+
+  function openPicker() {
+    document.getElementById('picker-search-input').value = '';
+    currentCat = 'all';
+    document.querySelectorAll('.picker-cat').forEach((b,i) => b.classList.toggle('active', i===0));
+    renderExercises();
+    document.getElementById('picker-overlay').classList.add('open');
+  }
+
+  function closePicker(e) {
+    if (!e || e.target === document.getElementById('picker-overlay')) {
+      document.getElementById('picker-overlay').classList.remove('open');
+    }
+  }
+
+  function setCat(btn, cat) {
+    currentCat = cat;
+    document.querySelectorAll('.picker-cat').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderExercises();
+  }
+
+  function filterExercises() { renderExercises(); }
+
+  function renderExercises() {
+    const q = document.getElementById('picker-search-input').value.toLowerCase();
+    const list = document.getElementById('picker-list');
+    const filtered = EXERCISES.filter(ex =>
+      (currentCat === 'all' || ex.cat === currentCat) &&
+      (!q || ex.name.toLowerCase().includes(q))
+    );
+    list.innerHTML = filtered.map(ex => `
+      <div class="picker-item" onclick="addExerciseFromPicker('${ex.name.replace(/'/g,"\\'")}')">
+        <div class="picker-item-name">${ex.name}</div>
+        <div style="color:var(--accent);font-size:18px;font-weight:300">+</div>
+      </div>`).join('');
+    if (!filtered.length) list.innerHTML = `<div style="text-align:center;color:var(--muted);padding:24px;font-size:14px">Не нашли? Введите своё название выше</div>`;
+  }
+
+  function addExerciseFromPicker(name) {
+    closePicker();
+    addExercise(name);
+  }
+
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('rest-chip')) {
+      e.target.closest('.rest-chips').querySelectorAll('.rest-chip').forEach(c => c.classList.remove('active'));
+      e.target.classList.add('active');
+    }
+  });
+
+  /* ── VOICE ── */
+  let recognition = null;
+  let isRecording = false;
+
+  function toggleVoice() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Голосовой ввод не поддерживается в этом браузере. Попробуйте Safari на iOS.');
+      return;
+    }
+    if (isRecording) {
+      recognition.stop();
+      return;
+    }
+    recognition = new SpeechRecognition();
+    recognition.lang = 'ru-RU';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    const btn = document.getElementById('voice-btn');
+    const textarea = document.getElementById('ai-textarea');
+
+    recognition.onstart = () => {
+      isRecording = true;
+      btn.classList.add('recording');
+      btn.textContent = '⏹';
+    };
+    recognition.onresult = (e) => {
+      const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+      textarea.value = transcript;
+    };
+    recognition.onend = () => {
+      isRecording = false;
+      btn.classList.remove('recording');
+      btn.textContent = '🎙';
+    };
+    recognition.start();
+  }
+
+  /* ── AI PARSE ── */
+  function parseWorkout() {
+    const text = document.getElementById('ai-textarea').value.trim();
+    if (!text) return;
+
+    document.getElementById('ai-parse-btn').style.display = 'none';
+    const thinking = document.getElementById('ai-thinking');
+    thinking.style.display = 'flex';
+
+    setTimeout(() => {
+      thinking.style.display = 'none';
+      document.getElementById('ai-input-block').style.display = 'none';
+
+      const exercises = parseExercisesFromText(text);
+      const container = document.getElementById('exercises-container');
+      container.innerHTML = '';
+
+      exercises.forEach((ex, i) => {
+        const block = document.createElement('div');
+        block.className = 'exercise-block';
+        const setsHtml = ex.sets.map((s, si) => `
+          <div class="set-row">
+            <div class="set-num">${si + 1}</div>
+            <div class="set-cell"><input type="number" class="set-input" value="${s.reps}" /></div>
+            <div class="set-cell"><input type="number" class="set-input" value="${s.weight}" /></div>
+          </div>`).join('');
+
+        block.innerHTML = `
+          <div class="exercise-header" onclick="toggleEx(this)">
+            <div class="exercise-num">${i + 1}</div>
+            <input class="exercise-name-input" value="${ex.name}" />
+            <div class="exercise-chevron open">▼</div>
+          </div>
+          <div class="sets-table">
+            <div class="sets-header"><span>#</span><span>Повт.</span><span>Вес, кг</span></div>
+            ${setsHtml}
+            <button class="add-set-btn" onclick="addSet(this)">+ Добавить сет</button>
+          </div>
+          <div class="exercise-rest">
+            <span class="rest-label">Отдых:</span>
+            <div class="rest-chips">
+              <button class="rest-chip">60с</button>
+              <button class="rest-chip active">90с</button>
+              <button class="rest-chip">120с</button>
+              <button class="rest-chip">180с</button>
+            </div>
+          </div>
+          <div class="exercise-note">
+            <textarea rows="1" placeholder="Заметка тренера…"></textarea>
+          </div>`;
+        container.appendChild(block);
+      });
+    }, 1400);
+  }
+
+  function parseExercisesFromText(text) {
+    const results = [];
+    const parts = text.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+
+    parts.forEach(part => {
+      let s = part;
+
+      // weight: "60 кг", "60kg"
+      const weightMatch = s.match(/(\d+[\.,]?\d*)\s*(кг|kg)/i);
+      const weight = weightMatch ? parseFloat(weightMatch[1]) : '';
+      s = s.replace(/(\d+[\.,]?\d*)\s*(кг|kg)/gi, '');
+
+      // time: "60 сек", "45 с" — for planks etc
+      const timeMatch = s.match(/(\d+)\s*(секунд|сек|sec)(?:\s|$)/i);
+      const time = timeMatch ? parseInt(timeMatch[1]) : null;
+      s = s.replace(/(\d+)\s*(секунд|сек|sec)(?:\s|$)/gi, ' ');
+
+      // sets: "4 подхода/подход/подходов" or "4х" / "4x"
+      const setsMatch = s.match(/(\d+)\s*(подходов|подхода|подход)/i)
+                     || s.match(/(\d+)\s*[хxХX×*](?!\d)/i);
+      const numSets = setsMatch ? parseInt(setsMatch[1]) : 3;
+      s = s.replace(/(\d+)\s*(подходов|подхода|подход)/gi, '');
+      s = s.replace(/(\d+)\s*[хxХX×*](?!\d)/gi, '');
+
+      // reps: "по 8", "х8", "8 раз", "8 повторений"
+      // note: \b doesn't work with Cyrillic — use lookahead instead
+      const repsMatch = s.match(/по\s+(\d+)/i)
+                     || s.match(/[хxХX×*]\s*(\d+)/i)
+                     || s.match(/(\d+)\s*(?:повторений|повторения|повторов|повтор|раз)(?:\s|$)/i)
+                     || s.match(/(\d+)/);  // fallback: any remaining number
+      const numReps = time !== null ? time : (repsMatch ? parseInt(repsMatch[1]) : 10);
+
+      // strip all numeric+unit patterns from name
+      s = s.replace(/по\s+\d+/gi, '');
+      s = s.replace(/[хxХX×*]\s*\d+/gi, '');
+      s = s.replace(/\d+\s*(?:повторений|повторения|повторов|повтор|раз)(?:\s|$)/gi, ' ');
+      s = s.replace(/\d+/g, ''); // remove any leftover numbers
+
+      // strip noise words
+      s = s.replace(/(?:^|\s)(?:по|на|и|в|с)(?:\s|$)/gi, ' ');
+      s = s.replace(/\s{2,}/g, ' ').trim();
+
+      const name = s ? s.charAt(0).toUpperCase() + s.slice(1) : 'Упражнение';
+
+      const sets = [];
+      for (let i = 0; i < numSets; i++) sets.push({ reps: numReps, weight });
+      results.push({ name, sets });
+    });
+
+    return results;
+  }
+
+  function saveWorkout() {
+    const btn = document.querySelector('.save-workout-btn');
+    btn.textContent = '✅ Сохранено';
+    btn.style.background = 'var(--accent3)';
+    btn.style.color = '#000';
+    setTimeout(() => {
+      btn.textContent = 'Сохранить тренировку';
+      btn.style.background = 'var(--accent)';
+      btn.style.color = 'white';
+      showReport();
+    }, 800);
+  }
+
+  function showReport() {
+    document.getElementById('screen-workout').classList.remove('active');
+    document.getElementById('screen-report').classList.add('active');
+
+    // collect workout stats for report
+    const exercises = document.querySelectorAll('#exercises-container .exercise-block');
+    const sets = document.querySelectorAll('#exercises-container .set-row');
+    let volume = 0;
+    sets.forEach(row => {
+      const inputs = row.querySelectorAll('.set-input');
+      const reps = parseFloat(inputs[0]?.value) || 0;
+      const weight = parseFloat(inputs[1]?.value) || 0;
+      volume += reps * weight;
+    });
+    document.getElementById('rep-exercises').textContent = exercises.length || 3;
+    document.getElementById('rep-sets').textContent = sets.length || 10;
+    document.getElementById('rep-volume').textContent = volume > 0 ? Math.round(volume).toLocaleString('ru') : '2 800';
+
+    // show generating animation, then reveal content
+    document.getElementById('report-generating').style.display = 'flex';
+    document.getElementById('report-content').style.display = 'none';
+    setTimeout(() => {
+      document.getElementById('report-generating').style.display = 'none';
+      document.getElementById('report-content').style.display = 'block';
+    }, 1800);
+  }
+
+  function goBackFromReport() {
+    document.getElementById('screen-report').classList.remove('active');
+    document.getElementById('screen-client').classList.add('active');
+  }
+
+  function sendReport() {
+    const btn = document.querySelector('.send-btn-main');
+    btn.textContent = '✅ Отправлено!';
+    btn.style.background = 'var(--accent)';
+    btn.style.color = 'white';
+    setTimeout(() => {
+      goBackFromReport();
+      btn.textContent = 'Отправить Алисе';
+      btn.style.background = 'var(--accent3)';
+      btn.style.color = '#000';
+    }, 1200);
+  }
+</script>
+</body>
+</html>
