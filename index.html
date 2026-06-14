@@ -476,24 +476,21 @@
       text-transform: uppercase; letter-spacing: 1px;
       padding: 14px 16px 10px;
     }
-    .time-slots {
-      display: flex; flex-wrap: wrap; gap: 8px;
+    .time-range-row {
+      display: flex; align-items: center; gap: 10px;
       padding: 0 16px 16px;
     }
-    .time-slot {
-      padding: 8px 16px; border-radius: 12px;
+    .time-range-field { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .time-range-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .time-input {
       background: var(--card); border: 1px solid var(--border);
-      color: var(--text); font-size: 14px; font-weight: 600;
-      cursor: pointer; font-family: inherit;
+      border-radius: 14px; padding: 12px 14px;
+      color: var(--text); font-size: 18px; font-weight: 700;
+      font-family: inherit; outline: none; width: 100%;
+      -webkit-appearance: none; text-align: center;
     }
-    .time-slot.active {
-      background: rgba(108,99,255,0.2);
-      border-color: var(--accent); color: var(--accent);
-    }
-    .time-slot.busy {
-      opacity: 0.35; cursor: default;
-      text-decoration: line-through;
-    }
+    .time-input:focus { border-color: var(--accent); }
+    .time-range-sep { font-size: 20px; color: var(--muted); padding-top: 20px; flex-shrink: 0; }
     .client-pick-list { display: flex; flex-direction: column; gap: 8px; padding: 0 16px 16px; }
     .client-pick-item {
       display: flex; align-items: center; gap: 12px;
@@ -1738,7 +1735,17 @@
         </div>
 
         <div class="booking-label">Время</div>
-        <div class="time-slots" id="time-slots"></div>
+        <div class="time-range-row">
+          <div class="time-range-field">
+            <div class="time-range-label">Начало</div>
+            <input type="time" class="time-input" id="time-start" value="09:00" onchange="updateBookingBtn()" />
+          </div>
+          <div class="time-range-sep">→</div>
+          <div class="time-range-field">
+            <div class="time-range-label">Конец</div>
+            <input type="time" class="time-input" id="time-end" value="10:00" onchange="updateBookingBtn()" />
+          </div>
+        </div>
 
         <div class="booking-label">Клиент</div>
         <div class="client-pick-list">
@@ -2200,29 +2207,16 @@
   }
 
   const DAY_FULL = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
-  const ALL_SLOTS = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
-  let selectedSlot = null;
   let selectedClient = null;
 
   function showNewWorkoutFromSchedule() {
-    const busy = (SCHEDULE_DATA[selectedDay] || []).map(e => e.time);
     document.getElementById('booking-title').textContent = `${DAY_FULL[selectedDay]}, ${9 + ((selectedDay - 1 + 7) % 7)} июня`;
-    document.getElementById('time-slots').innerHTML = ALL_SLOTS.map(t =>
-      `<button class="time-slot ${busy.includes(t) ? 'busy' : ''}" onclick="pickSlot(this,'${t}')">${t}</button>`
-    ).join('');
-    selectedSlot = null;
+    document.getElementById('time-start').value = '09:00';
+    document.getElementById('time-end').value = '10:00';
     selectedClient = null;
     document.querySelectorAll('.client-pick-item').forEach(el => el.classList.remove('active'));
     updateBookingBtn();
     document.getElementById('booking-overlay').classList.add('open');
-  }
-
-  function pickSlot(btn, time) {
-    if (btn.classList.contains('busy')) return;
-    document.querySelectorAll('.time-slot').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    selectedSlot = time;
-    updateBookingBtn();
   }
 
   function pickClient(el, id) {
@@ -2234,7 +2228,7 @@
 
   function updateBookingBtn() {
     const btn = document.getElementById('booking-confirm');
-    btn.classList.toggle('ready', !!(selectedSlot && selectedClient));
+    btn.classList.toggle('ready', !!selectedClient);
   }
 
   function closeBooking(e) {
