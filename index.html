@@ -631,6 +631,87 @@
       padding: 0 16px 32px;
     }
 
+    /* ═══ EXERCISE BUILDER ═══ */
+    .builder-field-label {
+      font-size: 12px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 1px;
+      padding: 0 16px 8px;
+    }
+    .builder-input {
+      width: calc(100% - 32px); margin: 0 16px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: var(--text); font-size: 15px; font-family: inherit;
+      outline: none; display: block;
+    }
+    .builder-input:focus { border-color: var(--accent); }
+    .builder-input::placeholder { color: var(--muted); }
+    .builder-textarea {
+      width: calc(100% - 32px); margin: 0 16px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: var(--text); font-size: 14px; font-family: inherit;
+      outline: none; resize: none; display: block; line-height: 1.5;
+    }
+    .builder-textarea:focus { border-color: var(--accent); }
+    .builder-textarea::placeholder { color: var(--muted); }
+    .builder-cats {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 0 16px 16px;
+    }
+    .builder-cat-btn {
+      font-size: 13px; font-weight: 600;
+      padding: 7px 14px; border-radius: 20px;
+      border: 1px solid var(--border); color: var(--muted);
+      background: none; cursor: pointer; font-family: inherit;
+    }
+    .builder-cat-btn.active {
+      background: rgba(108,99,255,0.2);
+      color: var(--accent); border-color: rgba(108,99,255,0.4);
+    }
+    .media-upload-row {
+      display: flex; gap: 10px; padding: 0 16px 16px;
+    }
+    .media-upload-btn {
+      flex: 1; aspect-ratio: 1;
+      background: var(--card);
+      border: 1.5px dashed var(--border);
+      border-radius: 16px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 6px;
+      cursor: pointer; color: var(--muted);
+      font-size: 12px; font-weight: 600;
+      font-family: inherit;
+    }
+    .media-upload-btn:active { border-color: var(--accent); color: var(--accent); }
+    .media-upload-icon { font-size: 24px; }
+    .media-preview {
+      flex: 1; aspect-ratio: 1;
+      border-radius: 16px; overflow: hidden;
+      position: relative; background: var(--card2);
+      border: 1px solid var(--border);
+    }
+    .media-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .media-preview-remove {
+      position: absolute; top: 6px; right: 6px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(0,0,0,0.6); color: white;
+      border: none; cursor: pointer; font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .builder-save-btn {
+      margin: 4px 16px 32px;
+      width: calc(100% - 32px);
+      padding: 15px; background: var(--accent);
+      border: none; border-radius: 16px;
+      color: white; font-size: 15px; font-weight: 800;
+      cursor: pointer; font-family: inherit;
+    }
+
     /* ── AI INPUT ── */
     .ai-input-block {
       margin: 0 16px 16px;
@@ -1354,7 +1435,74 @@
           <button class="picker-cat" onclick="setCat(this,'core')">Кор</button>
           <button class="picker-cat" onclick="setCat(this,'cardio')">Кардио</button>
         </div>
+        <div style="padding:0 16px 10px">
+          <button onclick="openExerciseBuilder()" style="width:100%;padding:10px;background:none;border:1.5px dashed var(--border);border-radius:12px;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
+            <span>＋</span> Создать своё упражнение
+          </button>
+        </div>
         <div class="picker-list" id="picker-list"></div>
+      </div>
+    </div>
+
+    <!-- ── EXERCISE BUILDER SCREEN ── -->
+    <div class="screen" id="screen-builder" style="position:absolute;inset:0;z-index:200;background:var(--bg);display:none">
+      <div class="nav-row">
+        <div class="nav-back" onclick="closeExerciseBuilder()">
+          <svg width="8" height="14" viewBox="0 0 8 14" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1L1 7l6 6"/></svg>
+        </div>
+        <div class="nav-title">Новое упражнение</div>
+      </div>
+
+      <div class="screen-scroll">
+
+        <div class="builder-field-label">Название</div>
+        <input class="builder-input" id="builder-name" placeholder="Например: Болгарский присед" />
+
+        <div class="builder-field-label">Группа мышц</div>
+        <div class="builder-cats" id="builder-cats">
+          <button class="builder-cat-btn" onclick="toggleBuilderCat(this)">Ноги</button>
+          <button class="builder-cat-btn" onclick="toggleBuilderCat(this)">Грудь</button>
+          <button class="builder-cat-btn" onclick="toggleBuilderCat(this)">Спина</button>
+          <button class="builder-cat-btn" onclick="toggleBuilderCat(this)">Плечи</button>
+          <button class="builder-cat-btn" onclick="toggleBuilderCat(this)">Руки</button>
+          <button class="builder-cat-btn" onclick="toggleBuilderCat(this)">Кор</button>
+          <button class="builder-cat-btn" onclick="toggleBuilderCat(this)">Кардио</button>
+          <button class="builder-cat-btn" onclick="toggleBuilderCat(this)">Растяжка</button>
+        </div>
+
+        <div class="builder-field-label">Описание техники</div>
+        <textarea class="builder-textarea" id="builder-desc" rows="4" placeholder="Опишите технику выполнения: исходное положение, движение, на что обратить внимание..."></textarea>
+
+        <div class="builder-field-label">Фото и видео</div>
+        <div class="media-upload-row" id="media-row">
+          <button class="media-upload-btn" onclick="mockUploadPhoto(this)">
+            <span class="media-upload-icon">📷</span>
+            <span>Фото</span>
+          </button>
+          <button class="media-upload-btn" onclick="mockUploadVideo(this)">
+            <span class="media-upload-icon">🎬</span>
+            <span>Видео</span>
+          </button>
+          <button class="media-upload-btn" onclick="mockUploadLink(this)">
+            <span class="media-upload-icon">🔗</span>
+            <span>Ссылка</span>
+          </button>
+        </div>
+
+        <div id="builder-link-row" style="display:none;padding:0 16px 16px">
+          <input class="builder-input" id="builder-link" placeholder="Ссылка на YouTube или другое видео" style="margin:0;width:100%" />
+        </div>
+
+        <div class="builder-field-label">Рекомендуемый отдых</div>
+        <div style="display:flex;gap:8px;padding:0 16px 24px">
+          <button class="rest-chip" onclick="selectBuilderRest(this)">60с</button>
+          <button class="rest-chip active" onclick="selectBuilderRest(this)">90с</button>
+          <button class="rest-chip" onclick="selectBuilderRest(this)">120с</button>
+          <button class="rest-chip" onclick="selectBuilderRest(this)">180с</button>
+        </div>
+
+        <button class="builder-save-btn" onclick="saveCustomExercise()">Сохранить упражнение</button>
+
       </div>
     </div>
 
@@ -1821,6 +1969,99 @@
       e.target.classList.add('active');
     }
   });
+
+  /* ── EXERCISE BUILDER ── */
+  function openExerciseBuilder() {
+    document.getElementById('picker-overlay').classList.remove('open');
+    const b = document.getElementById('screen-builder');
+    // move to phone root if not already there
+    const phone = document.querySelector('.phone');
+    if (b.parentElement !== phone) phone.appendChild(b);
+    b.style.display = 'flex';
+    b.style.flexDirection = 'column';
+    setTimeout(() => document.getElementById('builder-name').focus(), 100);
+  }
+
+  function closeExerciseBuilder() {
+    const b = document.getElementById('screen-builder');
+    b.style.display = 'none';
+    document.getElementById('picker-overlay').classList.add('open');
+  }
+
+  function toggleBuilderCat(btn) {
+    btn.classList.toggle('active');
+  }
+
+  function selectBuilderRest(btn) {
+    btn.closest('div').querySelectorAll('.rest-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function mockUploadPhoto(btn) {
+    const row = document.getElementById('media-row');
+    const preview = document.createElement('div');
+    preview.className = 'media-preview';
+    preview.innerHTML = `
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(108,99,255,0.3),rgba(67,233,123,0.2));display:flex;align-items:center;justify-content:center;font-size:28px">🏋️</div>
+      <button class="media-preview-remove" onclick="this.parentElement.remove()">✕</button>`;
+    btn.replaceWith(preview);
+  }
+
+  function mockUploadVideo(btn) {
+    const row = document.getElementById('media-row');
+    const preview = document.createElement('div');
+    preview.className = 'media-preview';
+    preview.innerHTML = `
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,rgba(255,107,107,0.3),rgba(245,166,35,0.2));display:flex;align-items:center;justify-content:center;font-size:28px">▶️</div>
+      <button class="media-preview-remove" onclick="this.parentElement.remove()">✕</button>`;
+    btn.replaceWith(preview);
+  }
+
+  function mockUploadLink(btn) {
+    document.getElementById('builder-link-row').style.display = 'block';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--accent)';
+    setTimeout(() => document.getElementById('builder-link').focus(), 100);
+  }
+
+  function saveCustomExercise() {
+    const name = document.getElementById('builder-name').value.trim();
+    if (!name) {
+      document.getElementById('builder-name').focus();
+      document.getElementById('builder-name').style.borderColor = 'var(--accent2)';
+      return;
+    }
+    const cats = [...document.querySelectorAll('#builder-cats .builder-cat-btn.active')].map(b => b.textContent);
+    const catKey = cats.length ? cats[0].toLowerCase() : 'other';
+
+    // add to EXERCISES list
+    EXERCISES.push({ name, cat: catKey });
+
+    const btn = document.querySelector('.builder-save-btn');
+    btn.textContent = '✅ Сохранено';
+    btn.style.background = 'var(--accent3)';
+    btn.style.color = '#000';
+
+    setTimeout(() => {
+      // reset form
+      document.getElementById('builder-name').value = '';
+      document.getElementById('builder-name').style.borderColor = '';
+      document.getElementById('builder-desc').value = '';
+      document.getElementById('builder-link').value = '';
+      document.getElementById('builder-link-row').style.display = 'none';
+      document.querySelectorAll('#builder-cats .builder-cat-btn').forEach(b => b.classList.remove('active'));
+      btn.textContent = 'Сохранить упражнение';
+      btn.style.background = 'var(--accent)';
+      btn.style.color = 'white';
+
+      // go back to picker with new exercise highlighted
+      closeExerciseBuilder();
+      currentCat = 'all';
+      document.querySelectorAll('.picker-cat').forEach((b,i) => b.classList.toggle('active', i===0));
+      document.getElementById('picker-search-input').value = name;
+      filterExercises();
+    }, 900);
+  }
 
   /* ── VOICE ── */
   let recognition = null;
