@@ -1954,27 +1954,29 @@
     document.getElementById('screen-workout').classList.add('active');
   }
 
-  function showNewWorkout() {
+  let workoutOrigin = 'client';
+
+  function showNewWorkout(origin) {
+    workoutOrigin = origin || 'client';
     document.querySelector('#screen-workout .nav-title').textContent = 'Новая тренировка';
     document.querySelector('#screen-workout input.workout-meta-input').value = '';
-
     document.getElementById('exercises-container').innerHTML = '';
-
-    // reset AI block
     const aiBlock = document.getElementById('ai-input-block');
     aiBlock.style.display = '';
     document.getElementById('ai-textarea').value = '';
     document.getElementById('ai-thinking').style.display = 'none';
-
-    document.getElementById('screen-client').classList.remove('active');
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen-workout').classList.add('active');
-
     setTimeout(() => document.getElementById('ai-textarea').focus(), 100);
   }
 
   function goBackFromWorkout() {
     document.getElementById('screen-workout').classList.remove('active');
-    document.getElementById('screen-client').classList.add('active');
+    if (workoutOrigin === 'schedule') {
+      document.getElementById('screen-schedule').classList.add('active');
+    } else {
+      document.getElementById('screen-client').classList.add('active');
+    }
   }
 
   function toggleEx(header) {
@@ -2238,7 +2240,7 @@
 
   function confirmBooking() {
     document.getElementById('booking-overlay').classList.remove('open');
-    showNewWorkout();
+    showNewWorkout('schedule');
   }
 
   function renderDaySchedule(day) {
