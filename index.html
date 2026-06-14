@@ -1645,9 +1645,12 @@
 
   <!-- ═══════════ SCREEN: SCHEDULE ═══════════ -->
   <div class="screen" id="screen-schedule">
-    <div class="nav-bar">
-      <h1>Расписание</h1>
-      <div class="subtitle">Июнь 2026</div>
+    <div class="nav-bar" style="display:flex;align-items:flex-start;justify-content:space-between">
+      <div>
+        <h1>Расписание</h1>
+        <div class="subtitle">Июнь 2026</div>
+      </div>
+      <button onclick="showNewWorkout()" style="margin-top:6px;width:40px;height:40px;border-radius:14px;background:var(--accent);border:none;color:white;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">+</button>
     </div>
 
     <!-- week strip -->
@@ -2103,7 +2106,7 @@
     const list = document.getElementById('schedule-list');
     const items = SCHEDULE_DATA[day] || [];
     if (!items.length) {
-      list.innerHTML = `<div class="empty-day">Тренировок нет<br><span style="font-size:12px">Свободный день — можно запланировать</span></div>`;
+      list.innerHTML = `<div class="empty-day">Тренировок нет<br><span style="font-size:12px;color:var(--muted)">Свободный день</span><br><br><button onclick="showNewWorkout()" style="margin-top:4px;padding:11px 24px;background:var(--accent);border:none;border-radius:12px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">+ Запланировать тренировку</button></div>`;
       return;
     }
     list.innerHTML = items.map((item, i) => `
