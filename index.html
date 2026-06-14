@@ -846,9 +846,8 @@
     .picker-cats {
       display: flex; gap: 6px;
       padding: 0 16px 12px;
-      overflow-x: auto; scrollbar-width: none;
+      flex-wrap: wrap;
     }
-    .picker-cats::-webkit-scrollbar { display: none; }
     .picker-cat {
       white-space: nowrap; font-size: 12px; font-weight: 700;
       padding: 6px 14px; border-radius: 20px;
