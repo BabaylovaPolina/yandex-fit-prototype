@@ -457,6 +457,67 @@
       color: var(--muted); font-size: 14px; line-height: 1.6;
     }
 
+    /* ── BOOKING SHEET ── */
+    .booking-overlay {
+      display: none; position: absolute; inset: 0;
+      background: rgba(0,0,0,0.6); z-index: 100;
+      align-items: flex-end; overflow: hidden; border-radius: inherit;
+    }
+    .booking-overlay.open { display: flex; }
+    .booking-sheet {
+      width: 100%; background: #1a1a24;
+      border-radius: 24px 24px 0 0;
+      display: flex; flex-direction: column;
+      animation: slideUp 0.25s ease;
+    }
+    .booking-section { padding: 0 16px 16px; }
+    .booking-label {
+      font-size: 12px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 1px;
+      padding: 14px 16px 10px;
+    }
+    .time-slots {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      padding: 0 16px 16px;
+    }
+    .time-slot {
+      padding: 8px 16px; border-radius: 12px;
+      background: var(--card); border: 1px solid var(--border);
+      color: var(--text); font-size: 14px; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+    }
+    .time-slot.active {
+      background: rgba(108,99,255,0.2);
+      border-color: var(--accent); color: var(--accent);
+    }
+    .time-slot.busy {
+      opacity: 0.35; cursor: default;
+      text-decoration: line-through;
+    }
+    .client-pick-list { display: flex; flex-direction: column; gap: 8px; padding: 0 16px 16px; }
+    .client-pick-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px; border-radius: 14px;
+      background: var(--card); border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .client-pick-item.active {
+      border-color: var(--accent);
+      background: rgba(108,99,255,0.1);
+    }
+    .client-pick-item.active .client-pick-name { color: var(--accent); }
+    .client-pick-name { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; }
+    .client-pick-meta { font-size: 12px; color: var(--muted); }
+    .booking-confirm-btn {
+      margin: 0 16px 24px;
+      padding: 15px; background: var(--accent);
+      border: none; border-radius: 16px;
+      color: white; font-size: 15px; font-weight: 800;
+      cursor: pointer; font-family: inherit; width: calc(100% - 32px);
+      opacity: 0.4; pointer-events: none;
+    }
+    .booking-confirm-btn.ready { opacity: 1; pointer-events: auto; }
+
     /* ═══ WORKOUT SCREEN ═══ */
     .exercise-block {
       margin: 0 16px 12px;
@@ -1650,7 +1711,7 @@
         <h1>Расписание</h1>
         <div class="subtitle">Июнь 2026</div>
       </div>
-      <button onclick="showNewWorkout()" style="margin-top:6px;width:40px;height:40px;border-radius:14px;background:var(--accent);border:none;color:white;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">+</button>
+      <button onclick="showNewWorkoutFromSchedule()" style="margin-top:6px;width:40px;height:40px;border-radius:14px;background:var(--accent);border:none;color:white;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">+</button>
     </div>
 
     <!-- week strip -->
@@ -1665,6 +1726,42 @@
       <div class="tab active" onclick="showTab('schedule')"><div class="tab-icon">📅</div><div class="tab-label">Расписание</div></div>
       <div class="tab" onclick="showTab('analytics')"><div class="tab-icon">📊</div><div class="tab-label">Аналитика</div></div>
       <div class="tab" onclick="showTab('profile')"><div class="tab-icon">⚙️</div><div class="tab-label">Профиль</div></div>
+    </div>
+
+    <!-- booking sheet -->
+    <div class="booking-overlay" id="booking-overlay" onclick="closeBooking(event)">
+      <div class="booking-sheet">
+        <div class="picker-handle"></div>
+        <div class="picker-header">
+          <div class="picker-title" id="booking-title">Новая тренировка · Пн, 9 июня</div>
+          <button class="picker-close" onclick="closeBooking()">✕</button>
+        </div>
+
+        <div class="booking-label">Время</div>
+        <div class="time-slots" id="time-slots"></div>
+
+        <div class="booking-label">Клиент</div>
+        <div class="client-pick-list">
+          <div class="client-pick-item" onclick="pickClient(this,'alice')" data-id="alice">
+            <div class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:13px;background:linear-gradient(135deg,#ff6b6b,#c0143c)">АК</div>
+            <div><div class="client-pick-name">Алиса Козлова</div><div class="client-pick-meta">Силовые · 3 мес.</div></div>
+          </div>
+          <div class="client-pick-item" onclick="pickClient(this,'daria')" data-id="daria">
+            <div class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:13px;background:linear-gradient(135deg,#43e97b,#0a7c34)">ДС</div>
+            <div><div class="client-pick-name">Дарья Смирнова</div><div class="client-pick-meta">Рельеф · 5 мес.</div></div>
+          </div>
+          <div class="client-pick-item" onclick="pickClient(this,'mike')" data-id="mike">
+            <div class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:13px;background:linear-gradient(135deg,#f5a623,#c47d00)">МВ</div>
+            <div><div class="client-pick-name">Михаил Воронов</div><div class="client-pick-meta">Масса · 2 мес.</div></div>
+          </div>
+          <div class="client-pick-item" onclick="pickClient(this,'igor')" data-id="igor">
+            <div class="avatar" style="width:36px;height:36px;border-radius:12px;font-size:13px;background:linear-gradient(135deg,#6c63ff,#3a2fa0)">ИП</div>
+            <div><div class="client-pick-name">Игорь Петров</div><div class="client-pick-meta">Кардио · 4 мес.</div></div>
+          </div>
+        </div>
+
+        <button class="booking-confirm-btn" id="booking-confirm" onclick="confirmBooking()">Перейти к тренировке →</button>
+      </div>
     </div>
   </div>
 
@@ -2102,11 +2199,59 @@
     renderDaySchedule(day);
   }
 
+  const DAY_FULL = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+  const ALL_SLOTS = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
+  let selectedSlot = null;
+  let selectedClient = null;
+
+  function showNewWorkoutFromSchedule() {
+    const busy = (SCHEDULE_DATA[selectedDay] || []).map(e => e.time);
+    document.getElementById('booking-title').textContent = `${DAY_FULL[selectedDay]}, ${9 + ((selectedDay - 1 + 7) % 7)} июня`;
+    document.getElementById('time-slots').innerHTML = ALL_SLOTS.map(t =>
+      `<button class="time-slot ${busy.includes(t) ? 'busy' : ''}" onclick="pickSlot(this,'${t}')">${t}</button>`
+    ).join('');
+    selectedSlot = null;
+    selectedClient = null;
+    document.querySelectorAll('.client-pick-item').forEach(el => el.classList.remove('active'));
+    updateBookingBtn();
+    document.getElementById('booking-overlay').classList.add('open');
+  }
+
+  function pickSlot(btn, time) {
+    if (btn.classList.contains('busy')) return;
+    document.querySelectorAll('.time-slot').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedSlot = time;
+    updateBookingBtn();
+  }
+
+  function pickClient(el, id) {
+    document.querySelectorAll('.client-pick-item').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    selectedClient = id;
+    updateBookingBtn();
+  }
+
+  function updateBookingBtn() {
+    const btn = document.getElementById('booking-confirm');
+    btn.classList.toggle('ready', !!(selectedSlot && selectedClient));
+  }
+
+  function closeBooking(e) {
+    if (!e || e.target === document.getElementById('booking-overlay'))
+      document.getElementById('booking-overlay').classList.remove('open');
+  }
+
+  function confirmBooking() {
+    document.getElementById('booking-overlay').classList.remove('open');
+    showNewWorkout();
+  }
+
   function renderDaySchedule(day) {
     const list = document.getElementById('schedule-list');
     const items = SCHEDULE_DATA[day] || [];
     if (!items.length) {
-      list.innerHTML = `<div class="empty-day">Тренировок нет<br><span style="font-size:12px;color:var(--muted)">Свободный день</span><br><br><button onclick="showNewWorkout()" style="margin-top:4px;padding:11px 24px;background:var(--accent);border:none;border-radius:12px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">+ Запланировать тренировку</button></div>`;
+      list.innerHTML = `<div class="empty-day">Тренировок нет<br><span style="font-size:12px;color:var(--muted)">Свободный день</span><br><br><button onclick="showNewWorkoutFromSchedule()" style="margin-top:4px;padding:11px 24px;background:var(--accent);border:none;border-radius:12px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">+ Запланировать тренировку</button></div>`;
       return;
     }
     list.innerHTML = items.map((item, i) => `
