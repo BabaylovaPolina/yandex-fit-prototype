@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Яндекс Фит — Защита проекта</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --card: #13131a;
+      --border: #1e1e2e;
+      --accent: #6c63ff;
+      --accent2: #43e97b;
+      --accent3: #ff6b6b;
+      --text: #f0f0f8;
+      --muted: #7a7a96;
+      --yandex: #fc3f1d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      height: 100vh; overflow: hidden;
+    }
+
+    /* ── SLIDES ── */
+    .slide {
+      display: none; position: absolute; inset: 0;
+      flex-direction: column; padding: 48px 64px 40px;
+      animation: fadeIn 0.3s ease;
+    }
+    .slide.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 16px;
+      background: rgba(19,19,26,0.95); backdrop-filter: blur(20px);
+      border: 1px solid var(--border); border-radius: 50px;
+      padding: 10px 20px; z-index: 100;
+    }
+    .nav-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--border); border: none; color: var(--text);
+      cursor: pointer; font-size: 16px; display: flex;
+      align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .nav-btn:hover { background: var(--accent); }
+    .nav-counter { font-size: 13px; color: var(--muted); min-width: 60px; text-align: center; }
+    .nav-dots { display: flex; gap: 6px; }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--border); cursor: pointer; transition: background 0.2s;
+    }
+    .dot.active { background: var(--accent); }
+
+    /* ── TYPOGRAPHY ── */
+    .slide-num {
+      font-size: 11px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+    }
+    h1 { font-size: clamp(36px, 4vw, 56px); font-weight: 900; line-height: 1.05; color: var(--text); }
+    h2 { font-size: clamp(22px, 2.5vw, 34px); font-weight: 800; color: var(--text); margin-bottom: 6px; }
+    h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .sub { font-size: clamp(15px, 1.5vw, 20px); color: var(--muted); line-height: 1.5; margin-top: 10px; }
+    .label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+
+    /* ── LAYOUT ── */
+    .cols { display: flex; gap: 32px; flex: 1; }
+    .col { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+    .col-2 { flex: 2; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px;
+    }
+    .card-accent {
+      background: rgba(108,99,255,0.08);
+      border: 1px solid rgba(108,99,255,0.3); border-radius: 16px; padding: 20px;
+    }
+    .card-green {
+      background: rgba(67,233,123,0.06);
+      border: 1px solid rgba(67,233,123,0.25); border-radius: 16px; padding: 20px;
+    }
+    .card-red {
+      background: rgba(255,107,107,0.06);
+      border: 1px solid rgba(255,107,107,0.25); border-radius: 16px; padding: 20px;
+    }
+
+    /* ── STAT ── */
+    .stat-val {
+      font-size: clamp(28px, 3vw, 42px); font-weight: 900;
+      background: linear-gradient(135deg, #fff, var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; line-height: 1;
+    }
+    .stat-val.green { background: linear-gradient(135deg, #fff, var(--accent2)); -webkit-background-clip: text; background-clip: text; }
+    .stat-val.red { background: linear-gradient(135deg, #fff, var(--accent3)); -webkit-background-clip: text; background-clip: text; }
+    .stat-lbl { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+
+    /* ── LIST ── */
+    ul.fancy { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    ul.fancy li { font-size: 14px; color: var(--text); display: flex; gap: 10px; align-items: flex-start; line-height: 1.5; }
+    ul.fancy li::before { content: '→'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+    ul.fancy.check li::before { content: '✓'; color: var(--accent2); }
+    ul.fancy.cross li::before { content: '✕'; color: var(--accent3); }
+
+    /* ── TABLE ── */
+    .fin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .fin-table th { background: var(--card); padding: 10px 12px; text-align: left; color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    .fin-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+    .fin-table tr:last-child td { border-bottom: none; }
+    .fin-table td.pos { color: var(--accent2); font-weight: 700; }
+    .fin-table td.neg { color: var(--accent3); }
+    .fin-table td.bold { font-weight: 800; color: var(--text); }
+
+    /* ── BADGE ── */
+    .badge {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      padding: 4px 10px; border-radius: 20px;
+    }
+    .badge-purple { background: rgba(108,99,255,0.15); color: var(--accent); border: 1px solid rgba(108,99,255,0.3); }
+    .badge-green { background: rgba(67,233,123,0.12); color: var(--accent2); border: 1px solid rgba(67,233,123,0.25); }
+    .badge-red { background: rgba(255,107,107,0.12); color: var(--accent3); border: 1px solid rgba(255,107,107,0.25); }
+    .badge-yandex { background: rgba(252,63,29,0.15); color: #fc7a57; border: 1px solid rgba(252,63,29,0.3); }
+
+    /* ── ROADMAP ── */
+    .roadmap { display: flex; gap: 12px; flex: 1; }
+    .roadmap-q {
+      flex: 1; background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px;
+    }
+    .roadmap-q.highlight { border-color: rgba(108,99,255,0.4); background: rgba(108,99,255,0.07); }
+    .roadmap-q h4 { font-size: 13px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+    .roadmap-q .phase { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+    .roadmap-q ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .roadmap-q ul li { font-size: 12px; color: var(--text); padding-left: 12px; position: relative; line-height: 1.4; }
+    .roadmap-q ul li::before { content: '•'; position: absolute; left: 0; color: var(--accent); }
+
+    /* ── COVER ── */
+    .cover-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(252,63,29,0.12); border: 1px solid rgba(252,63,29,0.3);
+      border-radius: 24px; padding: 8px 16px;
+      font-size: 13px; font-weight: 700; color: #fc7a57; margin-bottom: 24px;
+    }
+    .yandex-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--yandex); }
+
+    /* ── PROGRESS BAR ── */
+    .prog-wrap { background: rgba(255,255,255,0.06); border-radius: 20px; height: 8px; overflow: hidden; margin-top: 8px; }
+    .prog-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+
+    /* ── MINI CHART ── */
+    .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 80px; }
+    .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar { width: 100%; border-radius: 4px 4px 0 0; background: rgba(108,99,255,0.3); }
+    .bar.hi { background: var(--accent); }
+    .bar-lbl { font-size: 10px; color: var(--muted); }
+
+    /* ── PERSON CARD ── */
+    .person { display: flex; gap: 14px; align-items: flex-start; }
+    .person-avatar {
+      width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 900; color: white;
+    }
+    .person-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .person-role { font-size: 12px; color: var(--accent); font-weight: 700; margin-top: 2px; }
+    .person-bio { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+    /* ── QUOTE ── */
+    .quote {
+      background: linear-gradient(135deg, rgba(108,99,255,0.12), rgba(67,233,123,0.06));
+      border: 1px solid rgba(108,99,255,0.3); border-radius: 16px;
+      padding: 20px 24px; font-size: 16px; font-weight: 600;
+      color: var(--text); line-height: 1.6; font-style: italic;
+    }
+    .quote::before { content: '«'; color: var(--accent); font-size: 24px; font-style: normal; }
+    .quote::after { content: '»'; color: var(--accent); font-size: 24px; font-style: normal; }
+
+    /* ── MOAT ── */
+    .moat-item { display: flex; gap: 12px; align-items: flex-start; }
+    .moat-num {
+      width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ SLIDE 1: COVER ═══════════ -->
+<div class="slide active" id="s1">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;max-width:800px">
+    <div class="cover-tag"><div class="yandex-dot"></div> Яндекс · GrowthLab 2026</div>
+    <h1 style="font-size:clamp(48px,6vw,80px);margin-bottom:20px">Яндекс Фит</h1>
+    <div style="font-size:clamp(20px,2.5vw,30px);color:var(--muted);line-height:1.4;margin-bottom:40px">
+      AI-ассистент для тренера и его клиентов.<br>Записал тренировку голосом — получил карточку, прогресс и отчёт.
+    </div>
+    <div style="display:flex;gap:32px;flex-wrap:wrap">
+      <div><div class="stat-val">240 млрд ₽</div><div class="stat-lbl">Рынок фитнеса РФ, 2025</div></div>
+      <div><div class="stat-val green">+12% CAGR</div><div class="stat-lbl">Ежегодный рост рынка</div></div>
+      <div><div class="stat-val">500 млн ₽</div><div class="stat-lbl">Инвестиций на 3 года</div></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center;margin-top:auto">
+    <div class="badge badge-purple">CPO — Полина Бабайлова</div>
+    <div class="badge badge-purple">CTO — Павел Подколзин</div>
+    <div class="badge badge-purple">CFO — Михаил Ишметьев</div>
+    <div class="badge badge-yandex">Product Lead — Вова Власов</div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 2: РЕЗЮМЕ ═══════════ -->
+<div class="slide" id="s2">
+  <div class="slide-num">01 · Резюме проекта</div>
+  <h2 style="margin-bottom:24px">Что создаём и в чём ценность</h2>
+  <div class="cols">
+    <div class="col">
+      <div class="quote">Тренер надиктовывает итоги тренировки — приложение само собирает карточку клиента, прогресс и отчёт</div>
+      <div class="card-accent" style="margin-top:8px">
+        <div class="label">Гипотеза</div>
+        <div style="font-size:14px;line-height:1.6">Тренеры готовы платить за AI-инструмент, который убирает рутину: ведение клиентов в таблицах, заметках и чатах — и даёт им больше времени на саму тренировку</div>
+      </div>
+      <div class="card">
+        <div class="label">Цели на 3 года</div>
+        <ul class="fancy check" style="margin-top:4px">
+          <li>Выход на безубыточность к 2030 году</li>
+          <li>107 650 платных пользователей</li>
+          <li>Выручка 1.1 млрд ₽ к 2030</li>
+          <li>ARR 1.4 млрд ₽</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col">
+      <div class="grid-2" style="flex:none">
+        <div class="card"><div class="stat-val">490 ₽</div><div class="stat-lbl">Подписка атлета / мес</div></div>
+        <div class="card"><div class="stat-val">990 ₽</div><div class="stat-lbl">Подписка тренера / мес</div></div>
+        <div class="card"><div class="stat-val">2 990 ₽</div><div class="stat-lbl">Тренер PRO (безлимит)</div></div>
+        <div class="card"><div class="stat-val">500 млн</div><div class="stat-lbl">Инвестиций до break-even</div></div>
+      </div>
+      <div class="card" style="flex:1">
+        <div class="label">Ценность по ролям</div>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:10px">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px">Тренер</div>
+            <div style="font-size:13px;color:var(--muted)">Карточка клиента, история тренировок, AI-отчёты, подсказки — без таблиц и заметок</div>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:10px">
+            <div style="font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:4px">Клиент</div>
+            <div style="font-size:13px;color:var(--muted)">План, история занятий, прогресс, отчёты от тренера — в одном месте</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 3: РЫНОК ═══════════ -->
+<div class="slide" id="s3">
+  <div class="slide-num">02 · Рынок</div>
+  <h2 style="margin-bottom:20px">Размер, динамика и структура</h2>
+  <div class="cols">
+    <div class="col">
+      <div class="grid-2" style="flex:none">
+        <div class="card"><div class="stat-val">145 млн</div><div class="stat-lbl">Население РФ</div></div>
+        <div class="card"><div class="stat-val green">6.9 млн</div><div class="stat-lbl">Используют фитнес-услуги (4.75%)</div></div>
+        <div class="card"><div class="stat-val">240 млрд ₽</div><div class="stat-lbl">Рынок фитнеса РФ, 2025</div></div>
+        <div class="card"><div class="stat-val green">423 млрд ₽</div><div class="stat-lbl">Прогноз 2030, CAGR 12%</div></div>
+      </div>
+      <div class="card-green" style="flex:none">
+        <div class="label">Потенциал роста</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.5">В Европе фитнесом пользуются <strong style="color:var(--accent2)">15–20%</strong> населения. РФ сейчас — <strong style="color:var(--accent)">4.75%</strong>. При движении к европейскому уровню — рост до <strong style="color:var(--accent2)">30 млн человек</strong>, ×4 к текущему рынку</div>
+        <div class="prog-wrap" style="margin-top:10px"><div class="prog-fill" style="width:24%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px"><span>РФ сейчас 4.75%</span><span>Европа 15–20%</span></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card" style="flex:1">
+        <div class="label">Ядро аудитории (65% рынка)</div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px">
+          <div style="background:var(--bg);border-radius:10px;padding:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:14px;font-weight:700">«Эстетический фитнес»</div><div style="font-size:12px;color:var(--muted)">25–40 лет · 70% женщины</div></div>
+              <div class="badge badge-purple">~40% рынка</div>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-top:6px">Похудение, тонус, форма · готовность платить 399–599 ₽/мес</div>
+          </div>
+          <div style="background:var(--bg);border-radius:10px;padding:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div><div style="font-size:14px;font-weight:700">«Здоровье и форма»</div><div style="font-size:12px;color:var(--muted)">30–50 лет · 50/50</div></div>
+              <div class="badge badge-green">~25% рынка</div>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-top:6px">Энергия, спина, баланс работа/жизнь · 599–990 ₽/мес</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="flex:none">
+        <div class="label">Драйверы роста</div>
+        <ul class="fancy check" style="margin-top:6px">
+          <li>AI + носимая электроника — главный триггер</li>
+          <li>200 «умных» спортобъектов/год с 2025 г.</li>
+          <li>1 500 умных залов к 2030 по плану</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 4: КОНКУРЕНТЫ ═══════════ -->
+<div class="slide" id="s4">
+  <div class="slide-num">02 · Рынок — Конкуренты</div>
+  <h2 style="margin-bottom:20px">Конкурентная среда</h2>
+  <div class="cols">
+    <div class="col">
+      <div class="card-red">
+        <h3 style="color:var(--accent3)">Почему существующие решения не работают</h3>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+          <div><div style="font-size:13px;font-weight:700">Strava</div><div style="font-size:12px;color:var(--muted)">Ушла из России. Оплата иностранной картой. Нет связки тренер–клиент.</div></div>
+          <div style="border-top:1px solid var(--border);padding-top:10px"><div style="font-size:13px;font-weight:700">TrainingPeaks</div><div style="font-size:12px;color:var(--muted)">Нишевый. Иностранная карта. Не развивается — застрял в 2010-х. Сложный UX.</div></div>
+          <div style="border-top:1px solid var(--border);padding-top:10px"><div style="font-size:13px;font-weight:700">Simpla / TriSystems</div><div style="font-size:12px;color:var(--muted)">Нишевые микроклубы. Нет AI. Нет масштаба.</div></div>
+          <div style="border-top:1px solid var(--border);padding-top:10px"><div style="font-size:13px;font-weight:700">FitStars / Fitmost</div><div style="font-size:12px;color:var(--muted)">B2C видеотека или агрегатор студий — нет C2C-связки тренер–клиент.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col col-2">
+      <div class="card-accent">
+        <h3 style="color:var(--accent)">Наше место на рынке</h3>
+        <div style="margin-top:16px;overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="text-align:left;padding:8px 12px;color:var(--muted)">Функция</th>
+                <th style="text-align:center;padding:8px;color:var(--muted)">TrainingPeaks</th>
+                <th style="text-align:center;padding:8px;color:var(--muted)">FitStars</th>
+                <th style="text-align:center;padding:8px;color:var(--accent);font-weight:800">Яндекс Фит</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px">Связка тренер–клиент</td><td style="text-align:center">✓</td><td style="text-align:center;color:var(--muted)">—</td><td style="text-align:center;color:var(--accent2)">✓</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px">Голосовой ввод / AI</td><td style="text-align:center;color:var(--muted)">—</td><td style="text-align:center;color:var(--muted)">—</td><td style="text-align:center;color:var(--accent2)">✓</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px">Работает в РФ</td><td style="text-align:center;color:var(--accent3)">✕</td><td style="text-align:center;color:var(--accent2)">✓</td><td style="text-align:center;color:var(--accent2)">✓</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px">Отчёт клиенту от AI</td><td style="text-align:center;color:var(--muted)">—</td><td style="text-align:center;color:var(--muted)">—</td><td style="text-align:center;color:var(--accent2)">✓</td></tr>
+              <tr style="border-bottom:1px solid var(--border)"><td style="padding:8px 12px">Цена тренера / мес</td><td style="text-align:center">$35–165</td><td style="text-align:center">—</td><td style="text-align:center;color:var(--accent2)">990–2990 ₽</td></tr>
+              <tr><td style="padding:8px 12px">Экосистема</td><td style="text-align:center;color:var(--muted)">—</td><td style="text-align:center;color:var(--muted)">Сбер</td><td style="text-align:center;color:var(--accent2)">Яндекс</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="label">Регуляторика</div>
+        <ul class="fancy" style="margin-top:6px">
+          <li>152-ФЗ: данные в российском регионе Yandex Cloud, TTL аудио 30 дней</li>
+          <li>RBAC: тренер видит только своих клиентов + audit log</li>
+          <li>Отдельное согласие на обработку аудио и персональных данных</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 5: ПРОДУКТ ═══════════ -->
+<div class="slide" id="s5">
+  <div class="slide-num">03 · Продукт</div>
+  <h2 style="margin-bottom:20px">Что создаём и для кого</h2>
+  <div class="cols">
+    <div class="col">
+      <div class="card-accent" style="flex:none">
+        <div class="label">Ключевая проблема</div>
+        <div style="font-size:14px;line-height:1.6;margin-top:6px">Тренер ведёт клиентов в Telegram, заметках и Excel. Данные теряются, подготовка к сессии занимает время. Нет инструмента, который <strong>автоматически</strong> собирает прогресс и создаёт отчёт.</div>
+      </div>
+      <div class="card">
+        <div class="label">MVP (P0) — ядро продукта</div>
+        <ul class="fancy check" style="margin-top:6px">
+          <li>Голосовой / текстовый ввод тренировки</li>
+          <li>AI-разбор в упражнения, веса, повторы</li>
+          <li>Карточка клиента и история тренировок</li>
+          <li>Автоматический отчёт клиенту после сессии</li>
+          <li>Подсказки для тренера на следующую тренировку</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="label">За рамками MVP</div>
+        <ul class="fancy cross" style="margin-top:6px">
+          <li>Маркетплейс тренеров (P1)</li>
+          <li>Интеграция с носимыми устройствами (P1)</li>
+          <li>AI-тренер для самостоятельных (P2)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card" style="flex:1">
+        <div class="label">Путь клиента</div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:0">
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(108,99,255,0.2);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+            <div><div style="font-size:13px;font-weight:700">Тренер находит продукт</div><div style="font-size:12px;color:var(--muted)">Через сообщества, клуб или Яндекс-экосистему</div></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(108,99,255,0.2);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+            <div><div style="font-size:13px;font-weight:700">Подключает клиентов</div><div style="font-size:12px;color:var(--muted)">Приглашает 3–5 клиентов — они создают аккаунты</div></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(108,99,255,0.2);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+            <div><div style="font-size:13px;font-weight:700">Работает в приложении</div><div style="font-size:12px;color:var(--muted)">Надиктовывает тренировки, клиент видит отчёты и прогресс</div></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0">
+            <div style="width:28px;height:28px;border-radius:8px;background:rgba(67,233,123,0.15);color:var(--accent2);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+            <div><div style="font-size:13px;font-weight:700">Привычка и lock-in</div><div style="font-size:12px;color:var(--muted)">Накопленные данные делают переход дорогим. Тренер переходит на платный тариф.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-green" style="flex:none">
+        <div class="label">Сложно скопировать — наш ров (moat)</div>
+        <div style="font-size:13px;line-height:1.6;margin-top:6px"><strong style="color:var(--accent2)">Данные.</strong> Структурированные тренировки, прогресс клиентов, голосовые исправления → fine-tuning AI под фитнес-домен. Чем больше пользователей, тем умнее система. Data lock-in.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 6: БИЗНЕС-МОДЕЛЬ ═══════════ -->
+<div class="slide" id="s6">
+  <div class="slide-num">04 · Бизнес-модель</div>
+  <h2 style="margin-bottom:20px">Экономика и привлечение</h2>
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <div class="label">Источники выручки (Freemium)</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+          <div style="background:var(--bg);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:14px;font-weight:700">B2C — Атлет</div><div style="font-size:12px;color:var(--muted)">Дневник, прогресс, AI-подсказки</div></div>
+            <div style="font-size:20px;font-weight:800;color:var(--accent)">490 ₽/мес</div>
+          </div>
+          <div style="background:var(--bg);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:14px;font-weight:700">B2B — Тренер</div><div style="font-size:12px;color:var(--muted)">До N клиентов, AI-отчёты, карточки</div></div>
+            <div style="font-size:20px;font-weight:800;color:var(--accent)">990 ₽/мес</div>
+          </div>
+          <div style="background:var(--bg);border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:14px;font-weight:700">B2B PRO — Тренер</div><div style="font-size:12px;color:var(--muted)">Безлимит клиентов + аналитика</div></div>
+            <div style="font-size:20px;font-weight:800;color:var(--accent)">2 990 ₽/мес</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-accent">
+        <div class="label">Яндекс — Unfair Advantage</div>
+        <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;font-size:12px"><div style="color:var(--accent);font-weight:700;margin-bottom:3px">Музыка</div>Вход из тренировочного контекста</div>
+          <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;font-size:12px"><div style="color:var(--accent);font-weight:700;margin-bottom:3px">Карты</div>Залы, студии, тренеры рядом</div>
+          <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;font-size:12px"><div style="color:var(--accent);font-weight:700;margin-bottom:3px">Плюс</div>Массовый доступ, подписка</div>
+          <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;font-size:12px"><div style="color:var(--accent);font-weight:700;margin-bottom:3px">Маркет</div>Экипировка, питание, слоты</div>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card" style="flex:1">
+        <div class="label">Стратегия захвата рынка</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:12px">
+          <div class="moat-item"><div class="moat-num" style="background:rgba(108,99,255,0.2);color:var(--accent)">1</div><div><div style="font-size:13px;font-weight:700">Тренеры как вектор роста</div><div style="font-size:12px;color:var(--muted)">Один тренер приводит 5–15 клиентов. CAC на клиента → ≈₽0</div></div></div>
+          <div class="moat-item"><div class="moat-num" style="background:rgba(108,99,255,0.2);color:var(--accent)">2</div><div><div style="font-size:13px;font-weight:700">Фитнес-клубы и студии</div><div style="font-size:12px;color:var(--muted)">Стандарт ведения клиентов для группы тренеров</div></div></div>
+          <div class="moat-item"><div class="moat-num" style="background:rgba(108,99,255,0.2);color:var(--accent)">3</div><div><div style="font-size:13px;font-weight:700">Экосистема Яндекса</div><div style="font-size:12px;color:var(--muted)">Музыка, Карты, Плюс — готовая база пользователей</div></div></div>
+          <div class="moat-item"><div class="moat-num" style="background:rgba(108,99,255,0.2);color:var(--accent)">4</div><div><div style="font-size:13px;font-weight:700">Маркетплейс тренеров</div><div style="font-size:12px;color:var(--muted)">Клиент ищет тренера → тренер монетизируется → оба остаются в продукте</div></div></div>
+          <div class="moat-item"><div class="moat-num" style="background:rgba(67,233,123,0.15);color:var(--accent2)">5</div><div><div style="font-size:13px;font-weight:700">Цена ×3 ниже зарубежных</div><div style="font-size:12px;color:var(--muted)">TrainingPeaks: $35–165/мес. Наш тариф: 990 ₽/мес</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 7: ДОРОЖНАЯ КАРТА ═══════════ -->
+<div class="slide" id="s7">
+  <div class="slide-num">05 · Дорожная карта</div>
+  <h2 style="margin-bottom:20px">План на первый год — по кварталам</h2>
+  <div class="roadmap" style="flex:1">
+    <div class="roadmap-q highlight">
+      <h4>Q1 — P0</h4>
+      <div class="phase">Пилот с тренерами</div>
+      <ul>
+        <li>MVP: приложение тренера</li>
+        <li>Голосовой ввод (SpeechKit) + AI-разбор (YandexGPT)</li>
+        <li>Карточка клиента и история</li>
+        <li>Закрытое бета-тестирование</li>
+        <li>30 тренеров → 10 в пилоте → 3–5 клиентов каждый</li>
+      </ul>
+      <div style="margin-top:12px;padding:8px;background:rgba(108,99,255,0.1);border-radius:8px">
+        <div style="font-size:11px;color:var(--accent);font-weight:700">IT-метрики</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Uptime 99.9% · STQ &lt;5с · WER &lt;10% · RPS 15</div>
+      </div>
+    </div>
+    <div class="roadmap-q">
+      <h4>Q2 — P1</h4>
+      <div class="phase">Клиентское приложение</div>
+      <ul>
+        <li>Релиз клиентского приложения</li>
+        <li>Интеграция Yandex Pay</li>
+        <li>Веб-версия (Next.js)</li>
+        <li>Базовая аналитика</li>
+        <li>Расширение команды разработки</li>
+      </ul>
+      <div style="margin-top:12px;padding:8px;background:rgba(108,99,255,0.1);border-radius:8px">
+        <div style="font-size:11px;color:var(--accent);font-weight:700">IT-метрики</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Uptime 99.95% · Платежи &gt;99% · p95 &lt;200мс · RPS 50</div>
+      </div>
+    </div>
+    <div class="roadmap-q">
+      <h4>Q3 — P2</h4>
+      <div class="phase">AI и аналитика</div>
+      <ul>
+        <li>AI-коуч для самостоятельных</li>
+        <li>ClickHouse + DataLens</li>
+        <li>Оптимизация БД (партиционирование)</li>
+        <li>AI-подсказки тренеру</li>
+        <li>Маркетплейс тренеров (бета)</li>
+      </ul>
+      <div style="margin-top:12px;padding:8px;background:rgba(108,99,255,0.1);border-radius:8px">
+        <div style="font-size:11px;color:var(--accent);font-weight:700">IT-метрики</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Uptime 99.99% · AI-точность &gt;85% · RPS 200</div>
+      </div>
+    </div>
+    <div class="roadmap-q">
+      <h4>Q4 — P2+</h4>
+      <div class="phase">Экосистема Яндекса</div>
+      <ul>
+        <li>Интеграция с Алисой</li>
+        <li>Яндекс.Музыка, Карты, Плюс</li>
+        <li>Массовый запуск 2028</li>
+        <li>Multi-region подготовка</li>
+        <li>Маркетинг в B2C канале</li>
+      </ul>
+      <div style="margin-top:12px;padding:8px;background:rgba(108,99,255,0.1);border-radius:8px">
+        <div style="font-size:11px;color:var(--accent);font-weight:700">IT-метрики</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Uptime 99.99% · Алиса &gt;20% · RPS 300–500</div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px;flex:none">
+    <div style="display:flex;gap:24px;flex-wrap:wrap">
+      <div><span style="font-size:12px;color:var(--muted)">Инфраструктура Q1: </span><span style="font-size:12px;color:var(--text)">1×userver, 1×PostgreSQL 2vCPU/8GB, 1×Redis</span></div>
+      <div><span style="font-size:12px;color:var(--muted)">Ресурсы компании: </span><span style="font-size:12px;color:var(--text)">SpeechKit, YandexGPT, Yandex Cloud, Yandex ID, Yandex Pay</span></div>
+      <div><span style="font-size:12px;color:var(--muted)">Бюджет до break-even: </span><span style="font-size:12px;color:var(--accent2);font-weight:700">500 млн ₽ (3 года)</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 8: КОМАНДА ═══════════ -->
+<div class="slide" id="s8">
+  <div class="slide-num">06 · Команда</div>
+  <h2 style="margin-bottom:20px">Инициаторы проекта</h2>
+  <div class="grid-2" style="flex:1;align-content:start">
+    <div class="card">
+      <div class="person">
+        <div class="person-avatar" style="background:linear-gradient(135deg,#6c63ff,#3a2fa0)">ВВ</div>
+        <div>
+          <div class="person-name">Вова Власов</div>
+          <div class="person-role">Product Lead & Co-founder</div>
+          <div class="person-bio">8 лет Яндекс: Такси межнар (2017–2020), Лавка (2020–2022), Доставка рост&стратегия (2023–н.в.) · 3 года McKinsey · 25 лет в плавании, 10 — в беге, 8 — в триатлоне · 7 лет опыта тренером</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="person">
+        <div class="person-avatar" style="background:linear-gradient(135deg,#ff6b6b,#c0143c)">ПБ</div>
+        <div>
+          <div class="person-name">Полина Бабайлова</div>
+          <div class="person-role">CPO & Co-founder</div>
+          <div class="person-bio">iOS разработка в Яндекс Еде · Продуктовое проектирование и прототипирование · Отвечает за продуктовую стратегию и UX</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="person">
+        <div class="person-avatar" style="background:linear-gradient(135deg,#43e97b,#0a7c34)">ПП</div>
+        <div>
+          <div class="person-name">Павел Подколзин</div>
+          <div class="person-role">CTO & Co-founder</div>
+          <div class="person-bio">6 лет в ecom: ex-Ozon, ex-AliExpress · Создание и развитие SaaS-решения в B2B Яндекс.Лавке · C++, React Native, userver, ML</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="person">
+        <div class="person-avatar" style="background:linear-gradient(135deg,#f5a623,#c47d00)">МИ</div>
+        <div>
+          <div class="person-name">Михаил Ишметьев</div>
+          <div class="person-role">CFO & Co-founder</div>
+          <div class="person-bio">8 лет в ecom · Запуск проектов с 0 в быстро растущих ecom из топ-3 · Увеличение эффективности ресурсов ×2 за 4 года · Отвечает за инвестиции и сходимость бизнес-модели</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px;flex:none">
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <div style="font-size:13px;color:var(--muted)">Чего не хватает:</div>
+      <div class="badge badge-red">Head of Marketing</div>
+      <div class="badge badge-red">ML Engineer (fine-tuning)</div>
+      <div class="badge badge-red">Head of Sales (B2B тренеры)</div>
+      <div style="font-size:12px;color:var(--muted);margin-left:auto">+ Антон Князев — маркетинг и продвижение</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 9: ФИНАНСЫ ═══════════ -->
+<div class="slide" id="s9">
+  <div class="slide-num">07 · Финансовые показатели</div>
+  <h2 style="margin-bottom:20px">Метрики на 5 лет</h2>
+  <div class="cols">
+    <div class="col col-2">
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>Метрика</th>
+            <th>2027</th>
+            <th>2028</th>
+            <th>2029</th>
+            <th>2030</th>
+            <th>2031</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="bold">Revenue</td><td>22 млн</td><td>168 млн</td><td>537 млн</td><td class="pos">1.1 млрд</td><td class="pos">1.7 млрд</td></tr>
+          <tr><td class="bold">Gross Profit</td><td class="neg">−58 млн</td><td>27 млн</td><td>359 млн</td><td class="pos">859 млн</td><td class="pos">1.4 млрд</td></tr>
+          <tr><td class="bold">Gross Margin</td><td class="neg">−262%</td><td>16.1%</td><td>67%</td><td class="pos">79.1%</td><td class="pos">83.4%</td></tr>
+          <tr><td class="bold">EBITDA</td><td class="neg">−151 млн</td><td class="neg">−225 млн</td><td class="neg">−72 млн</td><td class="pos">+428 млн</td><td class="pos">+951 млн</td></tr>
+          <tr><td class="bold">ARR (end year)</td><td>59 млн</td><td>297 млн</td><td>771 млн</td><td class="pos">1.4 млрд</td><td class="pos">1.9 млрд</td></tr>
+          <tr><td class="bold">Платных клиентов</td><td>6 660</td><td>29 540</td><td>68 479</td><td class="pos">107 650</td><td class="pos">137 488</td></tr>
+          <tr><td class="bold">Avg CAC</td><td>222 ₽</td><td>225 ₽</td><td>182 ₽</td><td class="pos">121 ₽</td><td class="pos">102 ₽</td></tr>
+          <tr><td class="bold">LTV / CAC</td><td>60x</td><td>54x</td><td>65x</td><td class="pos">102x</td><td class="pos">131x</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col">
+      <div class="card-green">
+        <div class="label">Break-even</div>
+        <div class="stat-val green" style="font-size:32px;margin-top:6px">2030</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:6px">EBITDA выходит в плюс (+428 млн ₽). До этого — кассовый разрыв покрывается инвестициями.</div>
+      </div>
+      <div class="card">
+        <div class="label">Предпосылки модели</div>
+        <ul class="fancy" style="margin-top:6px">
+          <li>Один тренер = 10–15 клиентов</li>
+          <li>Конверсия в платный: 30% тренеров, 15% клиентов</li>
+          <li>Churn тренера: 5%/мес (данные важнее → lock-in)</li>
+          <li>CAC снижается: органика + экосистема Яндекса</li>
+          <li>AI-затраты: ~2 ₽/тренировку (оптимизировано)</li>
+        </ul>
+      </div>
+      <div class="card-accent">
+        <div class="label">Затраты 2027, млн ₽</div>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;font-size:13px">
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">R&D</span><span>80.3</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">S&M</span><span>44.7</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">G&A</span><span>37.8</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">COGS</span><span>10.2</span></div>
+          <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:4px;margin-top:4px"><span style="font-weight:700">Итого</span><span style="font-weight:700;color:var(--accent)">173 млн</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 10: KPI ═══════════ -->
+<div class="slide" id="s10">
+  <div class="slide-num">08 · KPI первого года</div>
+  <h2 style="margin-bottom:24px">Коммиты команды — что измеряем</h2>
+  <div class="grid-2" style="flex:1;align-content:start;gap:20px">
+    <div class="card-accent">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(108,99,255,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--accent)">1</div>
+        <div style="font-size:16px;font-weight:700">Вовлечённость тренера</div>
+      </div>
+      <div class="stat-val" style="font-size:36px">70%</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:6px">тренеров сделали 5+ голосовых/текстовых заметок за 2 недели пилота</div>
+    </div>
+    <div class="card-accent">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(108,99,255,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--accent)">2</div>
+        <div style="font-size:16px;font-weight:700">Retention тренера</div>
+      </div>
+      <div class="stat-val" style="font-size:36px">50%</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:6px">тренеров вернулись в приложение 3+ раза за неделю</div>
+    </div>
+    <div class="card-green">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(67,233,123,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--accent2)">3</div>
+        <div style="font-size:16px;font-weight:700">Ценность для клиента</div>
+      </div>
+      <div class="stat-val green" style="font-size:36px">50%</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:6px">клиентов открыли хотя бы один AI-отчёт от тренера</div>
+    </div>
+    <div class="card-green">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(67,233,123,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--accent2)">4</div>
+        <div style="font-size:16px;font-weight:700">Монетизация</div>
+      </div>
+      <div class="stat-val green" style="font-size:36px">30%</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:6px">тренеров готовы перейти на платный тариф после пилота</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px;flex:none">
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+      <div><span style="font-size:12px;color:var(--muted)">Дополнительно: </span></div>
+      <div class="badge badge-purple">MAU тренеров ↗</div>
+      <div class="badge badge-purple">Cashflow положительный к Q4</div>
+      <div class="badge badge-purple">NPS &gt; 40</div>
+      <div class="badge badge-green">Доля платных B2B &gt; 30%</div>
+      <div class="badge badge-green">Кол-во тренеров с публичным профилем &gt; 20%</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ NAV ═══════════ -->
+<div class="nav">
+  <button class="nav-btn" onclick="prevSlide()">←</button>
+  <div class="nav-dots" id="dots"></div>
+  <div class="nav-counter" id="counter">1 / 10</div>
+  <button class="nav-btn" onclick="nextSlide()">→</button>
+</div>
+
+<script>
+  const TOTAL = 10;
+  let current = 1;
+
+  function init() {
+    const dots = document.getElementById('dots');
+    for (let i = 1; i <= TOTAL; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i === 1 ? ' active' : '');
+      d.onclick = () => goTo(i);
+      dots.appendChild(d);
+    }
+  }
+
+  function goTo(n) {
+    document.getElementById('s' + current).classList.remove('active');
+    document.querySelectorAll('.dot')[current - 1].classList.remove('active');
+    current = Math.max(1, Math.min(TOTAL, n));
+    document.getElementById('s' + current).classList.add('active');
+    document.querySelectorAll('.dot')[current - 1].classList.add('active');
+    document.getElementById('counter').textContent = current + ' / ' + TOTAL;
+  }
+
+  function nextSlide() { goTo(current + 1); }
+  function prevSlide() { goTo(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextSlide();
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevSlide();
+  });
+
+  init();
+</script>
+</body>
+</html>
