@@ -209,11 +209,10 @@
        PHASE B — phones, bottom-cropped
     ═══════════════════════════════ */
     .reveal-phones {
-      position: absolute; bottom: -8%; left: 0; right: 0;
+      position: absolute; bottom: -5%; left: 0; right: 0;
       z-index: 21; display: flex;
       align-items: flex-end; justify-content: center;
-      gap: 24px; opacity: 0; pointer-events: none;
-      perspective: 1200px; perspective-origin: 50% 20%;
+      opacity: 0; pointer-events: none;
       transition: opacity 0.7s;
     }
     .reveal-phones.show { opacity: 1; pointer-events: auto; }
@@ -418,32 +417,13 @@
       <div class="rt-name">Яндекс&nbsp;Фит</div>
     </div>
 
-    <!-- Phase B: two phones Apple-style -->
+    <!-- Phase B: real iPhone photo -->
     <div class="reveal-phones" id="reveal-phones">
-      <div class="phone-wrap" id="pw1">
-        <div class="phone-outer" id="ps1">
-          <div class="phone-shell">
-            <div class="phone-notch-bar"></div>
-            <div class="phone-home-bar"></div>
-            <div class="phone-iframe-wrap" id="piw1">
-              <iframe src="index.html" title="Тренер" loading="lazy"></iframe>
-            </div>
-          </div>
-        </div>
-        <div class="phone-label">Для тренера</div>
-      </div>
-      <div class="phone-wrap" id="pw2">
-        <div class="phone-outer" id="ps2">
-          <div class="phone-shell">
-            <div class="phone-notch-bar"></div>
-            <div class="phone-home-bar"></div>
-            <div class="phone-iframe-wrap" id="piw2">
-              <iframe src="client.html" title="Клиент" loading="lazy"></iframe>
-            </div>
-          </div>
-        </div>
-        <div class="phone-label">Для клиента</div>
-      </div>
+      <img src="iphone16pro.png" id="phones-img"
+           alt="Яндекс Фит — приложения для тренера и клиента"
+           style="width:100%;max-width:900px;object-fit:contain;
+                  opacity:0;transform:translateY(40px);
+                  transition:opacity 0.9s,transform 0.9s cubic-bezier(0.34,1.1,0.64,1)">
     </div>
 
   </div>
@@ -583,12 +563,13 @@
       document.getElementById('reveal-text').classList.add('top');
     }, 1800);
 
-    // Step 4: phones appear with rotateY Apple-style
+    // Step 4: phones image appears
     setTimeout(() => {
       document.getElementById('reveal-phones').classList.add('show');
+      const img = document.getElementById('phones-img');
       setTimeout(() => {
-        document.getElementById('pw1').classList.add('enter');
-        document.getElementById('pw2').classList.add('enter');
+        img.style.opacity = '1';
+        img.style.transform = 'translateY(0)';
         revealShown = true;
       }, 80);
     }, 2200);
@@ -625,7 +606,8 @@
         }
         document.getElementById('reveal-text').classList.remove('show','top');
         document.getElementById('reveal-phones').classList.remove('show');
-        ['pw1','pw2'].forEach(id => document.getElementById(id).classList.remove('enter'));
+        const img = document.getElementById('phones-img');
+        img.style.opacity = '0'; img.style.transform = 'translateY(40px)';
         setTimeout(() => showProblem(1), 300);
       }
     }
