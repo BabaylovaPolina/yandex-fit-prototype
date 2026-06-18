@@ -494,12 +494,32 @@
   </div>
 </div>
 
+<!-- ═══ SCENE: VIDEO MORPH ═══ -->
+<div class="scene" id="sv">
+  <video class="sv-video" id="sv-vid" autoplay muted loop playsinline>
+    <source src="workout.mov" type="video/mp4">
+    <source src="workout.mov" type="video/quicktime">
+  </video>
+
+  <div class="sv-overlay" id="sv-overlay">
+    <div class="sv-eyebrow">Голосовой ввод</div>
+    <div class="sv-title">Надиктуй тренировку.<br>Алиса сделает остальное.</div>
+  </div>
+
+  <img class="sv-frame" id="sv-frame" src="iphone-frame.png" alt="">
+
+  <div class="sv-caption" id="sv-caption">
+    <p>Скажи «присед 4 подхода по 8, 60 кг» — и всё.<br>
+    <strong>Упражнения, веса, сеты появятся сами.</strong></p>
+  </div>
+</div>
+
 <!-- ── DOTS ── -->
 <div class="dots" id="dots-nav"></div>
 <div class="hint" id="hint">пробел / →</div>
 
 <script>
-  const SCENES = ['s1','s2','s3','s5','s6','s7','s8','s9'];
+  const SCENES = ['s1','s2','s3','sv','s6','s7','s8','s9'];
   const TOTAL_STEPS = 9 + 7; // 9 scenes + 7 problem steps in scene 3
   let sceneIdx = 0;
   let problemStep = 0;
@@ -519,14 +539,6 @@
     });
   }
 
-  function showScene(idx) {
-    SCENES.forEach((id, i) => {
-      document.getElementById(id).classList.toggle('active', i === idx);
-    });
-    updateDots();
-    // hint fades on last scene
-    document.getElementById('hint').style.opacity = idx === SCENES.length - 1 ? '0' : '1';
-  }
 
   function showProblem(n) {
     for (let i = 1; i <= 7; i++) {
@@ -583,7 +595,39 @@
     }, 2200);
   }
 
+  let videoShrunk = false;
+
+  function showScene(idx) {
+    SCENES.forEach((id, i) => {
+      document.getElementById(id).classList.toggle('active', i === idx);
+    });
+    updateDots();
+    document.getElementById('hint').style.opacity = idx === SCENES.length - 1 ? '0' : '1';
+    // reset video scene when re-entering
+    if (SCENES[idx] === 'sv') {
+      videoShrunk = false;
+      document.getElementById('sv-vid').classList.remove('shrink');
+      document.getElementById('sv-overlay').classList.remove('hide');
+      document.getElementById('sv-frame').classList.remove('show');
+      document.getElementById('sv-caption').classList.remove('show');
+    }
+  }
+
   function advance() {
+    // video morph scene
+    if (SCENES[sceneIdx] === 'sv') {
+      if (!videoShrunk) {
+        videoShrunk = true;
+        document.getElementById('sv-vid').classList.add('shrink');
+        document.getElementById('sv-overlay').classList.add('hide');
+        document.getElementById('sv-frame').classList.add('show');
+        document.getElementById('sv-caption').classList.add('show');
+      } else {
+        sceneIdx++;
+        showScene(sceneIdx);
+      }
+      return;
+    }
     if (sceneIdx === 2) {
       // scene 3: problems then reveal
       if (revealShown) {
