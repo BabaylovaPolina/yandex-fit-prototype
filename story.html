@@ -92,46 +92,32 @@
     /* ═══════════════════════════════
        SCENE 3 — PROBLEMS
     ═══════════════════════════════ */
-    #s3 { overflow: hidden; align-items: flex-start; justify-content: flex-start; }
+    #s3 { overflow: hidden; }
 
-    .s3-eyebrow {
-      font-size: clamp(11px, 1.2vw, 14px); font-weight: 700;
-      letter-spacing: 3px; text-transform: uppercase;
-      color: #9B59F5;
-      padding: 60px 0 28px 72px;
-      opacity: 0; transform: translateY(12px);
-      transition: opacity 0.5s, transform 0.5s;
-      flex-shrink: 0;
-    }
-    #s3.active .s3-eyebrow { opacity: 1; transform: none; }
-
-    /* Problems — cascade, newest = biggest/brightest */
     .problems-wrap {
       display: flex; flex-direction: column;
-      align-items: flex-start; justify-content: flex-start;
-      width: 100%; flex: 1;
-      padding: 0 72px 60px;
-      position: relative; gap: 0;
-      justify-content: center;
+      align-items: center; justify-content: center;
+      width: 100%; height: 100%;
+      padding: 60px 80px;
+      position: relative; gap: 6px;
     }
 
     .problem {
-      font-weight: 600; white-space: nowrap;
-      opacity: 0; transform: translateY(20px);
-      padding: 3px 0;
-      font-size: clamp(13px, calc(2.4vw - var(--age, 0) * 0.2vw), calc(32px - var(--age, 0) * 3px));
-      color: hsl(0, 0%, calc(100% - var(--age, 0) * 13%));
-      letter-spacing: calc(-0.8px + var(--age, 0) * 0.15px);
-      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.34,1.1,0.64,1),
-                  font-size 0.6s ease, color 0.6s ease, letter-spacing 0.6s ease;
+      font-weight: 700;
+      font-size: clamp(20px, 2.6vw, 34px);
+      letter-spacing: -0.5px;
+      color: #fff;
+      text-align: center;
+      opacity: 0; transform: translateY(18px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.1,0.64,1),
+                  color 0.5s ease;
     }
     .problem .ico  { display: none; }
     .problem .dash { display: none; }
 
-    .problem.show {
-      opacity: calc(1 - var(--age, 0) * 0.14);
-      transform: translateY(0);
-    }
+    .problem.show  { opacity: 1; transform: translateY(0); }
+    .problem.dim   { opacity: 0.22; color: #888; transform: translateY(0); }
+    .problem.p-gpt { color: #43e97b; }
 
     /* Converge */
     .problem.converge {
@@ -418,12 +404,11 @@
 <div class="scene" id="s3">
   <div class="problems-wrap" id="problems-wrap">
 
-    <div class="problem" id="p1"><span class="dash">—</span>Тренер ведёт клиентов в заметках и Excel</div>
-    <div class="problem" id="p2"><span class="dash">—</span>Скрин с часов — тренеру в WhatsApp</div>
-    <div class="problem" id="p3"><span class="dash">—</span>КБЖУ — Fat Secret, таблицы, отдельное приложение</div>
-    <div class="problem" id="p4"><span class="dash">—</span>Вместо чата с тренером — формочка раз в месяц</div>
-    <div class="problem" id="p5"><span class="dash">—</span>Куда бежать? Три приложения, ни одного ответа</div>
-    <div class="problem" id="p6"><span class="dash">—</span>И всё это потом — в GPT</div>
+    <div class="problem" id="p1">Тренер ведёт клиентов в заметках и Excel</div>
+    <div class="problem" id="p2">Скрин с часов — тренеру в WhatsApp</div>
+    <div class="problem" id="p3">КБЖУ — Fat Secret, таблицы, отдельное приложение</div>
+    <div class="problem" id="p4">Куда бежать? Три приложения, ни одного ответа</div>
+    <div class="problem p-gpt" id="p5">И всё это потом — в GPT</div>
 
     <!-- Phase A: big text -->
     <div class="reveal-text" id="reveal-text">
@@ -777,7 +762,7 @@
 
 <script>
   const SCENES = ['s1','s2','s3','s5','s6','s7','s8','sm1','sm2','sbm','smkt','s9'];
-  const TOTAL_STEPS = 9 + 6; // 9 scenes + 6 problem steps in scene 3
+  const TOTAL_STEPS = 9 + 5; // 9 scenes + 5 problem steps in scene 3
   let sceneIdx = 0;
   let problemStep = 0;
   let revealShown = false;
@@ -798,11 +783,14 @@
 
 
   function showProblem(n) {
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 5; i++) {
       const el = document.getElementById('p' + i);
-      if (i <= n) {
+      if (i < n) {
+        el.classList.remove('show');
+        el.classList.add('dim');
+      } else if (i === n) {
+        el.classList.remove('dim');
         el.classList.add('show');
-        el.style.setProperty('--age', n - i); // 0 = newest, 5 = oldest
       }
     }
   }
@@ -825,7 +813,7 @@
 
   function convergeProblems() {
     // Step 1: problems fade
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 5; i++) {
       document.getElementById('p' + i).classList.add('converge');
     }
 
@@ -896,9 +884,9 @@
         return;
       }
       problemStep++;
-      if (problemStep <= 6) {
+      if (problemStep <= 5) {
         showProblem(problemStep);
-      } else if (problemStep === 7) {
+      } else if (problemStep === 6) {
         convergeProblems();
       }
       return;
@@ -910,8 +898,8 @@
       if (sceneIdx === 2) {
         problemStep = 1;
         revealShown = false;
-        for (let i = 1; i <= 6; i++) {
-          document.getElementById('p' + i).classList.remove('show','converge');
+        for (let i = 1; i <= 5; i++) {
+          document.getElementById('p' + i).classList.remove('show','dim','converge');
         }
         document.getElementById('reveal-text').classList.remove('show','top');
         document.getElementById('reveal-phones').classList.remove('show');
@@ -925,11 +913,12 @@
   function retreat() {
     if (sceneIdx === 2 && problemStep > 0) {
       problemStep--;
-      for (let i = 1; i <= 6; i++) {
+      for (let i = 1; i <= 5; i++) {
         const el = document.getElementById('p' + i);
         el.classList.remove('converge');
-        if (i <= problemStep) el.classList.add('show');
-        else el.classList.remove('show');
+        if (i < problemStep) { el.classList.add('dim'); el.classList.remove('show'); }
+        else if (i === problemStep) { el.classList.add('show'); el.classList.remove('dim'); }
+        else { el.classList.remove('show','dim'); }
       }
       document.getElementById('phone-reveal').classList.remove('show');
       return;
