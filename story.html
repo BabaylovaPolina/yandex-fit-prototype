@@ -181,79 +181,104 @@
     }
 
     /* ═══════════════════════════════
-       CONVERGE TEXT + PHONES (inside s3)
+       REVEAL STAGE (inside s3)
     ═══════════════════════════════ */
 
-    /* Text "Яндекс Фит" — big, sits behind phones */
-    .converge-text {
-      position: absolute; top: 10%; left: 50%;
-      transform: translateX(-50%);
-      text-align: center; z-index: 15;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.7s ease;
+    /* Full-screen stage for phones + text */
+    .reveal-stage {
+      position: absolute; inset: 0; z-index: 20;
+      pointer-events: none; opacity: 0;
+      transition: opacity 0.6s;
     }
-    .converge-text.show { opacity: 1; }
-    .converge-text.hide {
-      opacity: 0; transition: opacity 0.8s ease-in;
+    .reveal-stage.show { opacity: 1; pointer-events: auto; }
+
+    /* Top 1/3: text zone (hidden until tilt) */
+    .s3-text {
+      position: absolute; top: 0; left: 0; right: 0; height: 33%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 6px;
+      opacity: 0; z-index: 25;
+      background: linear-gradient(to bottom, #000 50%, transparent 100%);
+      transition: opacity 0.9s ease;
     }
-    .converge-meets {
-      font-size: clamp(12px, 1.2vw, 16px); color: #555;
-      letter-spacing: 4px; text-transform: uppercase; margin-bottom: 8px;
+    .s3-text.show { opacity: 1; }
+    .s3-meets {
+      font-size: clamp(11px, 1.1vw, 15px); color: #555;
+      letter-spacing: 4px; text-transform: uppercase;
     }
-    .converge-name {
-      font-size: clamp(64px, 11vw, 140px); font-weight: 900; letter-spacing: -4px;
-      background: linear-gradient(160deg, #fff 20%, #888);
+    .s3-name {
+      font-size: clamp(44px, 7vw, 86px); font-weight: 900; letter-spacing: -3px;
+      background: linear-gradient(135deg, #fff 40%, #aaa);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text; white-space: nowrap; line-height: 0.95;
+      background-clip: text; line-height: 1;
     }
 
-    /* Phones container — perspective stage */
-    .reveal-block {
-      position: absolute; bottom: -20px; left: 50%;
-      transform: translateX(-50%);
-      display: flex; gap: 24px; align-items: flex-end;
-      z-index: 20; pointer-events: none;
-      perspective: 900px; perspective-origin: 50% 100%;
+    /* Phones container — perspective pivot at bottom */
+    .phones-stage {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 100%;
+      display: flex; align-items: flex-end; justify-content: center;
+      gap: 28px; padding-bottom: 0;
+      perspective: 700px;
+      perspective-origin: 50% 100%;
     }
-    .reveal-block.show { pointer-events: auto; }
 
     .phone-wrap {
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      display: flex; flex-direction: column; align-items: center; gap: 0;
+      transform-origin: center bottom;
+      transform: rotateX(0deg);
       opacity: 0;
+      transition: transform 1.4s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.7s ease;
     }
-    .phone-wrap.rise {
-      animation: phoneRise 1.1s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-    }
-    .phone-wrap.rise:nth-child(2) {
-      animation-delay: 0.08s;
-    }
-
-    @keyframes phoneRise {
-      0%   { opacity: 0; transform: rotateX(55deg) translateY(80px) scale(0.9); }
-      30%  { opacity: 1; }
-      100% { opacity: 1; transform: rotateX(0deg) translateY(0)    scale(1);   }
-    }
+    .phone-wrap.appear { opacity: 1; }
+    .phone-wrap.tilt   { transform: rotateX(-34deg); }
 
     .phone-label {
-      font-size: 11px; color: #444;
-      letter-spacing: 2.5px; text-transform: uppercase;
-      opacity: 0; transition: opacity 0.5s 0.8s;
+      font-size: 11px; color: rgba(255,255,255,0.35);
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 12px; opacity: 0;
+      transition: opacity 0.5s 1.8s;
     }
-    .phone-wrap.rise .phone-label { opacity: 1; }
+    .phone-wrap.tilt .phone-label { opacity: 1; }
 
+    /* iPhone shell — full viewport height */
     .phone-shell {
-      width: 230px; height: 470px;
-      border-radius: 44px; overflow: hidden; position: relative;
-      border: 1.5px solid rgba(255,255,255,0.12);
-      box-shadow: 0 50px 100px rgba(0,0,0,0.95), 0 0 0 1px rgba(255,255,255,0.04), 0 0 60px rgba(108,99,255,0.15);
-      background: #000; flex-shrink: 0;
-      transform-style: preserve-3d;
+      width: calc(91vh * 390 / 844);
+      height: 91vh;
+      max-height: 760px;
+      max-width: calc(760px * 390 / 844);
+      border-radius: clamp(32px, 5vh, 52px);
+      overflow: hidden; position: relative;
+      border: 2px solid rgba(255,255,255,0.13);
+      box-shadow:
+        0 60px 120px rgba(0,0,0,1),
+        0 0 0 1px rgba(255,255,255,0.04),
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 0 80px rgba(100,80,255,0.12);
+      background: #050505; flex-shrink: 0;
     }
+
+    /* Side buttons (decorative) */
+    .phone-shell::before {
+      content: ''; position: absolute;
+      right: -3px; top: 22%; height: 14%; width: 3px;
+      background: rgba(255,255,255,0.08); border-radius: 0 2px 2px 0;
+    }
+
+    /* Notch */
+    .phone-notch-bar {
+      position: absolute; top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 35%; height: 3.5%;
+      background: #000; border-radius: 0 0 20px 20px;
+      z-index: 2;
+    }
+
     .phone-iframe-wrap {
-      width: 390px; height: 844px;
-      transform: scale(0.59);
-      transform-origin: top left;
       position: absolute; top: 0; left: 0;
+      width: 390px; height: 844px;
+      transform-origin: top left;
       pointer-events: none;
     }
     .phone-iframe-wrap iframe { width: 390px; height: 844px; border: none; }
@@ -358,30 +383,37 @@
     <div class="problem" id="p6"><span class="dash">—</span>В отпуске без тренера — импровизируешь</div>
     <div class="problem" id="p7"><span class="dash">—</span>Куда побежать? Три приложения, ни одного ответа</div>
 
-    <!-- Step A: "Знакомьтесь. Яндекс Фит." materialises from problems -->
-    <div class="converge-text" id="converge-text">
-      <div class="converge-meets">Знакомьтесь</div>
-      <div class="converge-name">Яндекс Фит</div>
-    </div>
+    <!-- Reveal stage: phones full-height then tilt back revealing text -->
+    <div class="reveal-stage" id="reveal-stage">
 
-    <!-- Step B: two phones emerge from where text was -->
-    <div class="reveal-block" id="reveal-block">
-      <div class="phone-wrap">
-        <div class="phone-shell">
-          <div class="phone-iframe-wrap">
-            <iframe src="index.html" title="Тренер" loading="lazy"></iframe>
+      <!-- Text appears in top 1/3 after tilt -->
+      <div class="s3-text" id="s3-text">
+        <div class="s3-meets">Знакомьтесь</div>
+        <div class="s3-name">Яндекс&nbsp;Фит</div>
+      </div>
+
+      <!-- Phones fill full height, then tilt -->
+      <div class="phones-stage">
+        <div class="phone-wrap" id="pw1">
+          <div class="phone-label">Для тренера</div>
+          <div class="phone-shell" id="ps1">
+            <div class="phone-notch-bar"></div>
+            <div class="phone-iframe-wrap" id="piw1">
+              <iframe src="index.html" title="Тренер" loading="lazy"></iframe>
+            </div>
           </div>
         </div>
-        <div class="phone-label">Для тренера</div>
-      </div>
-      <div class="phone-wrap">
-        <div class="phone-shell">
-          <div class="phone-iframe-wrap">
-            <iframe src="client.html" title="Клиент" loading="lazy"></iframe>
+        <div class="phone-wrap" id="pw2">
+          <div class="phone-label">Для клиента</div>
+          <div class="phone-shell" id="ps2">
+            <div class="phone-notch-bar"></div>
+            <div class="phone-iframe-wrap" id="piw2">
+              <iframe src="client.html" title="Клиент" loading="lazy"></iframe>
+            </div>
           </div>
         </div>
-        <div class="phone-label">Для клиента</div>
       </div>
+
     </div>
 
   </div>
@@ -488,28 +520,43 @@
     }
   }
 
+  function scaleIframes() {
+    // scale iframes to fit phone shell
+    [1, 2].forEach(n => {
+      const shell = document.getElementById('ps' + n);
+      const wrap  = document.getElementById('piw' + n);
+      if (shell && wrap) {
+        const scale = shell.offsetHeight / 844;
+        wrap.style.transform = `scale(${scale})`;
+      }
+    });
+  }
+
   function convergeProblems() {
-    // Step 1: problems fade out
+    // Step 1: problems fade
     for (let i = 1; i <= 7; i++) {
       document.getElementById('p' + i).classList.add('converge');
     }
 
-    // Step 2: big "Яндекс Фит" text appears
+    // Step 2: reveal stage + phones appear upright (full height)
     setTimeout(() => {
-      document.getElementById('converge-text').classList.add('show');
+      document.getElementById('reveal-stage').classList.add('show');
+      scaleIframes();
+      setTimeout(() => {
+        document.getElementById('pw1').classList.add('appear');
+        document.getElementById('pw2').classList.add('appear');
+      }, 50);
     }, 500);
 
-    // Step 3: phones rise up in 3D from below the text
+    // Step 3: phones tilt back — top goes away, bottom comes forward
     setTimeout(() => {
-      const block = document.getElementById('reveal-block');
-      block.classList.add('show');
-      block.querySelectorAll('.phone-wrap').forEach(p => p.classList.add('rise'));
+      document.getElementById('pw1').classList.add('tilt');
+      document.getElementById('pw2').classList.add('tilt');
     }, 1400);
 
-    // Step 4: text fades behind phones
+    // Step 4: text appears in freed top space
     setTimeout(() => {
-      document.getElementById('converge-text').classList.remove('show');
-      document.getElementById('converge-text').classList.add('hide');
+      document.getElementById('s3-text').classList.add('show');
       revealShown = true;
     }, 2000);
   }
@@ -543,10 +590,12 @@
         for (let i = 1; i <= 7; i++) {
           document.getElementById('p' + i).classList.remove('show','converge');
         }
-        const rb = document.getElementById('reveal-block');
-        rb.classList.remove('show');
-        rb.querySelectorAll('.phone-wrap').forEach(p => p.classList.remove('rise'));
-        document.getElementById('converge-text').classList.remove('show','hide');
+        document.getElementById('reveal-stage').classList.remove('show');
+        document.getElementById('s3-text').classList.remove('show');
+        ['pw1','pw2'].forEach(id => {
+          const el = document.getElementById(id);
+          el.classList.remove('appear','tilt');
+        });
         setTimeout(() => showProblem(1), 300);
       }
     }
