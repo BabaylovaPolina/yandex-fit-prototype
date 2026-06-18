@@ -416,16 +416,14 @@
 
 <!-- ═══ SCENE 3 — PROBLEMS ═══ -->
 <div class="scene" id="s3">
-  <div class="s3-eyebrow">Проблема</div>
   <div class="problems-wrap" id="problems-wrap">
 
     <div class="problem" id="p1"><span class="dash">—</span>Тренер ведёт клиентов в заметках и Excel</div>
-    <div class="problem" id="p2"><span class="dash">—</span>После занятия — фото в WhatsApp тренеру</div>
-    <div class="problem" id="p3"><span class="dash">—</span>Скрин с часов — в GPT за советом</div>
-    <div class="problem" id="p4"><span class="dash">—</span>Стал сильнее? Листаешь чаты месячной давности</div>
-    <div class="problem" id="p5"><span class="dash">—</span>КБЖУ — Fat Secret, таблицы, отдельный чат</div>
-    <div class="problem" id="p6"><span class="dash">—</span>В отпуске без тренера — импровизируешь</div>
-    <div class="problem" id="p7"><span class="dash">—</span>Куда побежать? Три приложения, ни одного ответа</div>
+    <div class="problem" id="p2"><span class="dash">—</span>Скрин с часов — тренеру в WhatsApp</div>
+    <div class="problem" id="p3"><span class="dash">—</span>КБЖУ — Fat Secret, таблицы, отдельное приложение</div>
+    <div class="problem" id="p4"><span class="dash">—</span>Вместо чата с тренером — формочка раз в месяц</div>
+    <div class="problem" id="p5"><span class="dash">—</span>Куда бежать? Три приложения, ни одного ответа</div>
+    <div class="problem" id="p6"><span class="dash">—</span>И всё это потом — в GPT</div>
 
     <!-- Phase A: big text -->
     <div class="reveal-text" id="reveal-text">
@@ -779,7 +777,7 @@
 
 <script>
   const SCENES = ['s1','s2','s3','s5','s6','s7','s8','sm1','sm2','sbm','smkt','s9'];
-  const TOTAL_STEPS = 9 + 7; // 9 scenes + 7 problem steps in scene 3
+  const TOTAL_STEPS = 9 + 6; // 9 scenes + 6 problem steps in scene 3
   let sceneIdx = 0;
   let problemStep = 0;
   let revealShown = false;
@@ -800,11 +798,11 @@
 
 
   function showProblem(n) {
-    for (let i = 1; i <= 7; i++) {
+    for (let i = 1; i <= 6; i++) {
       const el = document.getElementById('p' + i);
       if (i <= n) {
         el.classList.add('show');
-        el.style.setProperty('--age', n - i); // 0 = newest, 6 = oldest
+        el.style.setProperty('--age', n - i); // 0 = newest, 5 = oldest
       }
     }
   }
@@ -827,7 +825,7 @@
 
   function convergeProblems() {
     // Step 1: problems fade
-    for (let i = 1; i <= 7; i++) {
+    for (let i = 1; i <= 6; i++) {
       document.getElementById('p' + i).classList.add('converge');
     }
 
@@ -898,9 +896,9 @@
         return;
       }
       problemStep++;
-      if (problemStep <= 7) {
+      if (problemStep <= 6) {
         showProblem(problemStep);
-      } else if (problemStep === 8) {
+      } else if (problemStep === 7) {
         convergeProblems();
       }
       return;
@@ -912,7 +910,7 @@
       if (sceneIdx === 2) {
         problemStep = 1;
         revealShown = false;
-        for (let i = 1; i <= 7; i++) {
+        for (let i = 1; i <= 6; i++) {
           document.getElementById('p' + i).classList.remove('show','converge');
         }
         document.getElementById('reveal-text').classList.remove('show','top');
@@ -927,7 +925,7 @@
   function retreat() {
     if (sceneIdx === 2 && problemStep > 0) {
       problemStep--;
-      for (let i = 1; i <= 7; i++) {
+      for (let i = 1; i <= 6; i++) {
         const el = document.getElementById('p' + i);
         el.classList.remove('converge');
         if (i <= problemStep) el.classList.add('show');
