@@ -220,7 +220,7 @@
       display: flex; align-items: flex-end; justify-content: center;
       gap: 28px; padding-bottom: 0;
       perspective: 700px;
-      perspective-origin: 50% 100%;
+      perspective-origin: 50% 10%; /* viewer from above — top recedes */
     }
 
     .phone-wrap {
@@ -232,7 +232,7 @@
                   opacity 0.7s ease;
     }
     .phone-wrap.appear { opacity: 1; }
-    .phone-wrap.tilt   { transform: rotateX(-34deg); }
+    .phone-wrap.tilt   { transform: rotateX(32deg); } /* top away, bottom toward viewer */
 
     .phone-label {
       font-size: 11px; color: rgba(255,255,255,0.35);
