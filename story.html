@@ -495,16 +495,17 @@
 </div>
 
 <!-- ═══ SCENE sm1: MARKET GROWTH ═══ -->
-<div class="scene feature-scene" id="sm1">
+<div class="scene feature-scene" id="sm1" style="padding:44px 60px 48px">
   <div class="feature-eyebrow">Рынок</div>
-  <div class="feature-headline" style="color:#fff;margin-bottom:4px;font-size:clamp(32px,5vw,66px);font-weight:800;letter-spacing:-2px;line-height:1.1;opacity:0;transform:translateY(20px);transition:opacity 0.7s 0.15s,transform 0.7s 0.15s">Россия только<br><span class="gradient-text">начинает.</span></div>
+  <div class="feature-headline" style="color:#fff;margin-bottom:16px;font-size:clamp(32px,5vw,64px);font-weight:800;letter-spacing:-2px;line-height:1.1;opacity:0;transform:translateY(20px);transition:opacity 0.7s 0.15s,transform 0.7s 0.15s">Россия только<br><span class="gradient-text">начинает.</span></div>
 
-  <div style="display:flex;gap:40px;align-items:stretch;width:100%;flex:1;min-height:0">
+  <div style="display:flex;gap:48px;align-items:flex-start;width:100%;height:clamp(240px,40vh,340px)">
 
-    <!-- LEFT: line chart, Y-axis 0–20%, projected to ×4 -->
-    <div style="flex:3;display:flex;flex-direction:column;gap:8px;min-width:0">
-      <div style="font-size:11px;color:#555;letter-spacing:2px;text-transform:uppercase">Проникновение фитнеса в РФ, % населения</div>
-      <svg viewBox="0 0 540 185" style="width:100%;flex:1" preserveAspectRatio="none">
+    <!-- LEFT: chart -->
+    <div style="flex:11;display:flex;flex-direction:column;gap:6px;height:100%">
+      <div style="font-size:13px;font-weight:600;color:#fff;letter-spacing:-0.2px">Динамика проникновения фитнеса в РФ</div>
+      <div style="font-size:10px;color:#555;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px">% населения · Прогноз ×4 к 2030</div>
+      <svg viewBox="0 0 540 185" style="width:100%;height:0;flex:1" preserveAspectRatio="none">
         <defs>
           <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.6"/>
@@ -516,12 +517,11 @@
             <stop offset="100%" stop-color="#6c63ff" stop-opacity="0"/>
           </linearGradient>
           <linearGradient id="projAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#43e97b" stop-opacity="0.08"/>
+            <stop offset="0%" stop-color="#43e97b" stop-opacity="0.09"/>
             <stop offset="100%" stop-color="#43e97b" stop-opacity="0"/>
           </linearGradient>
         </defs>
-        <!-- Y: 170=0%, 136=5%, 102=10%, 68=15%, 34=20% (6px per %) -->
-        <!-- X: step=40px, 2018=40 … 2030=520 -->
+        <!-- Y: 170=0%, 136=5%, 102=10%, 68=15%, 34=20% -->
         <line x1="40" y1="136" x2="520" y2="136" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
         <line x1="40" y1="102" x2="520" y2="102" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
         <line x1="40" y1="68"  x2="520" y2="68"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
@@ -531,20 +531,13 @@
         <text x="32" y="105" fill="#555" font-size="9" text-anchor="end">10%</text>
         <text x="32" y="71"  fill="#555" font-size="9" text-anchor="end">15%</text>
         <text x="32" y="37"  fill="#555" font-size="9" text-anchor="end">20%</text>
-        <!-- Area under actual -->
-        <polygon points="40,170 40,146 80,145 120,150 160,146 200,143 240,141 280,139 320,136 360,133 360,170"
-          fill="url(#areaGrad)"/>
-        <!-- Area projected 2026→2030 -->
-        <polygon points="360,133 400,116 440,88 480,61 520,34 520,170 360,170"
-          fill="url(#projAreaGrad)"/>
-        <!-- Actual line 2018→2026 -->
+        <polygon points="40,170 40,146 80,145 120,150 160,146 200,143 240,141 280,139 320,136 360,133 360,170" fill="url(#areaGrad)"/>
+        <polygon points="360,133 400,116 440,88 480,61 520,34 520,170 360,170" fill="url(#projAreaGrad)"/>
         <polyline points="40,146 80,145 120,150 160,146 200,143 240,141 280,139 320,136 360,133"
           fill="none" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <!-- Projected dashed 2026→2030, reaching ~20% -->
         <polyline points="360,133 400,116 440,88 480,61 520,34"
           fill="none" stroke="#43e97b" stroke-width="2" stroke-dasharray="5,4"
           stroke-linejoin="round" stroke-linecap="round" opacity="0.85"/>
-        <!-- Actual points -->
         <circle cx="40"  cy="146" r="3" fill="#6c63ff"/>
         <circle cx="80"  cy="145" r="3" fill="#6c63ff"/>
         <circle cx="120" cy="150" r="3" fill="#7070ff"/>
@@ -554,15 +547,12 @@
         <circle cx="280" cy="139" r="3" fill="#50b890"/>
         <circle cx="320" cy="136" r="3" fill="#48cc78"/>
         <circle cx="360" cy="133" r="4" fill="#43e97b"/>
-        <!-- Projected points -->
         <circle cx="400" cy="116" r="3" fill="#43e97b" opacity="0.5"/>
         <circle cx="440" cy="88"  r="3" fill="#43e97b" opacity="0.5"/>
         <circle cx="480" cy="61"  r="3" fill="#43e97b" opacity="0.5"/>
         <circle cx="520" cy="34"  r="4" fill="#43e97b" opacity="0.7"/>
-        <!-- Labels -->
         <text x="360" y="124" fill="#43e97b" font-size="9.5" text-anchor="middle" font-weight="700">5.4%</text>
         <text x="520" y="25"  fill="#43e97b" font-size="9.5" text-anchor="middle" font-weight="700">~20%</text>
-        <!-- X labels -->
         <text x="40"  y="180" fill="#555" font-size="8.5" text-anchor="middle">2018</text>
         <text x="120" y="180" fill="#555" font-size="8.5" text-anchor="middle">2020</text>
         <text x="200" y="180" fill="#555" font-size="8.5" text-anchor="middle">2022</text>
@@ -571,47 +561,47 @@
         <text x="440" y="180" fill="#555" font-size="8.5" text-anchor="middle" opacity="0.5">2028</text>
         <text x="520" y="180" fill="#43e97b" font-size="8.5" text-anchor="middle" opacity="0.7">2030</text>
       </svg>
-      <div style="font-size:11px;color:#444">Источник: DDX Fitness, 2026</div>
+      <div style="font-size:10px;color:#444">Источник: DDX Fitness, 2026</div>
     </div>
 
-    <!-- RIGHT: countries, all same style -->
-    <div style="flex:2;display:flex;flex-direction:column;gap:14px;justify-content:center">
-      <div style="font-size:11px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Проникновение, 2026</div>
+    <!-- RIGHT: countries -->
+    <div style="flex:6;display:flex;flex-direction:column;gap:16px;height:100%;justify-content:center">
+      <div style="font-size:13px;font-weight:600;color:#fff;letter-spacing:-0.2px;margin-bottom:2px">Проникновение фитнеса, 2026</div>
 
-      <div style="padding:0 4px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px">
           <div style="font-size:13px;color:#aaa">🇷🇺 Россия</div>
-          <div style="font-size:18px;font-weight:800;color:#fff">5.1%</div>
+          <div style="font-size:17px;font-weight:800;color:#fff">5.1%</div>
         </div>
         <div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px">
           <div style="width:calc(5.1/25*100%);height:100%;background:rgba(255,255,255,0.3);border-radius:4px"></div>
         </div>
       </div>
 
-      <div style="padding:0 4px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px">
           <div style="font-size:13px;color:#aaa">Китай</div>
-          <div style="font-size:18px;font-weight:800;color:#fff">6.2%</div>
+          <div style="font-size:17px;font-weight:800;color:#fff">6.2%</div>
         </div>
         <div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px">
           <div style="width:calc(6.2/25*100%);height:100%;background:rgba(255,255,255,0.3);border-radius:4px"></div>
         </div>
       </div>
 
-      <div style="padding:0 4px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px">
           <div style="font-size:13px;color:#aaa">Европа</div>
-          <div style="font-size:18px;font-weight:800;color:#43e97b">~15%</div>
+          <div style="font-size:17px;font-weight:800;color:#43e97b">~15%</div>
         </div>
         <div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px">
           <div style="width:60%;height:100%;background:rgba(67,233,123,0.55);border-radius:4px"></div>
         </div>
       </div>
 
-      <div style="padding:0 4px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px">
           <div style="font-size:13px;color:#aaa">США</div>
-          <div style="font-size:18px;font-weight:800;color:#43e97b">25%</div>
+          <div style="font-size:17px;font-weight:800;color:#43e97b">25%</div>
         </div>
         <div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px">
           <div style="width:100%;height:100%;background:#43e97b;border-radius:4px"></div>
