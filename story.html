@@ -208,7 +208,7 @@
     }
     .s3-name {
       font-size: clamp(44px, 7vw, 86px); font-weight: 900; letter-spacing: -3px;
-      background: linear-gradient(135deg, #fff 40%, #aaa);
+      background: linear-gradient(135deg, #fff 30%, #fc3f1d);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text; line-height: 1;
     }
@@ -242,37 +242,58 @@
     }
     .phone-wrap.tilt .phone-label { opacity: 1; }
 
-    /* iPhone shell — full viewport height */
-    .phone-shell {
-      width: calc(91vh * 390 / 844);
-      height: 91vh;
-      max-height: 760px;
-      max-width: calc(760px * 390 / 844);
-      border-radius: clamp(32px, 5vh, 52px);
-      overflow: hidden; position: relative;
-      border: 2px solid rgba(255,255,255,0.13);
+    /* iPhone outer frame */
+    .phone-outer {
+      width: 258px; height: 560px;
+      border-radius: 52px;
+      background: linear-gradient(160deg, #2c2c2e, #1a1a1c);
+      padding: 10px;
       box-shadow:
-        0 60px 120px rgba(0,0,0,1),
-        0 0 0 1px rgba(255,255,255,0.04),
-        inset 0 1px 0 rgba(255,255,255,0.08),
-        0 0 80px rgba(100,80,255,0.12);
-      background: #050505; flex-shrink: 0;
+        0 0 0 1px #111,
+        inset 0 0 0 1px rgba(255,255,255,0.06),
+        0 50px 100px rgba(0,0,0,1),
+        0 20px 40px rgba(0,0,0,0.6);
+      position: relative; flex-shrink: 0;
     }
-
-    /* Side buttons (decorative) */
-    .phone-shell::before {
+    /* Power button */
+    .phone-outer::after {
       content: ''; position: absolute;
-      right: -3px; top: 22%; height: 14%; width: 3px;
-      background: rgba(255,255,255,0.08); border-radius: 0 2px 2px 0;
+      right: -4px; top: 32%; width: 4px; height: 9%;
+      background: #2a2a2c; border-radius: 0 3px 3px 0;
+      box-shadow: 0 -22px 0 #2a2a2c, 0 22px 0 #2a2a2c;
+    }
+    /* Volume buttons */
+    .phone-outer::before {
+      content: ''; position: absolute;
+      left: -4px; top: 26%; width: 4px; height: 7%;
+      background: #2a2a2c; border-radius: 3px 0 0 3px;
+      box-shadow: 0 26px 0 4px #2a2a2c, 0 52px 0 4px #2a2a2c;
     }
 
-    /* Notch */
+    /* Screen inside frame */
+    .phone-shell {
+      width: 100%; height: 100%;
+      border-radius: 44px;
+      overflow: hidden; position: relative;
+      background: #000;
+    }
+
+    /* Dynamic Island */
     .phone-notch-bar {
-      position: absolute; top: 0; left: 50%;
+      position: absolute; top: 10px; left: 50%;
       transform: translateX(-50%);
-      width: 35%; height: 3.5%;
-      background: #000; border-radius: 0 0 20px 20px;
-      z-index: 2;
+      width: 80px; height: 22px;
+      background: #000; border-radius: 20px;
+      z-index: 3;
+    }
+
+    /* Home indicator */
+    .phone-home-bar {
+      position: absolute; bottom: 6px; left: 50%;
+      transform: translateX(-50%);
+      width: 90px; height: 4px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 3px; z-index: 3;
     }
 
     .phone-iframe-wrap {
@@ -396,19 +417,25 @@
       <div class="phones-stage">
         <div class="phone-wrap" id="pw1">
           <div class="phone-label">Для тренера</div>
-          <div class="phone-shell" id="ps1">
-            <div class="phone-notch-bar"></div>
-            <div class="phone-iframe-wrap" id="piw1">
-              <iframe src="index.html" title="Тренер" loading="lazy"></iframe>
+          <div class="phone-outer" id="ps1">
+            <div class="phone-shell">
+              <div class="phone-notch-bar"></div>
+              <div class="phone-home-bar"></div>
+              <div class="phone-iframe-wrap" id="piw1">
+                <iframe src="index.html" title="Тренер" loading="lazy"></iframe>
+              </div>
             </div>
           </div>
         </div>
         <div class="phone-wrap" id="pw2">
           <div class="phone-label">Для клиента</div>
-          <div class="phone-shell" id="ps2">
-            <div class="phone-notch-bar"></div>
-            <div class="phone-iframe-wrap" id="piw2">
-              <iframe src="client.html" title="Клиент" loading="lazy"></iframe>
+          <div class="phone-outer" id="ps2">
+            <div class="phone-shell">
+              <div class="phone-notch-bar"></div>
+              <div class="phone-home-bar"></div>
+              <div class="phone-iframe-wrap" id="piw2">
+                <iframe src="client.html" title="Клиент" loading="lazy"></iframe>
+              </div>
             </div>
           </div>
         </div>
@@ -521,12 +548,14 @@
   }
 
   function scaleIframes() {
-    // scale iframes to fit phone shell
     [1, 2].forEach(n => {
-      const shell = document.getElementById('ps' + n);
+      const outer = document.getElementById('ps' + n);
       const wrap  = document.getElementById('piw' + n);
-      if (shell && wrap) {
-        const scale = shell.offsetHeight / 844;
+      if (outer && wrap) {
+        // inner screen = outer minus padding (10px each side)
+        const screenH = outer.offsetHeight - 20;
+        const screenW = outer.offsetWidth  - 20;
+        const scale = Math.min(screenW / 390, screenH / 844);
         wrap.style.transform = `scale(${scale})`;
       }
     });
