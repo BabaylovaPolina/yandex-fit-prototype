@@ -486,13 +486,17 @@
 
   function convergeProblems() {
     for (let i = 1; i <= 7; i++) {
-      const el = document.getElementById('p' + i);
-      el.classList.add('converge');
+      document.getElementById('p' + i).classList.add('converge');
     }
     setTimeout(() => {
       document.getElementById('phone-reveal').classList.add('show');
     }, 400);
-    setTimeout(advance, 1600);
+    // directly jump to next scene after animation
+    setTimeout(() => {
+      sceneIdx++;
+      problemStep = 0;
+      showScene(sceneIdx);
+    }, 1800);
   }
 
   function advance() {
@@ -512,13 +516,14 @@
       sceneIdx++;
       showScene(sceneIdx);
       if (sceneIdx === 2) {
-        // entering scene 3, reset
-        problemStep = 0;
+        // entering scene 3: reset and show first problem immediately
+        problemStep = 1;
         for (let i = 1; i <= 7; i++) {
           const el = document.getElementById('p' + i);
           el.classList.remove('show','converge');
         }
         document.getElementById('phone-reveal').classList.remove('show');
+        setTimeout(() => showProblem(1), 300);
       }
     }
   }
