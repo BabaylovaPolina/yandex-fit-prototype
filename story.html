@@ -242,12 +242,14 @@
     }
     .phone-wrap.tilt .phone-label { opacity: 1; }
 
-    /* iPhone outer frame */
+    /* iPhone outer frame — full viewport height initially */
     .phone-outer {
-      width: 258px; height: 560px;
-      border-radius: 52px;
+      --ph: min(92vh, 740px);
+      height: var(--ph);
+      width: calc(var(--ph) * 390 / 844);
+      border-radius: clamp(36px, 5.5vh, 56px);
       background: linear-gradient(160deg, #2c2c2e, #1a1a1c);
-      padding: 10px;
+      padding: clamp(8px, 1.2vh, 12px);
       box-shadow:
         0 0 0 1px #111,
         inset 0 0 0 1px rgba(255,255,255,0.06),
@@ -551,13 +553,15 @@
     [1, 2].forEach(n => {
       const outer = document.getElementById('ps' + n);
       const wrap  = document.getElementById('piw' + n);
-      if (outer && wrap) {
-        // inner screen = outer minus padding (10px each side)
-        const screenH = outer.offsetHeight - 20;
-        const screenW = outer.offsetWidth  - 20;
-        const scale = Math.min(screenW / 390, screenH / 844);
-        wrap.style.transform = `scale(${scale})`;
-      }
+      if (!outer || !wrap) return;
+      const pad = parseFloat(getComputedStyle(outer).paddingTop) || 10;
+      const screenW = outer.offsetWidth  - pad * 2;
+      const screenH = outer.offsetHeight - pad * 2;
+      const scale = Math.min(screenW / 390, screenH / 844);
+      wrap.style.transform = `scale(${scale})`;
+      // center horizontally if scale based on height
+      const displayW = 390 * scale;
+      wrap.style.left = ((screenW - displayW) / 2) + 'px';
     });
   }
 
@@ -668,6 +672,7 @@
   });
 
   showScene(0);
+  window.addEventListener('resize', scaleIframes);
 </script>
 </body>
 </html>
