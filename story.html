@@ -194,26 +194,56 @@
     }
 
     /* ═══════════════════════════════
-       SCENE 4 — REVEAL
+       REVEAL BLOCK (inside s3)
     ═══════════════════════════════ */
-    #s4 { gap: 16px; }
-    #s4 .meets {
-      font-size: clamp(16px, 2vw, 24px); color: #666;
-      letter-spacing: 3px; text-transform: uppercase;
-      opacity: 0; transition: opacity 0.6s;
+    .reveal-block {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 32px; z-index: 20;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.9s 0.2s ease;
     }
-    #s4.active .meets { opacity: 1; }
-    #s4 .product-name {
-      font-size: clamp(56px, 10vw, 120px); font-weight: 900; letter-spacing: -4px;
-      opacity: 0; transform: translateY(30px);
-      transition: opacity 0.8s 0.3s, transform 0.8s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    .reveal-block.show { opacity: 1; pointer-events: auto; }
+
+    .reveal-top { text-align: center; }
+    .reveal-meets {
+      font-size: clamp(13px, 1.5vw, 18px); color: #555;
+      letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px;
     }
-    #s4.active .product-name { opacity: 1; transform: none; }
-    #s4 .product-sub {
-      font-size: clamp(16px, 2vw, 24px); color: #666;
-      opacity: 0; transition: opacity 0.6s 0.8s;
+    .reveal-name {
+      font-size: clamp(44px, 7vw, 88px); font-weight: 900; letter-spacing: -3px;
+      background: linear-gradient(135deg, #fff 30%, #fc3f1d);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    #s4.active .product-sub { opacity: 1; }
+
+    .reveal-phones { display: flex; gap: 32px; align-items: flex-start; }
+
+    .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .phone-label {
+      font-size: 12px; color: #555;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+
+    .phone-shell {
+      width: 180px; height: 370px;
+      border-radius: 36px; overflow: hidden; position: relative;
+      border: 2px solid rgba(255,255,255,0.12);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 40px rgba(108,99,255,0.25);
+      background: #000;
+      flex-shrink: 0;
+    }
+    .phone-iframe-wrap {
+      width: 390px; height: 844px;
+      transform: scale(0.46);
+      transform-origin: top left;
+      position: absolute; top: 0; left: 0;
+      pointer-events: none;
+    }
+    .phone-iframe-wrap iframe {
+      width: 390px; height: 844px; border: none;
+    }
 
     /* ═══════════════════════════════
        FEATURE SCENES (5-9)
@@ -336,52 +366,33 @@
       Куда красиво побежать? Три приложения, ни одного ответа
     </div>
 
-    <!-- Phone that appears on converge -->
-    <div class="phone-reveal" id="phone-reveal">
-      <div class="css-phone">
-        <div class="phone-notch"></div>
-        <div class="phone-screen">
-          <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:2px 0 6px;width:60%"></div>
-          <div class="phone-row">
-            <div class="phone-avatar" style="background:linear-gradient(135deg,#ff6b6b,#c0143c)"></div>
-            <div class="phone-text"><div class="phone-text-line" style="width:80%"></div><div class="phone-text-line" style="width:55%"></div></div>
-            <div class="phone-badge"></div>
-          </div>
-          <div class="phone-row">
-            <div class="phone-avatar" style="background:linear-gradient(135deg,#6c63ff,#3a2fa0)"></div>
-            <div class="phone-text"><div class="phone-text-line" style="width:70%"></div><div class="phone-text-line" style="width:45%"></div></div>
-            <div class="phone-badge" style="background:rgba(255,107,107,0.4)"></div>
-          </div>
-          <div class="phone-row">
-            <div class="phone-avatar" style="background:linear-gradient(135deg,#43e97b,#0a7c34)"></div>
-            <div class="phone-text"><div class="phone-text-line" style="width:75%"></div><div class="phone-text-line" style="width:50%"></div></div>
-            <div class="phone-badge" style="background:rgba(67,233,123,0.4)"></div>
-          </div>
-          <div class="phone-ai" style="margin-top:4px">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-              <div style="width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,#9B59F5,#6B2FD9)"></div>
-              <div style="height:5px;width:40%;border-radius:3px;background:rgba(155,89,245,0.6)"></div>
+    <!-- Reveal: phones + title (appears after converge) -->
+    <div class="reveal-block" id="reveal-block">
+      <div class="reveal-top">
+        <div class="reveal-meets">Знакомьтесь</div>
+        <div class="reveal-name">Яндекс Фит</div>
+      </div>
+      <div class="reveal-phones">
+        <div class="phone-wrap">
+          <div class="phone-shell">
+            <div class="phone-iframe-wrap">
+              <iframe src="index.html" title="Тренер" loading="lazy"></iframe>
             </div>
-            <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.15);margin-bottom:3px"></div>
-            <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.1);width:80%"></div>
           </div>
-          <div class="phone-row" style="background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.2)">
-            <div class="phone-avatar" style="background:linear-gradient(135deg,#f5a623,#c47d00)"></div>
-            <div class="phone-text"><div class="phone-text-line" style="width:65%"></div><div class="phone-text-line" style="width:40%"></div></div>
-            <div class="phone-badge" style="background:rgba(108,99,255,0.4)"></div>
+          <div class="phone-label">Для тренера</div>
+        </div>
+        <div class="phone-wrap">
+          <div class="phone-shell">
+            <div class="phone-iframe-wrap">
+              <iframe src="client.html" title="Клиент" loading="lazy"></iframe>
+            </div>
           </div>
+          <div class="phone-label">Для клиента</div>
         </div>
       </div>
     </div>
 
   </div>
-</div>
-
-<!-- ═══ SCENE 4 — REVEAL ═══ -->
-<div class="scene" id="s4">
-  <div class="meets">Знакомьтесь</div>
-  <div class="product-name yandex-text">Яндекс Фит</div>
-  <div class="product-sub">AI-платформа для тренировок</div>
 </div>
 
 <!-- ═══ SCENE 5 — VOICE ═══ -->
@@ -449,10 +460,11 @@
 <div class="hint" id="hint">пробел / →</div>
 
 <script>
-  const SCENES = ['s1','s2','s3','s4','s5','s6','s7','s8','s9'];
+  const SCENES = ['s1','s2','s3','s5','s6','s7','s8','s9'];
   const TOTAL_STEPS = 9 + 7; // 9 scenes + 7 problem steps in scene 3
   let sceneIdx = 0;
-  let problemStep = 0; // 0–7 for scene 3, 8 = converge
+  let problemStep = 0;
+  let revealShown = false;
 
   // Build dots
   const dotsEl = document.getElementById('dots-nav');
@@ -488,26 +500,29 @@
     for (let i = 1; i <= 7; i++) {
       document.getElementById('p' + i).classList.add('converge');
     }
+    // show reveal block on same slide
     setTimeout(() => {
-      document.getElementById('phone-reveal').classList.add('show');
-    }, 400);
-    // directly jump to next scene after animation
-    setTimeout(() => {
-      sceneIdx++;
-      problemStep = 0;
-      showScene(sceneIdx);
-    }, 1800);
+      document.getElementById('reveal-block').classList.add('show');
+      revealShown = true;
+    }, 600);
   }
 
   function advance() {
     if (sceneIdx === 2) {
-      // scene 3: problems
+      // scene 3: problems then reveal
+      if (revealShown) {
+        // reveal already shown → go to next scene
+        revealShown = false;
+        sceneIdx++;
+        problemStep = 0;
+        showScene(sceneIdx);
+        return;
+      }
       problemStep++;
       if (problemStep <= 7) {
         showProblem(problemStep);
       } else if (problemStep === 8) {
         convergeProblems();
-        return; // auto advances
       }
       return;
     }
@@ -516,13 +531,12 @@
       sceneIdx++;
       showScene(sceneIdx);
       if (sceneIdx === 2) {
-        // entering scene 3: reset and show first problem immediately
         problemStep = 1;
+        revealShown = false;
         for (let i = 1; i <= 7; i++) {
-          const el = document.getElementById('p' + i);
-          el.classList.remove('show','converge');
+          document.getElementById('p' + i).classList.remove('show','converge');
         }
-        document.getElementById('phone-reveal').classList.remove('show');
+        document.getElementById('reveal-block').classList.remove('show');
         setTimeout(() => showProblem(1), 300);
       }
     }
