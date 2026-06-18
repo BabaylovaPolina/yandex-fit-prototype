@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Яндекс Фит</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000; color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      height: 100vh; overflow: hidden; cursor: pointer;
+      user-select: none; -webkit-user-select: none;
+    }
+
+    /* ── SCENE BASE ── */
+    .scene {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.7s ease;
+    }
+    .scene.active { opacity: 1; pointer-events: auto; }
+
+    /* ── TYPOGRAPHY ── */
+    .big    { font-size: clamp(48px, 8vw, 96px); font-weight: 800; letter-spacing: -2px; line-height: 1.05; text-align: center; }
+    .medium { font-size: clamp(28px, 4vw, 52px); font-weight: 700; letter-spacing: -1px; line-height: 1.2; text-align: center; }
+    .small  { font-size: clamp(16px, 2vw, 24px); font-weight: 400; color: #888; text-align: center; line-height: 1.6; }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #fff 30%, #9B59F5);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .yandex-text {
+      background: linear-gradient(135deg, #fff 30%, #fc3f1d);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── PROGRESS DOTS ── */
+    .dots {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 100;
+    }
+    .dot-nav {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #333; transition: background 0.3s, transform 0.3s;
+    }
+    .dot-nav.on { background: #fff; transform: scale(1.3); }
+
+    /* ── HINT ── */
+    .hint {
+      position: fixed; bottom: 64px; right: 48px;
+      font-size: 13px; color: #333;
+      letter-spacing: 1px; text-transform: uppercase;
+      transition: opacity 0.5s;
+    }
+
+    /* ═══════════════════════════════
+       SCENE 1 — YEAR
+    ═══════════════════════════════ */
+    #s1 { background: #000; }
+    #s1 .year {
+      font-size: clamp(80px, 18vw, 200px);
+      font-weight: 900; letter-spacing: -6px; color: #fff;
+      opacity: 0; transform: scale(0.92);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    #s1.active .year { opacity: 1; transform: scale(1); }
+    #s1 .year-sub {
+      font-size: clamp(16px, 2.5vw, 28px); color: #555;
+      margin-top: 16px; letter-spacing: 2px; text-transform: uppercase;
+      opacity: 0; transition: opacity 1s 0.6s;
+    }
+    #s1.active .year-sub { opacity: 1; }
+
+    /* ═══════════════════════════════
+       SCENE 2 — CONTEXT
+    ═══════════════════════════════ */
+    #s2 { gap: 20px; padding: 40px; }
+    #s2 .line {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.6s, transform 0.6s;
+    }
+    #s2.active .line:nth-child(1) { opacity: 1; transform: none; transition-delay: 0.1s; }
+    #s2.active .line:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.4s; }
+    #s2.active .line:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.7s; }
+
+    /* ═══════════════════════════════
+       SCENE 3 — PROBLEMS
+    ═══════════════════════════════ */
+    #s3 { overflow: hidden; }
+
+    .problems-wrap {
+      position: relative; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .problem {
+      position: absolute;
+      display: flex; align-items: center; gap: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 14px 22px;
+      font-size: clamp(13px, 1.6vw, 18px);
+      font-weight: 500; color: #ccc; white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.5s, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), scale 0.8s cubic-bezier(0.4, 0, 0.2, 1), filter 0.5s;
+    }
+    .problem .ico { font-size: 1.4em; flex-shrink: 0; }
+
+    /* Positions - scattered naturally */
+    .problem:nth-child(1) { top: 12%;  left: 8%;  }
+    .problem:nth-child(2) { top: 8%;   right: 6%; }
+    .problem:nth-child(3) { top: 30%;  left: 4%;  }
+    .problem:nth-child(4) { top: 28%;  right: 5%; }
+    .problem:nth-child(5) { bottom: 28%; left: 6%; }
+    .problem:nth-child(6) { bottom: 22%; right: 5%; }
+    .problem:nth-child(7) { bottom: 10%; left: 50%; transform: translateX(-50%); }
+
+    /* Appear states */
+    .problem.show { opacity: 1; }
+
+    /* Converge state */
+    .problem.converge {
+      opacity: 0;
+      transform: translate(var(--tx), var(--ty)) scale(0.2) !important;
+      filter: blur(4px);
+    }
+    .problem:nth-child(1) { --tx: calc(50vw - 8%  - 160px); --ty: calc(50vh - 12% - 26px); }
+    .problem:nth-child(2) { --tx: calc(50vw - (100vw - 6%) - 160px  + 100vw - 6% - 50vw); --ty: calc(50vh - 8% - 26px); }
+    .problem:nth-child(3) { --tx: calc(50vw - 4%  - 160px); --ty: calc(50vh - 30% - 26px); }
+    .problem:nth-child(4) { --tx: calc(-(100vw - 5%) + 50vw - 160px); --ty: calc(50vh - 28% - 26px); }
+    .problem:nth-child(5) { --tx: calc(50vw - 6%  - 160px); --ty: calc(-(100vh - 28%) + 50vh); }
+    .problem:nth-child(6) { --tx: calc(-(100vw - 5%) + 50vw - 160px); --ty: calc(-(100vh - 22%) + 50vh); }
+    .problem:nth-child(7) { --tx: 0px; --ty: calc(-(100vh - 10%) + 50vh); }
+
+    /* Phone reveal at center */
+    .phone-reveal {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0.7);
+      opacity: 0;
+      transition: opacity 0.8s 0.3s ease, transform 0.8s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 10;
+    }
+    .phone-reveal.show {
+      opacity: 1; transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* CSS Phone */
+    .css-phone {
+      width: 200px; height: 390px;
+      background: linear-gradient(160deg, #1a1a2e, #16213e);
+      border-radius: 40px;
+      border: 2px solid rgba(255,255,255,0.15);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 40px 80px rgba(0,0,0,0.8), 0 0 60px rgba(108,99,255,0.3);
+      overflow: hidden; position: relative;
+      display: flex; flex-direction: column;
+    }
+    .phone-notch {
+      width: 80px; height: 24px;
+      background: #000; border-radius: 0 0 16px 16px;
+      margin: 0 auto; flex-shrink: 0;
+    }
+    .phone-screen {
+      flex: 1; padding: 8px;
+      display: flex; flex-direction: column; gap: 5px;
+      overflow: hidden;
+    }
+    .phone-row {
+      background: rgba(108,99,255,0.15); border-radius: 8px;
+      padding: 8px 10px; display: flex; align-items: center; gap: 6px;
+    }
+    .phone-avatar {
+      width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+    }
+    .phone-text { flex: 1; }
+    .phone-text-line {
+      height: 5px; border-radius: 3px; background: rgba(255,255,255,0.3);
+      margin-bottom: 3px;
+    }
+    .phone-badge {
+      width: 32px; height: 14px; border-radius: 7px;
+      background: rgba(67,233,123,0.4); flex-shrink: 0;
+    }
+    .phone-ai {
+      background: linear-gradient(135deg, rgba(108,99,255,0.25), rgba(67,233,123,0.1));
+      border: 1px solid rgba(108,99,255,0.4);
+      border-radius: 8px; padding: 8px 10px;
+    }
+
+    /* ═══════════════════════════════
+       SCENE 4 — REVEAL
+    ═══════════════════════════════ */
+    #s4 { gap: 16px; }
+    #s4 .meets {
+      font-size: clamp(16px, 2vw, 24px); color: #666;
+      letter-spacing: 3px; text-transform: uppercase;
+      opacity: 0; transition: opacity 0.6s;
+    }
+    #s4.active .meets { opacity: 1; }
+    #s4 .product-name {
+      font-size: clamp(56px, 10vw, 120px); font-weight: 900; letter-spacing: -4px;
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.8s 0.3s, transform 0.8s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    #s4.active .product-name { opacity: 1; transform: none; }
+    #s4 .product-sub {
+      font-size: clamp(16px, 2vw, 24px); color: #666;
+      opacity: 0; transition: opacity 0.6s 0.8s;
+    }
+    #s4.active .product-sub { opacity: 1; }
+
+    /* ═══════════════════════════════
+       FEATURE SCENES (5-9)
+    ═══════════════════════════════ */
+    .feature-scene { padding: 60px; gap: 24px; }
+
+    .feature-eyebrow {
+      font-size: clamp(11px, 1.2vw, 14px); font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: #9B59F5;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .feature-scene.active .feature-eyebrow { opacity: 1; transform: none; }
+
+    .feature-headline {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.7s 0.15s, transform 0.7s 0.15s;
+    }
+    .feature-scene.active .feature-headline { opacity: 1; transform: none; }
+
+    .feature-sub {
+      max-width: 640px; margin: 0 auto;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity 0.6s 0.35s, transform 0.6s 0.35s;
+    }
+    .feature-scene.active .feature-sub { opacity: 1; transform: none; }
+
+    .feature-pills {
+      display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+      opacity: 0; transition: opacity 0.6s 0.5s;
+    }
+    .feature-scene.active .feature-pills { opacity: 1; }
+    .pill {
+      padding: 8px 18px; border-radius: 24px;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      font-size: clamp(12px, 1.2vw, 15px); color: #aaa;
+    }
+    .pill.accent { background: rgba(155,89,245,0.15); border-color: rgba(155,89,245,0.3); color: #b48cfc; }
+
+    /* ═══════════════════════════════
+       SCENE 9 — FINAL
+    ═══════════════════════════════ */
+    #s9 { gap: 12px; }
+    #s9 .final-logo {
+      font-size: clamp(40px, 7vw, 80px); font-weight: 900; letter-spacing: -3px;
+      opacity: 0; transform: scale(0.9);
+      transition: opacity 1s, transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    #s9.active .final-logo { opacity: 1; transform: scale(1); }
+    #s9 .final-sub {
+      font-size: clamp(14px, 1.8vw, 22px); color: #555;
+      opacity: 0; transition: opacity 0.8s 0.5s;
+    }
+    #s9.active .final-sub { opacity: 1; }
+    #s9 .final-links {
+      display: flex; gap: 16px; margin-top: 24px;
+      opacity: 0; transition: opacity 0.8s 0.9s;
+    }
+    #s9.active .final-links { opacity: 1; }
+    .final-link {
+      padding: 12px 24px; border-radius: 24px;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+      color: #aaa; font-size: 13px; text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .final-link:hover { background: rgba(155,89,245,0.2); color: #fff; }
+    .final-link.primary {
+      background: #9B59F5; color: #fff; border-color: transparent;
+    }
+    .final-link.primary:hover { background: #7c3aed; }
+
+  </style>
+</head>
+<body>
+
+<!-- ═══ SCENE 1 — 2026 ═══ -->
+<div class="scene" id="s1">
+  <div class="year">2026.</div>
+  <div class="year-sub">Мы стали следить за собой</div>
+</div>
+
+<!-- ═══ SCENE 2 — CONTEXT ═══ -->
+<div class="scene" id="s2">
+  <div class="line medium" style="color:#fff">Трекеры, тренеры, залы.</div>
+  <div class="line medium" style="color:#888;margin-top:8px">Мы инвестируем в своё тело.</div>
+  <div class="line small" style="margin-top:32px;font-size:clamp(14px,1.8vw,20px)">Но данные о наших тренировках<br>разбросаны по десяткам мест.</div>
+</div>
+
+<!-- ═══ SCENE 3 — PROBLEMS ═══ -->
+<div class="scene" id="s3">
+  <div class="problems-wrap" id="problems-wrap">
+
+    <div class="problem" id="p1">
+      <span class="ico">📓</span>
+      Тренер ведёт клиентов в заметках и Excel
+    </div>
+    <div class="problem" id="p2">
+      <span class="ico">📸</span>
+      После занятия — фото в WhatsApp тренеру
+    </div>
+    <div class="problem" id="p3">
+      <span class="ico">⌚</span>
+      Скрин с часов — в GPT за советом
+    </div>
+    <div class="problem" id="p4">
+      <span class="ico">📊</span>
+      Стал сильнее? Листаешь чаты месячной давности
+    </div>
+    <div class="problem" id="p5">
+      <span class="ico">🍎</span>
+      КБЖУ — Fat Secret + таблицы + отдельный чат
+    </div>
+    <div class="problem" id="p6">
+      <span class="ico">🏃</span>
+      В отпуске без тренера — импровизируешь
+    </div>
+    <div class="problem" id="p7">
+      <span class="ico">🗺️</span>
+      Куда красиво побежать? Три приложения, ни одного ответа
+    </div>
+
+    <!-- Phone that appears on converge -->
+    <div class="phone-reveal" id="phone-reveal">
+      <div class="css-phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;margin:2px 0 6px;width:60%"></div>
+          <div class="phone-row">
+            <div class="phone-avatar" style="background:linear-gradient(135deg,#ff6b6b,#c0143c)"></div>
+            <div class="phone-text"><div class="phone-text-line" style="width:80%"></div><div class="phone-text-line" style="width:55%"></div></div>
+            <div class="phone-badge"></div>
+          </div>
+          <div class="phone-row">
+            <div class="phone-avatar" style="background:linear-gradient(135deg,#6c63ff,#3a2fa0)"></div>
+            <div class="phone-text"><div class="phone-text-line" style="width:70%"></div><div class="phone-text-line" style="width:45%"></div></div>
+            <div class="phone-badge" style="background:rgba(255,107,107,0.4)"></div>
+          </div>
+          <div class="phone-row">
+            <div class="phone-avatar" style="background:linear-gradient(135deg,#43e97b,#0a7c34)"></div>
+            <div class="phone-text"><div class="phone-text-line" style="width:75%"></div><div class="phone-text-line" style="width:50%"></div></div>
+            <div class="phone-badge" style="background:rgba(67,233,123,0.4)"></div>
+          </div>
+          <div class="phone-ai" style="margin-top:4px">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+              <div style="width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,#9B59F5,#6B2FD9)"></div>
+              <div style="height:5px;width:40%;border-radius:3px;background:rgba(155,89,245,0.6)"></div>
+            </div>
+            <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.15);margin-bottom:3px"></div>
+            <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.1);width:80%"></div>
+          </div>
+          <div class="phone-row" style="background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.2)">
+            <div class="phone-avatar" style="background:linear-gradient(135deg,#f5a623,#c47d00)"></div>
+            <div class="phone-text"><div class="phone-text-line" style="width:65%"></div><div class="phone-text-line" style="width:40%"></div></div>
+            <div class="phone-badge" style="background:rgba(108,99,255,0.4)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ SCENE 4 — REVEAL ═══ -->
+<div class="scene" id="s4">
+  <div class="meets">Знакомьтесь</div>
+  <div class="product-name yandex-text">Яндекс Фит</div>
+  <div class="product-sub">AI-платформа для тренировок</div>
+</div>
+
+<!-- ═══ SCENE 5 — VOICE ═══ -->
+<div class="scene feature-scene" id="s5">
+  <div class="feature-eyebrow">Голосовой ввод</div>
+  <div class="feature-headline big gradient-text">Надиктуй тренировку.<br>Алиса сделает остальное.</div>
+  <div class="feature-sub small">Скажи «присед 4 подхода по 8» — и всё. Упражнения, веса, сеты появятся сами. Никаких форм, никаких таблиц.</div>
+  <div class="feature-pills">
+    <div class="pill accent">SpeechKit</div>
+    <div class="pill accent">YandexGPT</div>
+    <div class="pill">Работает офлайн</div>
+  </div>
+</div>
+
+<!-- ═══ SCENE 6 — TRAINER ═══ -->
+<div class="scene feature-scene" id="s6">
+  <div class="feature-eyebrow">Для тренера</div>
+  <div class="feature-headline big" style="color:#fff">Все клиенты.<br><span class="gradient-text">Вся картина.</span></div>
+  <div class="feature-sub small">Карточка клиента, история тренировок, данные трекера и AI-подсказки — в одном месте. Тренер видит ЧСС, сон и восстановление ещё до того, как клиент зашёл в зал.</div>
+  <div class="feature-pills">
+    <div class="pill">Apple Watch</div>
+    <div class="pill">Garmin</div>
+    <div class="pill">WHOOP</div>
+    <div class="pill accent">AI-отчёт за секунды</div>
+  </div>
+</div>
+
+<!-- ═══ SCENE 7 — CLIENT ═══ -->
+<div class="scene feature-scene" id="s7">
+  <div class="feature-eyebrow">Для клиента</div>
+  <div class="feature-headline big" style="color:#fff">Ты знаешь,<br><span style="color:#43e97b">стал ли сильнее.</span></div>
+  <div class="feature-sub small">История каждой тренировки, динамика весов, прогресс к цели — и отчёт от тренера после каждого занятия. Всё в одном приложении.</div>
+  <div class="feature-pills">
+    <div class="pill accent">Прогресс к цели</div>
+    <div class="pill">Отчёт от тренера</div>
+    <div class="pill">История тренировок</div>
+  </div>
+</div>
+
+<!-- ═══ SCENE 8 — ANYWHERE ═══ -->
+<div class="scene feature-scene" id="s8">
+  <div class="feature-eyebrow">Всегда с тобой</div>
+  <div class="feature-headline big" style="color:#fff">В отпуске.<br>В зале. <span class="gradient-text">Везде.</span></div>
+  <div class="feature-sub small">Расписание тренировок, план от тренера и голосовой дневник — работают даже без интернета. Тренер составит план заранее, ты просто откроешь приложение.</div>
+  <div class="feature-pills">
+    <div class="pill accent">Офлайн-режим</div>
+    <div class="pill">Расписание</div>
+    <div class="pill">Голосовой дневник</div>
+  </div>
+</div>
+
+<!-- ═══ SCENE 9 — FINALE ═══ -->
+<div class="scene" id="s9">
+  <div class="final-logo yandex-text">Яндекс Фит.</div>
+  <div class="final-sub">Один инструмент. Тренер и клиент. Любой спорт.</div>
+  <div class="final-links">
+    <a class="final-link primary" href="pitch.html" target="_blank">Полная презентация →</a>
+    <a class="final-link" href="index.html" target="_blank">Тренерское приложение</a>
+    <a class="final-link" href="client.html" target="_blank">Клиентское приложение</a>
+  </div>
+</div>
+
+<!-- ── DOTS ── -->
+<div class="dots" id="dots-nav"></div>
+<div class="hint" id="hint">пробел / →</div>
+
+<script>
+  const SCENES = ['s1','s2','s3','s4','s5','s6','s7','s8','s9'];
+  const TOTAL_STEPS = 9 + 7; // 9 scenes + 7 problem steps in scene 3
+  let sceneIdx = 0;
+  let problemStep = 0; // 0–7 for scene 3, 8 = converge
+
+  // Build dots
+  const dotsEl = document.getElementById('dots-nav');
+  SCENES.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot-nav' + (i === 0 ? ' on' : '');
+    dotsEl.appendChild(d);
+  });
+
+  function updateDots() {
+    document.querySelectorAll('.dot-nav').forEach((d, i) => {
+      d.classList.toggle('on', i === sceneIdx);
+    });
+  }
+
+  function showScene(idx) {
+    SCENES.forEach((id, i) => {
+      document.getElementById(id).classList.toggle('active', i === idx);
+    });
+    updateDots();
+    // hint fades on last scene
+    document.getElementById('hint').style.opacity = idx === SCENES.length - 1 ? '0' : '1';
+  }
+
+  function showProblem(n) {
+    for (let i = 1; i <= 7; i++) {
+      const el = document.getElementById('p' + i);
+      if (i <= n) el.classList.add('show');
+    }
+  }
+
+  function convergeProblems() {
+    for (let i = 1; i <= 7; i++) {
+      const el = document.getElementById('p' + i);
+      el.classList.add('converge');
+    }
+    setTimeout(() => {
+      document.getElementById('phone-reveal').classList.add('show');
+    }, 400);
+    setTimeout(advance, 1600);
+  }
+
+  function advance() {
+    if (sceneIdx === 2) {
+      // scene 3: problems
+      problemStep++;
+      if (problemStep <= 7) {
+        showProblem(problemStep);
+      } else if (problemStep === 8) {
+        convergeProblems();
+        return; // auto advances
+      }
+      return;
+    }
+
+    if (sceneIdx < SCENES.length - 1) {
+      sceneIdx++;
+      showScene(sceneIdx);
+      if (sceneIdx === 2) {
+        // entering scene 3, reset
+        problemStep = 0;
+        for (let i = 1; i <= 7; i++) {
+          const el = document.getElementById('p' + i);
+          el.classList.remove('show','converge');
+        }
+        document.getElementById('phone-reveal').classList.remove('show');
+      }
+    }
+  }
+
+  function retreat() {
+    if (sceneIdx === 2 && problemStep > 0) {
+      problemStep--;
+      for (let i = 1; i <= 7; i++) {
+        const el = document.getElementById('p' + i);
+        el.classList.remove('converge');
+        if (i <= problemStep) el.classList.add('show');
+        else el.classList.remove('show');
+      }
+      document.getElementById('phone-reveal').classList.remove('show');
+      return;
+    }
+    if (sceneIdx > 0) {
+      sceneIdx--;
+      showScene(sceneIdx);
+    }
+  }
+
+  // Events
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); advance(); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); retreat(); }
+  });
+
+  document.body.addEventListener('click', e => {
+    if (e.clientX > window.innerWidth / 2) advance();
+    else retreat();
+  });
+
+  // Swipe
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) dx < 0 ? advance() : retreat();
+  });
+
+  showScene(0);
+</script>
+</body>
+</html>
