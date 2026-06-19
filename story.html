@@ -515,53 +515,55 @@
           </linearGradient>
         </defs>
 
-        <!-- Baseline and gridlines -->
-        <line x1="40" y1="200" x2="520" y2="200" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-        <line x1="40" y1="140" x2="520" y2="140" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-        <line x1="40" y1="80"  x2="520" y2="80"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-        <line x1="40" y1="20"  x2="520" y2="20"  stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-        <!-- Y labels -->
-        <text x="32" y="143" fill="#444" font-size="9" text-anchor="end">5%</text>
-        <text x="32" y="83"  fill="#444" font-size="9" text-anchor="end">10%</text>
-        <text x="32" y="23"  fill="#444" font-size="9" text-anchor="end">15%</text>
+        <!-- Y scale: 14px per 1% → y = 200 - pct×14 -->
+        <!-- 5%=130, 10%=60, 15%=-10, 20%=-80 -->
 
-        <!-- Historical area -->
-        <polygon points="40,200 40,158 80,162 120,164 160,162 200,158 240,152 280,146 320,140 360,135 360,200"
+        <!-- Baseline + 5% gridline (always visible) -->
+        <line x1="40" y1="200" x2="520" y2="200" stroke="rgba(255,255,255,0.1)"  stroke-width="1"/>
+        <line x1="40" y1="130" x2="520" y2="130" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <!-- 5% label (always visible) -->
+        <text x="32" y="133" fill="#444" font-size="9" text-anchor="end">5%</text>
+
+        <!-- Historical area (scale 14) -->
+        <polygon points="40,200 40,151 80,155 120,158 160,155 200,151 240,144 280,137 320,130 360,124 360,200"
                  fill="url(#areaGrad)"/>
         <!-- Historical Russia line 2018–2026 -->
-        <polyline points="40,158 80,162 120,164 160,162 200,158 240,152 280,146 320,140 360,135"
+        <polyline points="40,151 80,155 120,158 160,155 200,151 240,144 280,137 320,130 360,124"
           fill="none" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <!-- Historical dots (even years only) -->
-        <circle cx="40"  cy="158" r="3"   fill="#6c63ff"/>
-        <circle cx="120" cy="164" r="3"   fill="#7070ff"/>
-        <circle cx="200" cy="158" r="3"   fill="#8090c0"/>
-        <circle cx="280" cy="146" r="3"   fill="#50c090"/>
-        <circle cx="360" cy="135" r="4.5" fill="#43e97b"/>
+        <!-- Historical dots (even years) -->
+        <circle cx="40"  cy="151" r="3"   fill="#6c63ff"/>
+        <circle cx="120" cy="158" r="3"   fill="#7070ff"/>
+        <circle cx="200" cy="151" r="3"   fill="#8090c0"/>
+        <circle cx="280" cy="137" r="3"   fill="#50c090"/>
+        <circle cx="360" cy="124" r="4.5" fill="#43e97b"/>
         <!-- 5.4% label -->
-        <text x="360" y="126" fill="#43e97b" font-size="9.5" text-anchor="middle" font-weight="700">5.4%</text>
+        <text x="360" y="115" fill="#43e97b" font-size="9.5" text-anchor="middle" font-weight="700">5.4%</text>
         <!-- X labels – historical -->
-        <text x="40"  y="213" fill="#444"   font-size="8.5" text-anchor="middle">2018</text>
-        <text x="120" y="213" fill="#444"   font-size="8.5" text-anchor="middle">2020</text>
-        <text x="200" y="213" fill="#444"   font-size="8.5" text-anchor="middle">2022</text>
-        <text x="280" y="213" fill="#444"   font-size="8.5" text-anchor="middle">2024</text>
+        <text x="40"  y="213" fill="#444"    font-size="8.5" text-anchor="middle">2018</text>
+        <text x="120" y="213" fill="#444"    font-size="8.5" text-anchor="middle">2020</text>
+        <text x="200" y="213" fill="#444"    font-size="8.5" text-anchor="middle">2022</text>
+        <text x="280" y="213" fill="#444"    font-size="8.5" text-anchor="middle">2024</text>
         <text x="360" y="213" fill="#43e97b" font-size="8.5" text-anchor="middle" font-weight="700">2026</text>
 
         <!-- ══ PROJECTION GROUP — hidden until click ══ -->
         <g id="sm1-proj" style="opacity:0;transition:opacity 1s ease">
+          <!-- 10% gridline + label (revealed with projection) -->
+          <line x1="40" y1="60" x2="520" y2="60" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <text x="32" y="63" fill="#444" font-size="9" text-anchor="end">10%</text>
           <!-- Projection area -->
-          <polygon points="360,135 400,104 440,56 480,8 520,-40 520,200 360,200"
+          <polygon points="360,124 400,88 440,32 480,-24 520,-80 520,200 360,200"
                    fill="url(#projAreaGrad)"/>
           <!-- Dashed projection line -->
-          <polyline points="360,135 400,104 440,56 480,8 520,-40"
+          <polyline points="360,124 400,88 440,32 480,-24 520,-80"
             fill="none" stroke="#43e97b" stroke-width="2.5" stroke-dasharray="6,4"
             stroke-linejoin="round" stroke-linecap="round"/>
           <!-- Projection dots -->
-          <circle cx="400" cy="104" r="3"   fill="#43e97b" opacity="0.55"/>
-          <circle cx="440" cy="56"  r="3.5" fill="#43e97b" opacity="0.7"/>
-          <circle cx="480" cy="8"   r="3.5" fill="#43e97b" opacity="0.85"/>
-          <circle cx="520" cy="-40" r="5"   fill="#43e97b"/>
-          <!-- 20% label — appears above SVG, behind headline (overflow visible) -->
-          <text x="520" y="-52" fill="#43e97b" font-size="10" text-anchor="middle" font-weight="700">20%</text>
+          <circle cx="400" cy="88"  r="3"   fill="#43e97b" opacity="0.55"/>
+          <circle cx="440" cy="32"  r="3.5" fill="#43e97b" opacity="0.7"/>
+          <circle cx="480" cy="-24" r="3.5" fill="#43e97b" opacity="0.85"/>
+          <circle cx="520" cy="-80" r="5"   fill="#43e97b"/>
+          <!-- 20% label — high above SVG, clearly behind headline -->
+          <text x="520" y="-92" fill="#43e97b" font-size="10" text-anchor="middle" font-weight="700">20%</text>
           <!-- X labels – projection -->
           <text x="440" y="213" fill="#444"    font-size="8.5" text-anchor="middle" opacity="0.55">2028</text>
           <text x="520" y="213" fill="#43e97b" font-size="8.5" text-anchor="middle" font-weight="700">2030</text>
