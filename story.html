@@ -554,12 +554,12 @@
         <!-- 5% label (always visible) -->
         <text x="32" y="133" fill="#444" font-size="9" text-anchor="end">5%</text>
 
-        <!-- Historical area (scale 14) -->
-        <polygon points="40,200 40,151 80,155 120,158 160,155 200,151 240,144 280,137 320,130 360,124 360,200"
-                 fill="url(#areaGrad)"/>
-        <!-- Historical Russia line 2018–2026 -->
-        <polyline points="40,151 80,155 120,158 160,155 200,151 240,144 280,137 320,130 360,124"
-          fill="none" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <!-- Historical area (smooth bezier) -->
+        <path d="M 40,200 L 40,151 C 50,152 60,153 80,155 C 100,157 100,158 120,158 C 140,158 140,157 160,155 C 180,153 180,154 200,151 C 220,148 220,148 240,144 C 260,141 260,141 280,137 C 300,134 300,133 320,130 C 340,127 350,126 360,124 L 360,200 Z"
+              fill="url(#areaGrad)"/>
+        <!-- Historical Russia smooth curve 2018–2026 -->
+        <path d="M 40,151 C 50,152 60,153 80,155 C 100,157 100,158 120,158 C 140,158 140,157 160,155 C 180,153 180,154 200,151 C 220,148 220,148 240,144 C 260,141 260,141 280,137 C 300,134 300,133 320,130 C 340,127 350,126 360,124"
+          fill="none" stroke="url(#lineGrad)" stroke-width="2.5" stroke-linecap="round"/>
         <!-- Historical dots (even years) -->
         <circle cx="40"  cy="151" r="3"   fill="#6c63ff"/>
         <circle cx="120" cy="158" r="3"   fill="#7070ff"/>
@@ -580,20 +580,19 @@
           <!-- 10% gridline + label (revealed with projection) -->
           <line x1="40" y1="60" x2="520" y2="60" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
           <text x="32" y="63" fill="#444" font-size="9" text-anchor="end">10%</text>
-          <!-- Projection area -->
-          <polygon points="360,124 400,88 440,32 480,-24 520,-80 520,200 360,200"
-                   fill="url(#projAreaGrad)"/>
-          <!-- Dashed projection line -->
-          <polyline points="360,124 400,88 440,32 480,-24 520,-80"
-            fill="none" stroke="#43e97b" stroke-width="2.5" stroke-dasharray="6,4"
-            stroke-linejoin="round" stroke-linecap="round"/>
+          <!-- Projection area (smooth bezier) -->
+          <path d="M 360,200 L 360,124 C 380,114 380,111 400,88 C 420,65 420,60 440,32 C 460,4 460,4 480,-24 C 500,-52 510,-66 520,-80 L 520,200 Z"
+               fill="url(#projAreaGrad)"/>
+          <!-- Dashed projection smooth curve -->
+          <path d="M 360,124 C 380,114 380,111 400,88 C 420,65 420,60 440,32 C 460,4 460,4 480,-24 C 500,-52 510,-66 520,-80"
+            fill="none" stroke="#43e97b" stroke-width="2.5" stroke-dasharray="6,4" stroke-linecap="round"/>
           <!-- Projection dots -->
           <circle cx="400" cy="88"  r="3"   fill="#43e97b" opacity="0.55"/>
           <circle cx="440" cy="32"  r="3.5" fill="#43e97b" opacity="0.7"/>
           <circle cx="480" cy="-24" r="3.5" fill="#43e97b" opacity="0.85"/>
           <circle cx="520" cy="-80" r="5"   fill="#43e97b"/>
-          <!-- 20% label — high above SVG, clearly behind headline -->
-          <text x="520" y="-92" fill="#43e97b" font-size="10" text-anchor="middle" font-weight="700">20%</text>
+          <!-- 20% label — to the right of dot, less intrusive into headline -->
+          <text x="530" y="-74" fill="#43e97b" font-size="10" text-anchor="start" font-weight="700">20%</text>
           <!-- X labels – projection -->
           <text x="440" y="213" fill="#444"    font-size="8.5" text-anchor="middle" opacity="0.55">2028</text>
           <text x="520" y="213" fill="#43e97b" font-size="8.5" text-anchor="middle" font-weight="700">2030</text>
@@ -604,7 +603,7 @@
     </div>
 
     <!-- RIGHT: countries -->
-    <div style="flex:5;display:flex;flex-direction:column;gap:18px;padding-bottom:20px">
+    <div style="flex:5;display:flex;flex-direction:column;gap:18px;padding-bottom:44px">
 
       <div>
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px">
