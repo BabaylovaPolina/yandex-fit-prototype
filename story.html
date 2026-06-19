@@ -488,6 +488,36 @@
   </div>
 </div>
 
+<!-- ═══ SCENE sqr: QR DEMO ═══ -->
+<div class="scene feature-scene" id="sqr" style="gap:32px">
+  <div class="feature-eyebrow">Демо</div>
+  <div class="feature-headline big" style="color:#fff">Попробуй<br><span class="gradient-text">прямо сейчас.</span></div>
+
+  <div style="display:flex;gap:40px;justify-content:center;align-items:stretch">
+
+    <!-- Trainer QR -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:32px 40px;border-radius:24px;border:1px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.03)">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://babaylovapolina.github.io/yandex-fit-prototype/&bgcolor=000000&color=ffffff&margin=8"
+           width="160" height="160" style="border-radius:12px;display:block" alt="QR тренер"/>
+      <div style="text-align:center">
+        <div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:-0.3px">Для тренера</div>
+        <div style="font-size:11px;color:#555;margin-top:4px">Голосовой ввод · AI-отчёты</div>
+      </div>
+    </div>
+
+    <!-- Client QR -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:32px 40px;border-radius:24px;border:1px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.03)">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://babaylovapolina.github.io/yandex-fit-prototype/client.html&bgcolor=000000&color=ffffff&margin=8"
+           width="160" height="160" style="border-radius:12px;display:block" alt="QR клиент"/>
+      <div style="text-align:center">
+        <div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:-0.3px">Для клиента</div>
+        <div style="font-size:11px;color:#555;margin-top:4px">Прогресс · Связь с тренером</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ═══ SCENE sm1: MARKET GROWTH ═══ -->
 <div class="scene feature-scene" id="sm1" style="padding:44px 60px 36px;overflow:visible">
   <div class="feature-eyebrow">Рынок</div>
@@ -778,7 +808,7 @@
 <div class="hint" id="hint">пробел / →</div>
 
 <script>
-  const SCENES = ['s1','s2','s3','s5','s6','s7','s8','sm1','sm2','sbm','smkt','s9'];
+  const SCENES = ['s1','s2','s3','s5','s6','s7','s8','sqr','sm1','sm2','sbm','smkt','s9'];
   const TOTAL_STEPS = 9 + 5; // 9 scenes + 5 problem steps in scene 3
   let sceneIdx = 0;
   let problemStep = 0;
