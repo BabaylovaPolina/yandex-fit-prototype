@@ -1507,7 +1507,7 @@
   <div style="flex:1;display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;width:100%;min-height:0;opacity:0;transform:translateY(12px);transition:opacity 0.7s 0.25s,transform 0.7s 0.25s" class="sm2-cols">
 
     <!-- COL 1 -->
-    <div style="display:flex;flex-direction:column;padding-right:48px;justify-content:space-between">
+    <div style="display:flex;flex-direction:column;padding-right:48px;justify-content:flex-start">
       <!-- header -->
       <div style="border-bottom:1px solid rgba(255,255,255,0.07);padding-bottom:14px;margin-bottom:0">
         <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#9B59F5;text-transform:uppercase;margin-bottom:8px">1 · TAM</div>
@@ -1536,7 +1536,7 @@
         <span style="font-size:14px;font-weight:600;color:#777">50 млрд</span>
       </div>
       <!-- bottom number -->
-      <div>
+      <div id="sm2-bottom-1">
         <div style="font-size:clamp(28px,3vw,44px);font-weight:800;line-height:1;background:linear-gradient(135deg,#fff 10%,#9B59F5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">1 трлн ₽</div>
         <div style="font-size:12px;color:#555;margin-top:4px">суммарный рынок спорта в РФ</div>
       </div>
@@ -1546,7 +1546,7 @@
     <div style="background:rgba(255,255,255,0.07)"></div>
 
     <!-- COL 2 -->
-    <div style="display:flex;flex-direction:column;padding:0 48px;justify-content:space-between">
+    <div style="display:flex;flex-direction:column;padding:0 48px;justify-content:flex-start">
       <!-- header -->
       <div style="border-bottom:1px solid rgba(255,255,255,0.07);padding-bottom:14px">
         <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#9B59F5;text-transform:uppercase;margin-bottom:8px">2 · SAM</div>
@@ -1564,7 +1564,7 @@
         <div style="font-size:12px;color:#555;margin-top:4px">средний доход тренера в месяц</div>
       </div>
       <!-- bottom number -->
-      <div>
+      <div id="sm2-bottom-2">
         <div style="font-size:clamp(28px,3vw,44px);font-weight:800;line-height:1;background:linear-gradient(135deg,#fff 10%,#9B59F5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">330 млрд ₽</div>
         <div style="font-size:12px;color:#555;margin-top:4px">суммарный доход тренеров в год</div>
       </div>
@@ -1574,7 +1574,7 @@
     <div style="background:rgba(255,255,255,0.07)"></div>
 
     <!-- COL 3 -->
-    <div style="display:flex;flex-direction:column;padding-left:48px;justify-content:space-between">
+    <div style="display:flex;flex-direction:column;padding-left:48px;justify-content:flex-start">
       <!-- header -->
       <div style="border-bottom:1px solid rgba(255,255,255,0.07);padding-bottom:14px">
         <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#9B59F5;text-transform:uppercase;margin-bottom:8px">3 · SOM</div>
@@ -1592,7 +1592,7 @@
         <div style="font-size:12px;color:#555;margin-top:4px">в среднем тренер будет платить</div>
       </div>
       <!-- bottom number -->
-      <div>
+      <div id="sm2-bottom-3">
         <div style="font-size:clamp(28px,3vw,44px);font-weight:800;line-height:1;background:linear-gradient(135deg,#fff 10%,#9B59F5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">2 млрд ₽ / год</div>
         <div style="font-size:12px;color:#555;margin-top:4px">50 тыс. платящих тренеров</div>
       </div>
@@ -1891,6 +1891,18 @@
     if (SCENES[idx] === 'sm1b') {
       sm1bStep = 0;
       document.getElementById('sm1b-comp').style.opacity = '0';
+    }
+    if (SCENES[idx] === 'sm2') {
+      requestAnimationFrame(() => {
+        const ref = document.getElementById('sm2-bottom-1');
+        ['sm2-bottom-2','sm2-bottom-3'].forEach(id => {
+          const el = document.getElementById(id);
+          if (!ref || !el) return;
+          el.style.marginTop = '';
+          const diff = ref.getBoundingClientRect().top - el.getBoundingClientRect().top;
+          if (diff > 0) el.style.marginTop = diff + 'px';
+        });
+      });
     }
     // reset video scene when re-entering
     if (SCENES[idx] === 'sv') {
