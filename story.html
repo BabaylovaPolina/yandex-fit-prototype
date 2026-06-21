@@ -345,6 +345,9 @@
     }
     .feature-scene.active .feature-pills { opacity: 1; }
     #s6.active .s6-phone { opacity: 1 !important; transform: translateX(0) !important; }
+    #sm2.active .sm2-title { opacity: 1 !important; transform: none !important; }
+    #sm2.active .sm2-sub  { opacity: 1 !important; }
+    #sm2.active .sm2-cols { opacity: 1 !important; transform: none !important; }
     .pill {
       padding: 8px 18px; border-radius: 24px;
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
@@ -957,57 +960,113 @@
   </div>
 </div>
 
-<!-- ═══ SCENE sm2: SPENDING BUBBLES ═══ -->
-<div class="scene feature-scene" id="sm2">
-  <div class="feature-eyebrow">Рынок</div>
-  <div class="feature-headline big" style="color:#fff">Деньги в спорте<br><span class="gradient-text">уже есть.</span></div>
+<!-- ═══ SCENE sm2: TAM/SAM/SOM ═══ -->
+<div class="scene feature-scene" id="sm2" style="padding:44px 60px 40px;gap:16px;justify-content:flex-start">
+  <div class="feature-eyebrow" style="margin-bottom:0">Рынок</div>
+  <div style="font-size:clamp(22px,2.6vw,36px);font-weight:800;color:#fff;letter-spacing:-0.5px;line-height:1.2;opacity:0;transform:translateY(20px);transition:opacity 0.6s 0.1s,transform 0.6s 0.1s" class="sm2-title">TAM / SAM / SOM: первый клин — тренеры</div>
+  <div style="font-size:clamp(13px,1.1vw,16px);color:#666;max-width:700px;line-height:1.5;opacity:0;transition:opacity 0.6s 0.25s" class="sm2-sub">Из ~1 трлн ₽ спортивных трат в РФ начинаем с рынка тренеров — supply-side входа в атлетов.</div>
 
-  <div style="flex:1;display:flex;align-items:flex-end;justify-content:center;gap:16px;width:100%;flex-wrap:wrap;padding-bottom:8px">
+  <!-- 3 columns -->
+  <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;width:100%;min-height:0;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.35s,transform 0.7s 0.35s" class="sm2-cols">
 
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-      <div style="width:180px;height:180px;border-radius:50%;background:linear-gradient(135deg,rgba(108,99,255,0.28),rgba(108,99,255,0.1));border:1px solid rgba(108,99,255,0.4);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px">
-        <div style="font-size:22px;font-weight:900;color:#fff">425</div>
-        <div style="font-size:11px;color:rgba(155,89,245,0.9);font-weight:700">млрд ₽</div>
+    <!-- COL 1: TAM -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:4px 12px;width:fit-content">
+        <span style="font-size:11px;color:#888;font-weight:700;letter-spacing:0.5px">1&nbsp;&nbsp;TAM</span>
       </div>
-      <div style="text-align:center;font-size:12px;color:#555;max-width:120px;line-height:1.3;height:36px">Одежда, обувь, инвентарь</div>
+      <div>
+        <div style="font-size:clamp(16px,1.6vw,22px);font-weight:800;color:#fff;line-height:1.2">~1 трлн ₽ consumer spend</div>
+        <div style="font-size:12px;color:#555;margin-top:3px">Платежи вокруг спорта в РФ</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex:1">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px">
+          <span style="font-size:13px;color:#888">экипировка / спорттовары</span>
+          <span style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap">350 млрд</span>
+        </div>
+        <!-- highlighted row -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,100,50,0.08);border:1px solid rgba(255,100,50,0.35);border-radius:10px">
+          <span style="font-size:13px;color:#ccc;font-weight:600">тренеры / исполнители</span>
+          <span style="font-size:14px;font-weight:800;color:#ff6432;white-space:nowrap">330 млрд</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px">
+          <span style="font-size:13px;color:#888">абонементы / инфраструктура</span>
+          <span style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap">190 млрд</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px">
+          <span style="font-size:13px;color:#888">старты, восстановление, страховки</span>
+          <span style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap">80 млрд</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px">
+          <span style="font-size:13px;color:#888">спортивное питание</span>
+          <span style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap">50 млрд</span>
+        </div>
+      </div>
     </div>
 
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-      <div style="width:164px;height:164px;border-radius:50%;background:linear-gradient(135deg,rgba(108,99,255,0.28),rgba(108,99,255,0.1));border:1px solid rgba(108,99,255,0.4);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px">
-        <div style="font-size:20px;font-weight:900;color:#fff">350</div>
-        <div style="font-size:11px;color:rgba(155,89,245,0.9);font-weight:700">млрд ₽</div>
+    <!-- COL 2: SAM -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:4px 12px;width:fit-content">
+        <span style="font-size:11px;color:#888;font-weight:700;letter-spacing:0.5px">2&nbsp;&nbsp;SAM</span>
       </div>
-      <div style="text-align:center;font-size:12px;color:#555;max-width:110px;line-height:1.3;height:36px">Фитнес клубы и тренеры</div>
+      <div>
+        <div style="font-size:clamp(16px,1.6vw,22px);font-weight:800;color:#fff;line-height:1.2">Рынок тренеров</div>
+        <div style="font-size:12px;color:#555;margin-top:3px">Supply-слой для входа в категорию</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;flex:1;padding-top:4px">
+        <div style="border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:12px">
+          <div style="font-size:clamp(18px,2vw,28px);font-weight:800;color:#fff;line-height:1">350–375 тыс.</div>
+          <div style="font-size:12px;color:#555;margin-top:3px">фитнес-тренеров в РФ</div>
+        </div>
+        <div style="border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:12px">
+          <div style="font-size:clamp(18px,2vw,28px);font-weight:800;color:#fff;line-height:1">250–275 тыс.</div>
+          <div style="font-size:12px;color:#555;margin-top:3px">профессиональное ядро</div>
+        </div>
+        <div style="border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:12px">
+          <div style="font-size:clamp(18px,2vw,28px);font-weight:800;color:#fff;line-height:1">80 тыс. ₽</div>
+          <div style="font-size:12px;color:#555;margin-top:3px">средний доход тренера в месяц</div>
+        </div>
+        <div>
+          <div style="font-size:clamp(18px,2vw,28px);font-weight:800;color:#ff6432;line-height:1">~330 млрд ₽</div>
+          <div style="font-size:12px;color:#555;margin-top:3px">суммарный доход тренеров в год</div>
+        </div>
+      </div>
     </div>
 
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-      <div style="width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,rgba(108,99,255,0.28),rgba(108,99,255,0.1));border:1px solid rgba(108,99,255,0.4);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12px">
-        <div style="font-size:16px;font-weight:900;color:#fff">50</div>
-        <div style="font-size:10px;color:rgba(155,89,245,0.9);font-weight:700">млрд ₽</div>
+    <!-- COL 3: TOM/SOM -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:4px 12px;width:fit-content">
+        <span style="font-size:11px;color:#888;font-weight:700;letter-spacing:0.5px">3&nbsp;&nbsp;TOM / SOM</span>
       </div>
-      <div style="text-align:center;font-size:12px;color:#555;max-width:90px;line-height:1.3;height:36px">Спортивное питание</div>
+      <div>
+        <div style="font-size:clamp(16px,1.6vw,22px);font-weight:800;color:#fff;line-height:1.2">Подписка для тренера</div>
+        <div style="font-size:12px;color:#555;margin-top:3px">SaaS/AI: CRM, дневник, планирование, чат</div>
+      </div>
+      <!-- price box -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,100,50,0.1);border:1px solid rgba(255,100,50,0.3);border-radius:12px">
+        <span style="font-size:clamp(18px,2vw,26px);font-weight:800;color:#ff6432">2 900 ₽&nbsp;/&nbsp;мес</span>
+        <span style="font-size:12px;color:#c0774a;text-align:right;line-height:1.3">≈ 4%<br>дохода тренера</span>
+      </div>
+      <!-- TOM row -->
+      <div style="padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;font-weight:700;color:#fff;background:rgba(255,255,255,0.1);padding:2px 8px;border-radius:6px">TOM</span>
+          <span style="font-size:12px;color:#666">350 тыс. × 2 900 × 12</span>
+        </div>
+        <span style="font-size:13px;font-weight:700;color:#fff;white-space:nowrap">~12 млрд ₽/год</span>
+      </div>
+      <!-- SOM box -->
+      <div style="padding:12px 14px;background:rgba(255,100,50,0.08);border:1px solid rgba(255,100,50,0.3);border-radius:12px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:11px;font-weight:700;color:#000;background:#ff6432;padding:2px 8px;border-radius:6px">SOM</span>
+            <span style="font-size:12px;color:#888">50 тыс. платящих</span>
+          </div>
+          <span style="font-size:clamp(14px,1.4vw,18px);font-weight:800;color:#ff6432;white-space:nowrap">~1,7 млрд ₽/год</span>
+        </div>
+        <div style="font-size:11px;color:#666;line-height:1.4">30 тыс. × 2 900 × 12 = 1 млрд ₽&nbsp;&nbsp;·&nbsp;&nbsp;50 тыс. × 2 900 × 12 = 1,7 млрд ₽</div>
+      </div>
     </div>
 
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-      <div style="width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,rgba(108,99,255,0.28),rgba(108,99,255,0.1));border:1px solid rgba(108,99,255,0.4);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px">
-        <div style="font-size:15px;font-weight:900;color:#fff">30</div>
-        <div style="font-size:10px;color:rgba(155,89,245,0.9);font-weight:700">млрд ₽</div>
-      </div>
-      <div style="text-align:center;font-size:12px;color:#555;max-width:90px;line-height:1.3;height:36px">Гаджеты и устройства</div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
-      <div style="width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,rgba(108,99,255,0.28),rgba(108,99,255,0.1));border:1px solid rgba(108,99,255,0.4);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
-        <div style="font-size:12px;font-weight:900;color:#fff">5</div>
-        <div style="font-size:9px;color:rgba(155,89,245,0.9);font-weight:700">млрд</div>
-      </div>
-      <div style="text-align:center;font-size:12px;color:#555;max-width:80px;line-height:1.3;height:36px">Старты и регистрации</div>
-    </div>
-
-  </div>
-
-  <div style="margin-top:4px;padding:14px 20px;background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.2);border-radius:14px;font-size:14px;color:var(--muted);text-align:center;line-height:1.5;max-width:700px;margin-left:auto;margin-right:auto">
-    Итого: <span style="color:#fff;font-weight:700">~860 млрд ₽</span> ежегодно — и почти ни одного цифрового продукта,<br>который сшивает тренера, клиента и данные в одном месте.
   </div>
 </div>
 
