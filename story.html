@@ -87,7 +87,7 @@
     }
     #s2.active .line:nth-child(1) { opacity: 1; transform: none; transition-delay: 0.1s; }
     #s2.active .line:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.4s; }
-    #s2.active .line:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.7s; }
+    #s2 .line.show { opacity: 1; transform: none; transition-delay: 0.1s; }
 
     /* ═══════════════════════════════
        SCENE 3 — PROBLEMS
@@ -395,9 +395,9 @@
 
 <!-- ═══ SCENE 2 — CONTEXT ═══ -->
 <div class="scene" id="s2" style="gap:0;justify-content:center">
-  <div style="font-size:clamp(16px,2vw,26px);font-weight:700;color:#555;margin-bottom:6px">Трекеры, тренеры, залы.</div>
-  <div style="font-size:clamp(16px,2vw,26px);font-weight:700;color:#444;margin-bottom:52px">Мы инвестируем в своё тело.</div>
-  <div class="line medium" style="color:#fff">Но данные о тренировках<br><span class="gradient-text">разбросаны по десяткам мест.</span></div>
+  <div class="line" style="font-size:clamp(20px,2.6vw,36px);color:#555;margin-bottom:8px">Трекеры, тренеры, залы.</div>
+  <div class="line" style="font-size:clamp(20px,2.6vw,36px);color:#444;margin-bottom:52px">Мы инвестируем в своё тело.</div>
+  <div class="line medium" id="s2-reveal" style="color:#fff">Но данные о тренировках<br><span class="gradient-text">разбросаны по десяткам мест.</span></div>
 </div>
 
 <!-- ═══ SCENE 3 — PROBLEMS ═══ -->
@@ -1183,6 +1183,7 @@
   let problemStep = 0;
   let revealShown = false;
   let sm1Step = 0;
+  let s2Step = 0;
 
   // Build dots
   const dotsEl = document.getElementById('dots-nav');
@@ -1266,6 +1267,10 @@
     updateDots();
     document.getElementById('hint').style.opacity = idx === SCENES.length - 1 ? '0' : '1';
     // reset sm1 projection when re-entering
+    if (SCENES[idx] === 's2') {
+      s2Step = 0;
+      document.getElementById('s2-reveal').classList.remove('show');
+    }
     if (SCENES[idx] === 'sm1') {
       sm1Step = 0;
       document.getElementById('sm1-proj').style.opacity = '0';
@@ -1281,6 +1286,14 @@
   }
 
   function advance() {
+    // s2: first click shows key phrase, second click goes to next scene
+    if (SCENES[sceneIdx] === 's2') {
+      if (s2Step === 0) {
+        s2Step = 1;
+        document.getElementById('s2-reveal').classList.add('show');
+        return;
+      }
+    }
     // sm1: first click shows projection, second click goes to next scene
     if (SCENES[sceneIdx] === 'sm1') {
       if (sm1Step === 0) {
@@ -1341,6 +1354,11 @@
   }
 
   function retreat() {
+    if (SCENES[sceneIdx] === 's2' && s2Step === 1) {
+      s2Step = 0;
+      document.getElementById('s2-reveal').classList.remove('show');
+      return;
+    }
     if (SCENES[sceneIdx] === 'sm1' && sm1Step === 1) {
       sm1Step = 0;
       document.getElementById('sm1-proj').style.opacity = '0';
