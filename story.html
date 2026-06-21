@@ -702,6 +702,303 @@
   </div>
 </div>
 
+<!-- ═══ SPR-ASM — ВВОДНЫЕ (ASSUMPTIONS) ═══ -->
+<div class="scene feature-scene" id="spr-asm" style="padding:44px 60px 36px">
+  <div class="feature-eyebrow">Приложение · Вводные</div>
+  <div class="feature-headline big" style="color:#fff;margin-bottom:22px">Предпосылки<br><span class="gradient-text">модели.</span></div>
+  <div style="flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+
+    <!-- КОЛОНКА 1: Тарифы + Конверсии -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Тарифы, ₽/мес</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">B2C (атлет) free</span>
+            <span style="color:rgba(255,255,255,0.4)">0 ₽</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">B2C (атлет)</span>
+            <span style="color:#fff;font-weight:700">490 ₽</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">B2B (тренер)</span>
+            <span style="color:#fff;font-weight:700">990 ₽</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">B2B PRO (студия)</span>
+            <span style="color:#9b59f5;font-weight:700">2 990 ₽</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">B2C — атлеты</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Рост базы, MoM (ф.1→5)</span>
+            <span style="color:rgba(255,255,255,0.7)">20% → 1%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Churn</span>
+            <span style="color:#ff6b6b;font-weight:600">8% / мес</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Free → Paid</span>
+            <span style="color:#43e97b;font-weight:600">4% / мес</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">B2B — тренеры</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Рост базы, MoM (ф.1→5)</span>
+            <span style="color:rgba(255,255,255,0.7)">20% → 1%</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Paid churn</span>
+            <span style="color:#ff6b6b;font-weight:600">4% / мес</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">PRO churn</span>
+            <span style="color:#ff6b6b;font-weight:600">3% / мес</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Free → Paid</span>
+            <span style="color:#43e97b;font-weight:600">9% / мес</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Free → PRO</span>
+            <span style="color:#43e97b;font-weight:600">2% / мес</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Paid → PRO upgrade</span>
+            <span style="color:#43e97b;font-weight:600">20% / мес</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- КОЛОНКА 2: COGS + Маркетинг + Капитал -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">COGS — AI-инфраструктура, ₽/мес</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:4px 0;color:rgba(255,255,255,0.3);font-size:10px;font-weight:600"></th>
+              <th style="text-align:right;padding:4px 6px;color:rgba(255,255,255,0.3);font-size:10px">Ф 1</th>
+              <th style="text-align:right;padding:4px 6px;color:rgba(255,255,255,0.3);font-size:10px">Ф 2</th>
+              <th style="text-align:right;padding:4px 6px;color:rgba(255,255,255,0.3);font-size:10px">Ф 3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">Инфраструктура</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">21 К</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">123 К</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">277 К</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">SpeechKit</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">5 К</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">60 К</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">320 К</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">Yandex GPT</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">150 К</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1 800 К</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">9 600 К</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.1)">
+              <td style="padding:5px 0;color:#fff;font-weight:700">Итого</td>
+              <td style="padding:5px 6px;text-align:right;color:#43e97b;font-weight:700">176 К</td>
+              <td style="padding:5px 6px;text-align:right;color:#43e97b;font-weight:700">1 983 К</td>
+              <td style="padding:5px 6px;text-align:right;color:#43e97b;font-weight:700">10 197 К</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="margin-top:8px;font-size:10px;color:rgba(255,255,255,0.3);line-height:1.6">
+          Эквайринг: 3% от оборота<br>
+          Customer support: 250 ₽/письмо · 0,01 обращений/польз/мес
+        </div>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">S&M — маркетинг, ₽/мес</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Фаза 1 (2027)</span>
+            <span style="color:rgba(255,255,255,0.7)">200 К</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Фаза 2 (2028)</span>
+            <span style="color:rgba(255,255,255,0.7)">3 000 К</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Фаза 3 (2029–2030)</span>
+            <span style="color:rgba(255,255,255,0.7)">15 000 К</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:rgba(255,255,255,0.5)">Фаза 4 (2031+)</span>
+            <span style="color:rgba(255,255,255,0.7)">30 000 К</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.08);padding-top:5px;margin-top:2px">
+            <span style="color:rgba(255,255,255,0.35)">Прочие расходы</span>
+            <span style="color:rgba(255,255,255,0.45)">50 К / мес</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(67,233,123,0.06);border:1px solid rgba(67,233,123,0.2);border-radius:12px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:rgba(67,233,123,0.6);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Начальный капитал</div>
+        <div style="font-size:24px;font-weight:800;color:#43e97b;line-height:1.1">400 млн ₽</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:5px">инвестиционный раунд · break-even 2029</div>
+      </div>
+
+    </div>
+
+    <!-- КОЛОНКА 3: Команда G&A + R&D -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">G&A — команда</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:4px 0;color:rgba(255,255,255,0.3);font-size:10px"></th>
+              <th style="text-align:right;padding:4px 6px;color:rgba(255,255,255,0.3);font-size:10px">HC</th>
+              <th style="text-align:right;padding:4px 6px;color:rgba(255,255,255,0.3);font-size:10px">Gross, К₽</th>
+              <th style="text-align:right;padding:4px 6px;color:rgba(255,255,255,0.3);font-size:10px">ФОТ, К₽</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">Разработка</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">2</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">350</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.55)">700</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">Сэйлз</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">2</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">300</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.55)">600</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">Фаундер</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">5</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">500</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.55)">2 500</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">Юрист</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">150</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.55)">150</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">Бухгалтер</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">150</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.55)">150</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.1)">
+              <td style="padding:5px 0;color:#fff;font-weight:700">Итого</td>
+              <td style="padding:5px 6px;text-align:right;color:#43e97b;font-weight:700">11</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.3)">—</td>
+              <td style="padding:5px 6px;text-align:right;color:#43e97b;font-weight:700">4 100</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">R&D — команда (HC по фазам)</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:4px 0;color:rgba(255,255,255,0.3);font-size:10px"></th>
+              <th style="text-align:right;padding:4px 6px;color:rgba(255,255,255,0.3);font-size:10px">Ф1</th>
+              <th style="text-align:right;padding:4px 6px;color:rgba(255,255,255,0.3);font-size:10px">Ф2</th>
+              <th style="text-align:right;padding:4px 6px;color:rgba(255,255,255,0.3);font-size:10px">Ф3</th>
+              <th style="text-align:right;padding:4px 6px;color:rgba(255,255,255,0.3);font-size:10px">К₽</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">PM</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.45)">250</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">Backend (C++)</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">2</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">3</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">4</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.45)">300</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">Mobile (RN)</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">2</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">2</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">3</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.45)">280</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">AI/ML</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">2</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.45)">320</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">UI/UX</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">2</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.45)">200</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">QA</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">2</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">3</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.45)">180</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.06)">
+              <td style="padding:5px 0;color:rgba(255,255,255,0.55)">DevOps</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">0,5</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">1</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.7)">2</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.45)">300</td>
+            </tr>
+            <tr style="border-top:1px solid rgba(255,255,255,0.1)">
+              <td style="padding:5px 0;color:#fff;font-weight:700">Итого HC</td>
+              <td style="padding:5px 6px;text-align:right;color:#43e97b;font-weight:700">8,5</td>
+              <td style="padding:5px 6px;text-align:right;color:#43e97b;font-weight:700">11</td>
+              <td style="padding:5px 6px;text-align:right;color:#43e97b;font-weight:700">17</td>
+              <td style="padding:5px 6px;text-align:right;color:rgba(255,255,255,0.3)">—</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="margin-top:8px;font-size:10px;color:rgba(255,255,255,0.3);line-height:1.6">
+          ФОТ R&D: 2 260 К/мес (ф.1) · 2 890 К/мес (ф.2) · 4 470 К/мес (ф.3)
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <!-- ═══ SPR4 — ТЕХНОЛОГИИ ═══ -->
 <div class="scene feature-scene" id="spr4" style="padding:44px 60px 36px">
   <div class="feature-eyebrow">Приложение · Технологии</div>
@@ -1249,7 +1546,7 @@
 <div class="hint" id="hint">пробел / →</div>
 
 <script>
-  const SCENES = ['s1','s2','s3','s5','s6','s7','s8','sqr','sm1','sm2','sbm','smkt','srd','s9','spr0','spr1','spr2','spr3','spr4','spr5'];
+  const SCENES = ['s1','s2','s3','s5','s6','s7','s8','sqr','sm1','sm2','sbm','smkt','srd','s9','spr0','spr1','spr2','spr3','spr-asm','spr4','spr5'];
   const TOTAL_STEPS = 9 + 5; // 9 scenes + 5 problem steps in scene 3
   let sceneIdx = 0;
   let problemStep = 0;
