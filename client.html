@@ -349,12 +349,47 @@
     .add-sheet-overlay { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.6); z-index: 50; align-items: flex-end; }
     .add-sheet-overlay.open { display: flex; }
     .add-sheet { width: 100%; background: #1c1c26; border-radius: 24px 24px 0 0; padding: 0 0 32px; }
-    .add-sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border); margin: 12px auto 16px; }
-    .add-sheet-title { font-size: 17px; font-weight: 800; color: var(--text); padding: 0 20px 16px; border-bottom: 1px solid var(--border); }
+    .add-sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border); margin: 12px auto 12px; }
+    .add-sheet-title { font-size: 17px; font-weight: 800; color: var(--text); padding: 0 20px 12px; }
+    .mode-switcher { display: flex; gap: 0; margin: 0 16px 0; background: var(--bg); border-radius: 14px; padding: 4px; border: 1px solid var(--border); }
+    .mode-btn { flex: 1; padding: 9px 4px; border: none; background: none; color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer; border-radius: 10px; font-family: inherit; transition: all 0.2s; }
+    .mode-btn.active { background: var(--card2); color: var(--text); }
+    .mode-panel { display: none; }
+    .mode-panel.active { display: block; }
+    /* text mode */
     .add-sheet-input { margin: 12px 16px 0; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; font-size: 15px; color: var(--text); outline: none; width: calc(100% - 32px); font-family: inherit; }
-    .add-sheet-quick { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
+    .add-sheet-quick { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 16px 4px; }
     .add-sheet-chip { padding: 7px 14px; background: rgba(108,99,255,0.12); border: 1px solid rgba(108,99,255,0.25); border-radius: 20px; font-size: 13px; color: var(--accent); cursor: pointer; }
-    .add-sheet-confirm { margin: 4px 16px 0; width: calc(100% - 32px); padding: 14px; background: var(--accent); border: none; border-radius: 14px; color: white; font-size: 15px; font-weight: 800; cursor: pointer; font-family: inherit; }
+    .add-sheet-confirm { margin: 10px 16px 0; width: calc(100% - 32px); padding: 14px; background: var(--accent); border: none; border-radius: 14px; color: white; font-size: 15px; font-weight: 800; cursor: pointer; font-family: inherit; }
+    /* voice mode */
+    .voice-area { display: flex; flex-direction: column; align-items: center; padding: 20px 16px 8px; gap: 14px; }
+    .mic-btn { width: 72px; height: 72px; border-radius: 50%; border: 2px solid rgba(108,99,255,0.35); background: rgba(108,99,255,0.12); font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .mic-btn.recording { background: rgba(255,59,48,0.18); border-color: rgba(255,59,48,0.5); animation: mic-pulse 1s infinite; }
+    @keyframes mic-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,59,48,0.3)} 50%{box-shadow:0 0 0 14px rgba(255,59,48,0)} }
+    .voice-wave { display: flex; align-items: center; gap: 3px; height: 32px; }
+    .wave-bar { width: 4px; border-radius: 2px; background: var(--accent); height: 6px; }
+    .voice-wave.active .wave-bar { animation: wave-anim 0.7s ease-in-out infinite; }
+    .wave-bar:nth-child(2){animation-delay:.1s}.wave-bar:nth-child(3){animation-delay:.2s}.wave-bar:nth-child(4){animation-delay:.3s}.wave-bar:nth-child(5){animation-delay:.15s}.wave-bar:nth-child(6){animation-delay:.05s}.wave-bar:nth-child(7){animation-delay:.25s}
+    @keyframes wave-anim { 0%,100%{height:5px;opacity:.3} 50%{height:26px;opacity:1} }
+    .voice-hint { font-size: 13px; color: var(--muted); text-align: center; }
+    .voice-result-text { font-size: 15px; color: var(--text); font-weight: 600; text-align: center; padding: 0 8px; min-height: 22px; }
+    /* alice result (shared for voice+photo) */
+    .alice-food-result { margin: 8px 16px 4px; background: linear-gradient(135deg,rgba(108,99,255,0.12),rgba(67,233,123,0.06)); border: 1px solid rgba(108,99,255,0.3); border-radius: 16px; padding: 14px; }
+    .alice-food-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+    .alice-food-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+    .alice-kbju-row { display: flex; gap: 8px; }
+    .alice-kbju-item { flex: 1; background: rgba(255,255,255,0.04); border-radius: 10px; padding: 8px 6px; text-align: center; }
+    .alice-kbju-val { font-size: 16px; font-weight: 800; color: var(--text); }
+    .alice-kbju-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    /* photo mode */
+    .photo-upload-area { margin: 14px 16px 8px; border: 2px dashed rgba(108,99,255,0.3); border-radius: 16px; padding: 28px 20px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .photo-upload-area:active { border-color: var(--accent); background: rgba(108,99,255,0.06); }
+    .photo-preview-wrap { margin: 10px 16px 0; border-radius: 14px; overflow: hidden; max-height: 160px; }
+    .photo-preview-wrap img { width: 100%; display: block; object-fit: cover; max-height: 160px; }
+    .analyzing-row { display: flex; align-items: center; gap: 8px; padding: 10px 16px 0; font-size: 13px; color: var(--muted); }
+    .analyzing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: a-blink 1.2s infinite; }
+    .analyzing-dot:nth-child(2){animation-delay:.2s}.analyzing-dot:nth-child(3){animation-delay:.4s}
+    @keyframes a-blink { 0%,80%,100%{opacity:.2} 40%{opacity:1} }
   </style>
 </head>
 <body>
@@ -1006,16 +1041,92 @@
     <div class="add-sheet" onclick="event.stopPropagation()">
       <div class="add-sheet-handle"></div>
       <div class="add-sheet-title">Что поел?</div>
-      <input class="add-sheet-input" type="text" placeholder="Например: 200 г риса с рыбой" id="add-food-input"/>
-      <div class="add-sheet-quick">
-        <div class="add-sheet-chip" onclick="fillFood(this)">🍗 Куриная грудка</div>
-        <div class="add-sheet-chip" onclick="fillFood(this)">🥦 Брокколи</div>
-        <div class="add-sheet-chip" onclick="fillFood(this)">🍚 Рис</div>
-        <div class="add-sheet-chip" onclick="fillFood(this)">🥚 Яйца</div>
-        <div class="add-sheet-chip" onclick="fillFood(this)">🐟 Рыба</div>
-        <div class="add-sheet-chip" onclick="fillFood(this)">🧀 Творог</div>
+
+      <!-- Переключатель режимов -->
+      <div class="mode-switcher">
+        <button class="mode-btn active" id="mode-btn-text" onclick="switchFoodMode('text')">✏️ Текст</button>
+        <button class="mode-btn" id="mode-btn-voice" onclick="switchFoodMode('voice')">🎙 Голос</button>
+        <button class="mode-btn" id="mode-btn-photo" onclick="switchFoodMode('photo')">📷 Фото</button>
       </div>
-      <button class="add-sheet-confirm" onclick="confirmAddFood()">Добавить</button>
+
+      <!-- ТЕКСТ -->
+      <div class="mode-panel active" id="food-mode-text">
+        <input class="add-sheet-input" type="text" placeholder="Например: 200 г риса с рыбой" id="add-food-input"/>
+        <div class="add-sheet-quick">
+          <div class="add-sheet-chip" onclick="fillFood(this)">🍗 Куриная грудка</div>
+          <div class="add-sheet-chip" onclick="fillFood(this)">🥦 Брокколи</div>
+          <div class="add-sheet-chip" onclick="fillFood(this)">🍚 Рис</div>
+          <div class="add-sheet-chip" onclick="fillFood(this)">🥚 Яйца</div>
+          <div class="add-sheet-chip" onclick="fillFood(this)">🐟 Рыба</div>
+          <div class="add-sheet-chip" onclick="fillFood(this)">🧀 Творог</div>
+        </div>
+        <!-- Alice анализирует текст -->
+        <div class="alice-food-result" id="text-alice-result" style="display:none">
+          <div class="alice-food-lbl">Алиса · КБЖУ</div>
+          <div class="alice-food-name" id="text-alice-name"></div>
+          <div class="alice-kbju-row">
+            <div class="alice-kbju-item"><div class="alice-kbju-val" id="t-kcal">—</div><div class="alice-kbju-lbl">ккал</div></div>
+            <div class="alice-kbju-item"><div class="alice-kbju-val" id="t-prot">—</div><div class="alice-kbju-lbl">белки г</div></div>
+            <div class="alice-kbju-item"><div class="alice-kbju-val" id="t-fat">—</div><div class="alice-kbju-lbl">жиры г</div></div>
+            <div class="alice-kbju-item"><div class="alice-kbju-val" id="t-carb">—</div><div class="alice-kbju-lbl">углев. г</div></div>
+          </div>
+        </div>
+        <button class="add-sheet-confirm" onclick="analyzeTextFood()">Рассчитать КБЖУ</button>
+      </div>
+
+      <!-- ГОЛОС -->
+      <div class="mode-panel" id="food-mode-voice">
+        <div class="voice-area">
+          <button class="mic-btn" id="food-mic-btn" onclick="toggleFoodVoice()">🎙</button>
+          <div class="voice-hint" id="voice-food-hint">Нажми и скажи что поел</div>
+          <div class="voice-wave" id="voice-food-wave">
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+          </div>
+          <div class="voice-result-text" id="voice-food-result"></div>
+        </div>
+        <div class="alice-food-result" id="voice-alice-result" style="display:none">
+          <div class="alice-food-lbl">Алиса · КБЖУ</div>
+          <div class="alice-food-name" id="voice-alice-name"></div>
+          <div class="alice-kbju-row">
+            <div class="alice-kbju-item"><div class="alice-kbju-val" id="v-kcal">—</div><div class="alice-kbju-lbl">ккал</div></div>
+            <div class="alice-kbju-item"><div class="alice-kbju-val" id="v-prot">—</div><div class="alice-kbju-lbl">белки г</div></div>
+            <div class="alice-kbju-item"><div class="alice-kbju-val" id="v-fat">—</div><div class="alice-kbju-lbl">жиры г</div></div>
+            <div class="alice-kbju-item"><div class="alice-kbju-val" id="v-carb">—</div><div class="alice-kbju-lbl">углев. г</div></div>
+          </div>
+        </div>
+        <button class="add-sheet-confirm" id="voice-confirm-btn" style="display:none" onclick="confirmAddFood()">Добавить</button>
+      </div>
+
+      <!-- ФОТО -->
+      <div class="mode-panel" id="food-mode-photo">
+        <div class="photo-upload-area" onclick="document.getElementById('photo-file-input').click()">
+          <div style="font-size:36px">📷</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">Сфотографировать блюдо</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.3)">или выбрать из галереи</div>
+        </div>
+        <input type="file" accept="image/*" capture="environment" id="photo-file-input" style="display:none" onchange="handleFoodPhoto(this)"/>
+        <div id="photo-preview-wrap" style="display:none">
+          <div class="photo-preview-wrap"><img id="photo-preview-img" src="" alt=""/></div>
+          <div class="analyzing-row" id="photo-analyzing">
+            <div class="analyzing-dot"></div><div class="analyzing-dot"></div><div class="analyzing-dot"></div>
+            <span>Алиса анализирует блюдо...</span>
+          </div>
+          <div class="alice-food-result" id="photo-alice-result" style="display:none">
+            <div class="alice-food-lbl">Алиса · КБЖУ</div>
+            <div class="alice-food-name" id="photo-alice-name"></div>
+            <div class="alice-kbju-row">
+              <div class="alice-kbju-item"><div class="alice-kbju-val" id="p-kcal">—</div><div class="alice-kbju-lbl">ккал</div></div>
+              <div class="alice-kbju-item"><div class="alice-kbju-val" id="p-prot">—</div><div class="alice-kbju-lbl">белки г</div></div>
+              <div class="alice-kbju-item"><div class="alice-kbju-val" id="p-fat">—</div><div class="alice-kbju-lbl">жиры г</div></div>
+              <div class="alice-kbju-item"><div class="alice-kbju-val" id="p-carb">—</div><div class="alice-kbju-lbl">углев. г</div></div>
+            </div>
+          </div>
+        </div>
+        <button class="add-sheet-confirm" id="photo-confirm-btn" style="display:none" onclick="confirmAddFood()">Добавить</button>
+      </div>
+
     </div>
   </div>
 
@@ -1062,18 +1173,168 @@
     document.querySelectorAll('.alice-icon').forEach(el => { if (!el.innerHTML) el.innerHTML = ALICE_ICON_SVG; });
   }
 
+  // ── FOOD SHEET ──
+  let foodVoiceRecognition = null;
+  let foodVoiceActive = false;
+
   function openAddSheet() {
     document.getElementById('add-sheet-overlay').classList.add('open');
+    switchFoodMode('text');
   }
   function closeAddSheet(e) {
+    stopFoodVoice();
     document.getElementById('add-sheet-overlay').classList.remove('open');
+  }
+  function confirmAddFood() {
+    stopFoodVoice();
+    document.getElementById('add-sheet-overlay').classList.remove('open');
+    document.getElementById('add-food-input').value = '';
+    // reset photo
+    document.getElementById('photo-preview-wrap').style.display = 'none';
+    document.getElementById('photo-alice-result').style.display = 'none';
+    document.getElementById('photo-confirm-btn').style.display = 'none';
+    document.getElementById('photo-file-input').value = '';
+    // reset voice
+    document.getElementById('voice-food-result').textContent = '';
+    document.getElementById('voice-alice-result').style.display = 'none';
+    document.getElementById('voice-confirm-btn').style.display = 'none';
+    // reset text
+    document.getElementById('text-alice-result').style.display = 'none';
   }
   function fillFood(chip) {
     document.getElementById('add-food-input').value = chip.textContent.trim();
+    document.getElementById('text-alice-result').style.display = 'none';
   }
-  function confirmAddFood() {
-    document.getElementById('add-sheet-overlay').classList.remove('open');
-    document.getElementById('add-food-input').value = '';
+  function switchFoodMode(mode) {
+    ['text','voice','photo'].forEach(m => {
+      document.getElementById('food-mode-' + m).classList.toggle('active', m === mode);
+      document.getElementById('mode-btn-' + m).classList.toggle('active', m === mode);
+    });
+    if (mode !== 'voice') stopFoodVoice();
+  }
+
+  // TEXT: analyze
+  const FOOD_DB = [
+    { keys: ['рис','гречк','овсян','каш','макарон','паст'], name: 'Крупа / каша (250 г)', kcal: 290, p: 9, f: 3, c: 58 },
+    { keys: ['курица','куриц','индейк','filе','грудк'], name: 'Куриная грудка (200 г)', kcal: 220, p: 42, f: 4, c: 0 },
+    { keys: ['рыб','лосось','сёмг','треск','тунец'], name: 'Рыба (200 г)', kcal: 240, p: 36, f: 10, c: 0 },
+    { keys: ['яйц','яйцо'], name: 'Яйца (2 шт)', kcal: 160, p: 13, f: 11, c: 1 },
+    { keys: ['творог'], name: 'Творог 5% (200 г)', kcal: 200, p: 26, f: 10, c: 6 },
+    { keys: ['салат','овощ','огурец','помидор','перец'], name: 'Овощи / салат (200 г)', kcal: 80, p: 3, f: 1, c: 14 },
+    { keys: ['банан','яблок','груш','апельсин','ягод'], name: 'Фрукты (150 г)', kcal: 100, p: 1, f: 0, c: 24 },
+    { keys: ['хлеб','тост','бутерброд'], name: 'Хлеб (2 куска)', kcal: 160, p: 6, f: 2, c: 30 },
+    { keys: ['суп','борщ','щи'], name: 'Суп (350 мл)', kcal: 180, p: 8, f: 6, c: 22 },
+  ];
+  function guessFoodKbju(text) {
+    const lower = text.toLowerCase();
+    for (const item of FOOD_DB) {
+      if (item.keys.some(k => lower.includes(k))) return item;
+    }
+    return { name: text, kcal: Math.floor(Math.random()*200+200), p: Math.floor(Math.random()*20+10), f: Math.floor(Math.random()*10+5), c: Math.floor(Math.random()*30+15) };
+  }
+  function analyzeTextFood() {
+    const val = document.getElementById('add-food-input').value.trim();
+    if (!val) return;
+    const r = guessFoodKbju(val);
+    document.getElementById('text-alice-name').textContent = r.name;
+    document.getElementById('t-kcal').textContent = r.kcal;
+    document.getElementById('t-prot').textContent = r.p;
+    document.getElementById('t-fat').textContent = r.f;
+    document.getElementById('t-carb').textContent = r.c;
+    document.getElementById('text-alice-result').style.display = 'block';
+    // swap button
+    const btn = document.querySelector('#food-mode-text .add-sheet-confirm');
+    btn.textContent = 'Добавить';
+    btn.onclick = confirmAddFood;
+  }
+
+  // VOICE
+  function toggleFoodVoice() {
+    if (foodVoiceActive) { stopFoodVoice(); return; }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      // fallback demo
+      startFoodVoiceDemo();
+      return;
+    }
+    foodVoiceRecognition = new SpeechRecognition();
+    foodVoiceRecognition.lang = 'ru-RU';
+    foodVoiceRecognition.continuous = false;
+    foodVoiceRecognition.interimResults = true;
+    foodVoiceRecognition.onstart = () => setVoiceFoodUI(true);
+    foodVoiceRecognition.onresult = (e) => {
+      const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+      document.getElementById('voice-food-result').textContent = transcript;
+      if (e.results[e.results.length-1].isFinal) showVoiceFoodKbju(transcript);
+    };
+    foodVoiceRecognition.onerror = () => stopFoodVoice();
+    foodVoiceRecognition.onend = () => setVoiceFoodUI(false);
+    foodVoiceRecognition.start();
+    foodVoiceActive = true;
+  }
+  function startFoodVoiceDemo() {
+    setVoiceFoodUI(true);
+    foodVoiceActive = true;
+    const demo = 'гречка с куриной грудкой, 300 грамм';
+    let i = 0;
+    const el = document.getElementById('voice-food-result');
+    const interval = setInterval(() => {
+      el.textContent = demo.slice(0, ++i);
+      if (i >= demo.length) { clearInterval(interval); stopFoodVoice(); showVoiceFoodKbju(demo); }
+    }, 40);
+  }
+  function stopFoodVoice() {
+    foodVoiceActive = false;
+    if (foodVoiceRecognition) { try { foodVoiceRecognition.stop(); } catch(e){} foodVoiceRecognition = null; }
+    setVoiceFoodUI(false);
+  }
+  function setVoiceFoodUI(on) {
+    document.getElementById('food-mic-btn').classList.toggle('recording', on);
+    document.getElementById('voice-food-wave').classList.toggle('active', on);
+    document.getElementById('voice-food-hint').textContent = on ? 'Слушаю...' : 'Нажми и скажи что поел';
+  }
+  function showVoiceFoodKbju(text) {
+    const r = guessFoodKbju(text);
+    document.getElementById('voice-alice-name').textContent = r.name || text;
+    document.getElementById('v-kcal').textContent = r.kcal;
+    document.getElementById('v-prot').textContent = r.p;
+    document.getElementById('v-fat').textContent = r.f;
+    document.getElementById('v-carb').textContent = r.c;
+    document.getElementById('voice-alice-result').style.display = 'block';
+    document.getElementById('voice-confirm-btn').style.display = 'block';
+  }
+
+  // PHOTO
+  function handleFoodPhoto(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('photo-preview-img').src = e.target.result;
+      document.getElementById('photo-preview-wrap').style.display = 'block';
+      document.getElementById('photo-analyzing').style.display = 'flex';
+      document.getElementById('photo-alice-result').style.display = 'none';
+      document.getElementById('photo-confirm-btn').style.display = 'none';
+      // имитация анализа Алисой ~2 сек
+      setTimeout(() => {
+        document.getElementById('photo-analyzing').style.display = 'none';
+        const dishes = [
+          { name: 'Паста болоньезе (300 г)', kcal: 420, p: 18, f: 14, c: 52 },
+          { name: 'Гречка с куриной грудкой (350 г)', kcal: 380, p: 36, f: 7, c: 42 },
+          { name: 'Овощной салат с яйцом (250 г)', kcal: 210, p: 14, f: 12, c: 12 },
+          { name: 'Рис с лососем (300 г)', kcal: 440, p: 32, f: 11, c: 48 },
+          { name: 'Омлет с овощами (200 г)', kcal: 280, p: 18, f: 18, c: 8 },
+        ];
+        const r = dishes[Math.floor(Math.random() * dishes.length)];
+        document.getElementById('photo-alice-name').textContent = r.name;
+        document.getElementById('p-kcal').textContent = r.kcal;
+        document.getElementById('p-prot').textContent = r.p;
+        document.getElementById('p-fat').textContent = r.f;
+        document.getElementById('p-carb').textContent = r.c;
+        document.getElementById('photo-alice-result').style.display = 'block';
+        document.getElementById('photo-confirm-btn').style.display = 'block';
+      }, 2000);
+    };
+    reader.readAsDataURL(input.files[0]);
   }
 
   // workout timer
