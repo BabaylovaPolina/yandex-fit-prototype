@@ -1496,9 +1496,10 @@
 
 <!-- ═══ SCENE sm2: TAM/SAM/SOM ═══ -->
 <div class="scene feature-scene" id="sm2" style="padding:44px 72px 44px;gap:0;justify-content:flex-start">
-  <!-- header — same eyebrow + big headline as other slides -->
+  <!-- eyebrow — same class as sm1b so size/position match -->
+  <div class="feature-eyebrow" style="margin-bottom:8px;flex-shrink:0">Рынок</div>
+  <!-- headline -->
   <div style="opacity:0;transform:translateY(16px);transition:opacity 0.5s 0.05s,transform 0.5s 0.05s;flex-shrink:0;margin-bottom:16px" class="sm2-title">
-    <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#9B59F5;text-transform:uppercase;margin-bottom:12px">Рынок</div>
     <div style="font-size:clamp(48px,8vw,96px);font-weight:800;letter-spacing:-2px;line-height:1.05;color:#fff">Деньги в спорте <span class="gradient-text">есть.</span></div>
   </div>
   <div style="height:1px;background:rgba(255,255,255,0.07);width:100%;opacity:0;transition:opacity 0.4s 0.2s;margin-bottom:16px;flex-shrink:0" class="sm2-sub"></div>
@@ -1546,7 +1547,7 @@
     <div style="background:rgba(255,255,255,0.07)"></div>
 
     <!-- COL 2 -->
-    <div style="display:flex;flex-direction:column;padding:0 48px;justify-content:flex-start">
+    <div id="sm2-col2" style="display:flex;flex-direction:column;padding:0 48px;justify-content:flex-start">
       <!-- header -->
       <div style="border-bottom:1px solid rgba(255,255,255,0.07);padding-bottom:14px">
         <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#9B59F5;text-transform:uppercase;margin-bottom:8px">2 · SAM</div>
@@ -1574,7 +1575,7 @@
     <div style="background:rgba(255,255,255,0.07)"></div>
 
     <!-- COL 3 -->
-    <div style="display:flex;flex-direction:column;padding-left:48px;justify-content:flex-start">
+    <div id="sm2-col3" style="display:flex;flex-direction:column;padding-left:48px;justify-content:flex-start">
       <!-- header -->
       <div style="border-bottom:1px solid rgba(255,255,255,0.07);padding-bottom:14px">
         <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:#9B59F5;text-transform:uppercase;margin-bottom:8px">3 · SOM</div>
@@ -1895,12 +1896,23 @@
     if (SCENES[idx] === 'sm2') {
       requestAnimationFrame(() => {
         const ref = document.getElementById('sm2-bottom-1');
-        ['sm2-bottom-2','sm2-bottom-3'].forEach(id => {
-          const el = document.getElementById(id);
-          if (!ref || !el) return;
-          el.style.marginTop = '';
-          const diff = ref.getBoundingClientRect().top - el.getBoundingClientRect().top;
-          if (diff > 0) el.style.marginTop = diff + 'px';
+        if (!ref) return;
+        const refTop = ref.getBoundingClientRect().top;
+        [2, 3].forEach(n => {
+          const col = document.getElementById('sm2-col' + n);
+          if (!col) return;
+          // reset
+          col.style.gap = '';
+          // children: [0]=header, [1]=row1, [2]=row2, [3]=bottom-number
+          const kids = col.children;
+          if (kids.length < 4) return;
+          const h0 = kids[0].offsetHeight;
+          const h1 = kids[1].offsetHeight;
+          const h2 = kids[2].offsetHeight;
+          const colTop = col.getBoundingClientRect().top;
+          // gap so that: colTop + h0 + gap + h1 + gap + h2 + gap == refTop
+          const gap = (refTop - colTop - h0 - h1 - h2) / 3;
+          if (gap > 0) col.style.gap = gap + 'px';
         });
       });
     }
