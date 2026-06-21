@@ -2561,6 +2561,12 @@
       btn.style.color = '#000';
     }, 1200);
   }
+
+  // auto-navigate via URL param: ?client=alice
+  (function() {
+    const p = new URLSearchParams(location.search).get('client');
+    if (p) showClient(p);
+  })();
 </script>
 </body>
 </html>
