@@ -1434,6 +1434,85 @@
   </div>
 </div>
 
+<!-- ═══ SCENE sm1b — PENETRATION REDESIGN ═══ -->
+<div class="scene feature-scene" id="sm1b" style="padding:44px 60px 32px;overflow:hidden">
+  <div class="feature-eyebrow">Рынок</div>
+  <div class="feature-headline big" style="color:#fff;margin-bottom:16px">Проникновение фитнеса<br><span class="gradient-text">в РФ и мире.</span></div>
+
+  <div style="flex:1;min-height:0;width:100%;display:flex;flex-direction:column">
+    <svg id="sm1b-svg" viewBox="0 0 860 260" style="width:100%;flex:1;overflow:visible" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="sm1b-lg" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.7"/>
+          <stop offset="100%" stop-color="#43e97b"/>
+        </linearGradient>
+        <linearGradient id="sm1b-ag" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#6c63ff" stop-opacity="0.18"/>
+          <stop offset="100%" stop-color="#6c63ff" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+
+      <!-- baseline + 5% gridline -->
+      <line x1="40" y1="250" x2="760" y2="250" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+      <line x1="40" y1="202" x2="760" y2="202" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <text x="30" y="205" fill="#444" font-size="10" text-anchor="end">5%</text>
+
+      <!-- Russia area -->
+      <path d="M 40,250 L 40,207 C 130,208 130,209 220,209 C 310,209 310,208 400,208 C 490,205 490,203 580,203 C 670,200 670,199 760,198 L 760,250 Z"
+            fill="url(#sm1b-ag)"/>
+      <!-- Russia line -->
+      <path d="M 40,207 C 130,208 130,209 220,209 C 310,209 310,208 400,208 C 490,205 490,203 580,203 C 670,200 670,199 760,198"
+            fill="none" stroke="url(#sm1b-lg)" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Russia dots -->
+      <circle cx="40"  cy="207" r="3.5" fill="#6c63ff"/>
+      <circle cx="220" cy="209" r="3.5" fill="#7070ff"/>
+      <circle cx="400" cy="208" r="3.5" fill="#8090c0"/>
+      <circle cx="580" cy="203" r="3.5" fill="#50c090"/>
+      <circle cx="760" cy="198" r="5"   fill="#43e97b"/>
+      <!-- Russia 2026 label -->
+      <text x="760" y="186" fill="#43e97b" font-size="11" text-anchor="middle" font-weight="700">5.4%</text>
+      <text x="760" y="175" fill="#888" font-size="9" text-anchor="middle">🇷🇺 Россия</text>
+
+      <!-- X labels -->
+      <text x="40"  y="263" fill="#444"    font-size="10" text-anchor="middle">2018</text>
+      <text x="220" y="263" fill="#444"    font-size="10" text-anchor="middle">2020</text>
+      <text x="400" y="263" fill="#444"    font-size="10" text-anchor="middle">2022</text>
+      <text x="580" y="263" fill="#444"    font-size="10" text-anchor="middle">2024</text>
+      <text x="760" y="263" fill="#43e97b" font-size="10" text-anchor="middle" font-weight="700">2026</text>
+
+      <!-- ══ COMPARISON — hidden until 2nd step ══ -->
+      <g id="sm1b-comp" style="opacity:0;transition:opacity 0.9s ease">
+        <!-- additional gridlines -->
+        <line x1="40" y1="154" x2="760" y2="154" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <text x="30" y="157" fill="#444" font-size="10" text-anchor="end">10%</text>
+        <line x1="40" y1="106" x2="760" y2="106" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <text x="30" y="109" fill="#444" font-size="10" text-anchor="end">15%</text>
+        <line x1="40" y1="10"  x2="760" y2="10"  stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <text x="30" y="13"   fill="#444" font-size="10" text-anchor="end">25%</text>
+
+        <!-- China 6.2% → y=190 -->
+        <line x1="40" y1="190" x2="760" y2="190" stroke="rgba(155,140,255,0.25)" stroke-width="1" stroke-dasharray="5,4"/>
+        <circle cx="760" cy="190" r="5" fill="#9b8cff"/>
+        <text x="770" y="188" fill="#9b8cff" font-size="10.5" text-anchor="start" font-weight="700">6.2%</text>
+        <text x="770" y="200" fill="#777"    font-size="9"    text-anchor="start">Китай</text>
+
+        <!-- Europe 15% → y=106 -->
+        <line x1="40" y1="106" x2="760" y2="106" stroke="rgba(67,233,123,0.25)" stroke-width="1" stroke-dasharray="5,4"/>
+        <circle cx="760" cy="106" r="5" fill="#43e97b"/>
+        <text x="770" y="104" fill="#43e97b" font-size="10.5" text-anchor="start" font-weight="700">15%</text>
+        <text x="770" y="116" fill="#777"    font-size="9"    text-anchor="start">Европа</text>
+
+        <!-- USA 25% → y=10 -->
+        <line x1="40" y1="10" x2="760" y2="10" stroke="rgba(67,233,123,0.25)" stroke-width="1" stroke-dasharray="5,4"/>
+        <circle cx="760" cy="10" r="5" fill="#43e97b"/>
+        <text x="770" y="8"   fill="#43e97b" font-size="10.5" text-anchor="start" font-weight="700">25%</text>
+        <text x="770" y="20"  fill="#777"    font-size="9"    text-anchor="start">США</text>
+      </g>
+    </svg>
+    <div style="font-size:10px;color:#333;margin-top:6px">Источник: DDX Fitness, 2026</div>
+  </div>
+</div>
+
 <!-- ═══ SCENE sm2: TAM/SAM/SOM ═══ -->
 <div class="scene feature-scene" id="sm2" style="padding:44px 72px 44px;gap:0;justify-content:flex-start">
   <!-- header: eyebrow + title stacked -->
@@ -1723,12 +1802,13 @@
 <div class="hint" id="hint">пробел / →</div>
 
 <script>
-  const SCENES = ['s1','s2','s3','s5','s6','s7','s8','sqr','sm1','sm2','sbm','smkt','s9','spr0','spr1','spr2','spr3','spr-asm','spr-inv','srd','spr4','spr5'];
+  const SCENES = ['s1','s2','s3','s5','s6','s7','s8','sqr','sm1','sm1b','sm2','sbm','smkt','s9','spr0','spr1','spr2','spr3','spr-asm','spr-inv','srd','spr4','spr5'];
   const TOTAL_STEPS = 9 + 5; // 9 scenes + 5 problem steps in scene 3
   let sceneIdx = 0;
   let problemStep = 0;
   let revealShown = false;
   let sm1Step = 0;
+  let sm1bStep = 0;
   let s2Step = 0;
 
   // Build dots
@@ -1821,6 +1901,10 @@
       sm1Step = 0;
       document.getElementById('sm1-proj').style.opacity = '0';
     }
+    if (SCENES[idx] === 'sm1b') {
+      sm1bStep = 0;
+      document.getElementById('sm1b-comp').style.opacity = '0';
+    }
     // reset video scene when re-entering
     if (SCENES[idx] === 'sv') {
       videoShrunk = false;
@@ -1845,6 +1929,14 @@
       if (sm1Step === 0) {
         sm1Step = 1;
         document.getElementById('sm1-proj').style.opacity = '1';
+        return;
+      }
+    }
+    // sm1b: first click shows comparison countries, second click advances
+    if (SCENES[sceneIdx] === 'sm1b') {
+      if (sm1bStep === 0) {
+        sm1bStep = 1;
+        document.getElementById('sm1b-comp').style.opacity = '1';
         return;
       }
     }
@@ -1908,6 +2000,11 @@
     if (SCENES[sceneIdx] === 'sm1' && sm1Step === 1) {
       sm1Step = 0;
       document.getElementById('sm1-proj').style.opacity = '0';
+      return;
+    }
+    if (SCENES[sceneIdx] === 'sm1b' && sm1bStep === 1) {
+      sm1bStep = 0;
+      document.getElementById('sm1b-comp').style.opacity = '0';
       return;
     }
     if (sceneIdx === 2 && problemStep > 0) {
