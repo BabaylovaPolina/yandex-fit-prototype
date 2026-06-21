@@ -1794,94 +1794,172 @@
   let s2Step = 0;
   let univStep = 0;
 
-  // ── Universe slide data ──
+  // ── Universe slide (orbital, all purples, volumetric) ──
   const UNIV_PLANETS = [
-    { id:'up1', l1:'Тренерское',   l2:'приложение', c1:'#9B59F5', c2:'#3A1580' },
-    { id:'up2', l1:'Клиентское',   l2:'приложение', c1:'#7B3FD9', c2:'#2A1060' },
-    { id:'up3', l1:'Маркетплейс',  l2:'тренеров',   c1:'#43e97b', c2:'#0a5c28' },
-    { id:'up4', l1:'Маркетплейс',  l2:'товаров',    c1:'#6c63ff', c2:'#2a2480' },
-    { id:'up5', l1:'Реклама',      l2:'',            c1:'#ff6b9d', c2:'#800030' },
-    { id:'up6', l1:'Нутрициологи', l2:'',            c1:'#00c6fb', c2:'#004aaa' },
-    { id:'up7', l1:'Бьюти',        l2:'',            c1:'#f5a623', c2:'#885800' },
+    { id:'up1', l1:'Тренерское',   l2:'приложение', br:'#C4AAFF', mi:'#7B3FD9', dk:'#2A0860' },
+    { id:'up2', l1:'Клиентское',   l2:'приложение', br:'#BC94FF', mi:'#7030D4', dk:'#250755' },
+    { id:'up3', l1:'Маркетплейс',  l2:'тренеров',   br:'#B47EFF', mi:'#6420CF', dk:'#20064C' },
+    { id:'up4', l1:'Маркетплейс',  l2:'товаров',    br:'#AC68FF', mi:'#5810CA', dk:'#1C0542' },
+    { id:'up5', l1:'Реклама',      l2:'',            br:'#A452FF', mi:'#4C00C5', dk:'#180438' },
+    { id:'up6', l1:'Нутрициологи', l2:'',            br:'#9C3CFF', mi:'#4100C0', dk:'#14032E' },
+    { id:'up7', l1:'Бьюти',        l2:'',            br:'#9428FF', mi:'#3800BD', dk:'#100228' },
   ];
-  // Each state: [[xp% of width, yp% of height, dp=diameter in vh], ...]
-  const UNIV_STATES = [
-    [[50,50,72]],
-    [[27,50,50],[73,50,50]],
-    [[16,50,36],[50,50,36],[84,50,36]],
-    [[13,30,26],[40,33,28],[66,27,24],[78,68,44]],
-    [[11,27,21],[32,29,23],[52,22,20],[64,64,36],[87,44,40]],
-    [[9,24,18],[27,27,20],[44,19,17],[57,61,30],[75,41,34],[90,70,38]],
-    [[8,22,15],[22,25,17],[37,18,14],[51,58,26],[66,38,30],[80,66,34],[92,32,36]],
+  // Orbital positions [xp% of width, yp% of height, diameter vh]
+  // Center cx=50%, cy=55%; orbits are perspective-tilted ellipses
+  const UNIV_ORB = [
+    [44, 53, 10],  // orbit 0 — 210°
+    [61, 52, 13],  // orbit 1 — 335°
+    [37, 60, 17],  // orbit 2 — 140°
+    [58, 45, 21],  // orbit 3 — 290°
+    [66, 66, 25],  // orbit 4 — 55°
+    [19, 51, 29],  // orbit 5 — 195°
+    [84, 62, 34],  // orbit 6 — 20°
   ];
-  // Zoom-out final step: 7 originals + 13 extras
-  const UNIV_ZOOM = [
-    [8,22,7],[22,25,8],[37,18,6],[51,58,12],[66,38,14],[80,66,16],[92,32,17],
-    [30,10,5],[55,8,4],[75,12,6],[15,60,5],[40,75,7],[62,85,5],[85,20,5],
-    [20,40,4],[70,52,8],[45,45,5],[25,80,5],[88,78,7],[48,30,4],[10,50,6],
+  const UNIV_STATES = (() => {
+    const s = [[[50, 48, 70]]]; // step 0: p0 alone, huge
+    for (let n = 1; n <= 6; n++) s.push(UNIV_ORB.slice(0, n + 1));
+    return s;
+  })();
+  // Zoom final: originals shrink + 14 scattered extras
+  const UNIV_ZOOM_O = [[44,53,5],[61,52,7],[37,60,9],[58,45,11],[66,66,13],[19,51,15],[84,62,18]];
+  const UNIV_ZOOM_X = [
+    [28,18,4],[62,20,5],[82,35,4],[12,38,5],[35,72,4],[54,80,5],[75,76,4],
+    [90,22,3],[6,65,5],[48,33,4],[20,85,4],[70,42,5],[30,46,3],[56,62,4],
   ];
+  // SVG orbit ellipses (viewBox 1600×900, center 800,495)
+  const UNIV_SVG_ORBITS = [[112,31],[192,54],[272,77],[352,99],[432,122],[512,144],[576,171]];
+
+  const UNIV_TR = 'left .9s cubic-bezier(.34,1.05,.64,1),top .9s cubic-bezier(.34,1.05,.64,1),width .9s cubic-bezier(.34,1.05,.64,1),height .9s cubic-bezier(.34,1.05,.64,1),opacity .65s ease';
 
   function initUniverse() {
     const wrap = document.getElementById('univ-wrap');
     if (!wrap || wrap.dataset.inited) return;
     wrap.dataset.inited = '1';
-    const TR = 'left .85s cubic-bezier(.34,1.05,.64,1),top .85s cubic-bezier(.34,1.05,.64,1),width .85s cubic-bezier(.34,1.05,.64,1),height .85s cubic-bezier(.34,1.05,.64,1),opacity .6s ease';
+
+    // Stars
+    const ss = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    ss.setAttribute('viewBox','0 0 1600 900'); ss.setAttribute('preserveAspectRatio','xMidYMid slice');
+    ss.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none';
+    [[120,80],[380,45],[660,120],[940,60],[1200,90],[1450,140],[80,200],[300,250],
+     [550,180],[820,230],[1100,160],[1380,200],[1520,80],[40,350],[250,400],
+     [480,330],[720,380],[950,310],[1180,370],[1440,340],[1580,280],[30,500],
+     [200,560],[430,510],[680,580],[900,490],[1150,540],[1400,500],[1560,450],
+     [70,680],[320,640],[560,700],[800,660],[1050,720],[1300,680],[1480,650],
+     [150,800],[400,760],[650,830],[880,790],[1120,840],[1370,810],[1500,760],
+     [230,120],[490,80],[750,150],[1010,100],[1270,130],[1540,60],[170,460],
+    ].forEach(([x,y]) => {
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r', x%3===0?1.4:0.7);
+      c.setAttribute('fill','rgba(210,180,255,0.45)'); ss.appendChild(c);
+    });
+    wrap.appendChild(ss);
+
+    // Orbit ellipses
+    const os = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    os.id = 'univ-orb-svg'; os.setAttribute('viewBox','0 0 1600 900');
+    os.setAttribute('preserveAspectRatio','none');
+    os.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none';
+    UNIV_SVG_ORBITS.forEach(([rx,ry], i) => {
+      const el = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+      el.id = 'uo'+i; el.setAttribute('cx','800'); el.setAttribute('cy','495');
+      el.setAttribute('rx',rx); el.setAttribute('ry',ry);
+      el.setAttribute('fill','none'); el.setAttribute('stroke','rgba(180,140,255,0.22)');
+      el.setAttribute('stroke-width','1.2');
+      el.style.cssText = 'opacity:0;transition:opacity 0.8s ease';
+      os.appendChild(el);
+    });
+    wrap.appendChild(os);
+
+    // Planet divs (volumetric: radial gradient + specular highlight div + rim light)
     UNIV_PLANETS.forEach(p => {
       const el = document.createElement('div');
       el.id = p.id;
-      el.style.cssText = `position:absolute;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column;opacity:0;pointer-events:none;overflow:hidden;background:radial-gradient(circle at 38% 32%,${p.c1},${p.c2});box-shadow:0 0 60px ${p.c1}55,0 0 140px ${p.c1}22;transition:${TR}`;
-      el.innerHTML = `<div class="up-lbl" style="color:#fff;font-weight:800;line-height:1.25;text-shadow:0 2px 12px rgba(0,0,0,.5);pointer-events:none;transition:font-size .85s,opacity .5s">${p.l1}${p.l2?'<br>'+p.l2:''}</div>`;
+      const grad = `radial-gradient(circle at 32% 28%,rgba(248,232,255,0.9) 0%,${p.br} 18%,${p.mi} 52%,${p.dk} 82%,rgba(2,0,10,0.97) 100%)`;
+      const glow = `0 0 40px ${p.br}88,0 0 90px ${p.br}33,0 0 180px ${p.br}15`;
+      el.style.cssText = `position:absolute;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column;opacity:0;pointer-events:none;overflow:hidden;background:${grad};box-shadow:${glow};transition:${UNIV_TR}`;
+      // specular highlight (top-left glow → 3D sphere illusion)
+      const hl = document.createElement('div');
+      hl.style.cssText = 'position:absolute;top:8%;left:12%;width:33%;height:31%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,0.75) 0%,rgba(255,240,255,0.12) 65%,transparent 100%);pointer-events:none';
+      el.appendChild(hl);
+      // rim light (bottom-right subtle glow)
+      const rim = document.createElement('div');
+      rim.style.cssText = 'position:absolute;bottom:7%;right:9%;width:22%;height:20%;border-radius:50%;background:radial-gradient(circle,rgba(190,140,255,0.38) 0%,transparent 100%);pointer-events:none';
+      el.appendChild(rim);
+      // label
+      const lbl = document.createElement('div');
+      lbl.className = 'up-lbl';
+      lbl.style.cssText = 'color:#fff;font-weight:800;line-height:1.3;text-shadow:0 2px 14px rgba(0,0,0,.75);pointer-events:none;z-index:1;transition:font-size .9s,opacity .5s';
+      lbl.innerHTML = p.l1 + (p.l2 ? '<br>' + p.l2 : '');
+      el.appendChild(lbl);
       wrap.appendChild(el);
     });
-    UNIV_ZOOM.slice(7).forEach((_, i) => {
+
+    // Extra zoom planets
+    UNIV_ZOOM_X.forEach((_, i) => {
       const el = document.createElement('div');
       el.className = 'up-extra';
-      const colors = ['#9B59F5','#43e97b','#6c63ff','#00c6fb','#ff6b9d','#f5a623','#7B3FD9'];
-      const c = colors[i % 7];
-      el.style.cssText = `position:absolute;border-radius:50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none;background:radial-gradient(circle at 38% 32%,${c},${c}66);box-shadow:0 0 20px ${c}44;transition:${TR}`;
+      const purples = ['#9B59F5','#B47EFF','#7B3FD9','#C4AAFF','#8B3FE0','#A452FF','#C890FF'];
+      const c = purples[i % 7];
+      const g2 = `radial-gradient(circle at 32% 28%,rgba(248,230,255,0.8) 0%,${c} 30%,${c}88 65%,rgba(5,0,20,0.9) 100%)`;
+      el.style.cssText = `position:absolute;border-radius:50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none;background:${g2};box-shadow:0 0 18px ${c}66;transition:${UNIV_TR}`;
       wrap.appendChild(el);
     });
   }
-
-  const UNIV_TR = 'left .85s cubic-bezier(.34,1.05,.64,1),top .85s cubic-bezier(.34,1.05,.64,1),width .85s cubic-bezier(.34,1.05,.64,1),height .85s cubic-bezier(.34,1.05,.64,1),opacity .6s ease';
 
   function renderUniverse(step) {
     const wrap = document.getElementById('univ-wrap');
     if (!wrap) return;
     const isZoom = step === 7;
+
+    // Orbit lines: show orbit i when step >= 1 and i <= step (but not in zoom)
+    UNIV_SVG_ORBITS.forEach((_, i) => {
+      const el = document.getElementById('uo'+i);
+      if (el) el.style.opacity = isZoom ? '0.1' : (step >= 1 && i <= step ? '1' : '0');
+    });
+
+    // Main planets
+    const positions = isZoom ? UNIV_ZOOM_O : (UNIV_STATES[step] || []);
     UNIV_PLANETS.forEach((p, i) => {
       const el = document.getElementById(p.id);
       if (!el) return;
-      const state = isZoom ? UNIV_ZOOM[i] : (UNIV_STATES[step] && UNIV_STATES[step][i]);
-      if (!state) { el.style.opacity = '0'; return; }
-      const [xp, yp, dp] = state;
+      const pos = positions[i];
+      if (!pos) { el.style.opacity = '0'; return; }
+      const [xp, yp, dp] = pos;
       const wasHidden = parseFloat(el.style.opacity || '0') < 0.1;
       if (wasHidden) {
-        // snap to position at tiny size, then animate grow
         el.style.transition = 'none';
-        el.style.left = xp + '%'; el.style.top = yp + '%';
+        el.style.left = xp+'%'; el.style.top = yp+'%';
         el.style.width = '1vh'; el.style.height = '1vh';
-        el.offsetHeight;
-        el.style.transition = UNIV_TR;
+        el.offsetHeight; el.style.transition = UNIV_TR;
       }
-      el.style.left = xp + '%'; el.style.top = yp + '%';
-      el.style.width = dp + 'vh'; el.style.height = dp + 'vh';
+      el.style.left = xp+'%'; el.style.top = yp+'%';
+      el.style.width = dp+'vh'; el.style.height = dp+'vh';
       el.style.opacity = '1';
       const lbl = el.querySelector('.up-lbl');
       if (lbl) {
-        lbl.style.fontSize = Math.min(dp * 0.042, 2.8) + 'vh';
-        lbl.style.opacity = (dp >= 22 && !isZoom) ? '1' : '0';
+        lbl.style.fontSize = Math.max(Math.min(dp*0.038, 2.6), 1.2)+'vh';
+        const isNewest = i === positions.length - 1;
+        lbl.style.opacity = (dp >= 14 && isNewest && !isZoom) ? '1' : '0';
       }
     });
+
+    // Extra zoom planets
     const extras = wrap.querySelectorAll('.up-extra');
-    UNIV_ZOOM.slice(7).forEach((pos, i) => {
+    UNIV_ZOOM_X.forEach((pos, i) => {
       if (!extras[i]) return;
       if (isZoom) {
         const [xp, yp, dp] = pos;
-        extras[i].style.left = xp+'%'; extras[i].style.top = yp+'%';
-        extras[i].style.width = dp+'vh'; extras[i].style.height = dp+'vh';
-        extras[i].style.opacity = '1';
-      } else { extras[i].style.opacity = '0'; }
+        const wasH = parseFloat(extras[i].style.opacity||'0') < 0.1;
+        if (wasH) {
+          extras[i].style.transition='none';
+          extras[i].style.left=xp+'%'; extras[i].style.top=yp+'%';
+          extras[i].style.width='0.5vh'; extras[i].style.height='0.5vh';
+          extras[i].offsetHeight; extras[i].style.transition=UNIV_TR;
+        }
+        extras[i].style.left=xp+'%'; extras[i].style.top=yp+'%';
+        extras[i].style.width=dp+'vh'; extras[i].style.height=dp+'vh';
+        extras[i].style.opacity='1';
+      } else { extras[i].style.opacity='0'; }
     });
   }
 
