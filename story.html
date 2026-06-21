@@ -344,6 +344,7 @@
       opacity: 0; transition: opacity 0.6s 0.5s;
     }
     .feature-scene.active .feature-pills { opacity: 1; }
+    #s6.active .s6-phone { opacity: 1 !important; transform: translateX(0) !important; }
     .pill {
       padding: 8px 18px; border-radius: 24px;
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
@@ -440,15 +441,22 @@
 </div>
 
 <!-- ═══ SCENE 6 — TRAINER ═══ -->
-<div class="scene feature-scene" id="s6">
-  <div class="feature-eyebrow">Для тренера</div>
-  <div class="feature-headline big" style="color:#fff">Все клиенты.<br><span class="gradient-text">Вся картина.</span></div>
-  <div class="feature-sub small">Карточка клиента, история тренировок, данные трекера и AI-подсказки — в одном месте. Тренер знает, что ты ел, сколько спал и как восстановился — ещё до того, как ты зашёл в зал.</div>
-  <div class="feature-pills">
-    <div class="pill">Apple Watch</div>
-    <div class="pill">Garmin</div>
-    <div class="pill">WHOOP</div>
-    <div class="pill accent">AI-отчёт за секунды</div>
+<div class="scene feature-scene" id="s6" style="flex-direction:row;align-items:center;padding:60px 72px;gap:64px;text-align:left">
+  <!-- left: text -->
+  <div style="flex:1;display:flex;flex-direction:column;gap:22px;align-items:flex-start;min-width:0">
+    <div class="feature-eyebrow" style="margin:0">Для тренера</div>
+    <div class="feature-headline big" style="color:#fff;text-align:left">Все клиенты.<br><span class="gradient-text">Вся картина.</span></div>
+    <div class="feature-sub small" style="margin:0;max-width:460px;text-align:left">Карточка клиента, история тренировок, данные трекера и AI-подсказки — в одном месте. Тренер знает, что ты ел, сколько спал и как восстановился — ещё до того, как ты зашёл в зал.</div>
+    <div class="feature-pills" style="justify-content:flex-start">
+      <div class="pill">Apple Watch</div>
+      <div class="pill">Garmin</div>
+      <div class="pill">WHOOP</div>
+      <div class="pill accent">AI-отчёт за секунды</div>
+    </div>
+  </div>
+  <!-- right: phone mockup -->
+  <div class="s6-phone" style="flex:none;position:relative;width:264px;height:540px;border-radius:44px;border:8px solid #2a2a2a;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,0.7);background:#000;opacity:0;transform:translateX(40px);transition:opacity 0.8s 0.4s,transform 0.8s 0.4s">
+    <iframe src="index.html" scrolling="no" style="width:390px;height:795px;border:none;transform:scale(0.677);transform-origin:top left;pointer-events:none"></iframe>
   </div>
 </div>
 
