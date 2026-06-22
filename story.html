@@ -397,6 +397,32 @@
   <div id="univ-wrap" style="position:absolute;inset:0"></div>
 </div>
 
+<!-- ═══ SCENE smosaic — MOSAIC EXPANSION ═══ -->
+<div class="scene" id="smosaic" style="background:#000">
+  <div id="mosaic-grid" style="position:absolute;inset:32px 40px;display:grid;gap:10px;transition:grid-template-columns 0.7s ease,opacity 0.3s"></div>
+  <div id="mosaic-zoom" style="position:absolute;inset:20px;opacity:0;display:grid;grid-template-columns:repeat(10,1fr);grid-template-rows:repeat(6,1fr);gap:5px;pointer-events:none;transition:opacity 0.5s"></div>
+</div>
+
+<!-- ═══ SCENE sconst — CONSTELLATION ═══ -->
+<div class="scene" id="sconst" style="background:#000;padding:0">
+  <svg id="const-svg" viewBox="0 0 160 90" preserveAspectRatio="xMidYMid meet" style="position:absolute;inset:0;width:100%;height:100%">
+    <defs>
+      <filter id="cst-glow" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="1.2" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="cst-glow-sm" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="0.5" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <g id="const-lines"></g>
+    <g id="const-stars-g"></g>
+    <g id="const-labels-g"></g>
+    <g id="const-zoom-g"></g>
+  </svg>
+</div>
+
 <!-- ═══ SCENE 1 — 2026 ═══ -->
 <div class="scene" id="s1">
   <div class="year">2026.</div>
@@ -1784,7 +1810,7 @@
 <div class="hint" id="hint">пробел / →</div>
 
 <script>
-  const SCENES = ['suniv','s1','s2','s3','s5','s6','s7','s8','sm1','sm1b','sm2','sbm','smkt','s9','spr0','spr1','spr2','spr3','spr-asm','spr-inv','srd','spr4','spr5'];
+  const SCENES = ['suniv','smosaic','sconst','s1','s2','s3','s5','s6','s7','s8','sm1','sm1b','sm2','sbm','smkt','s9','spr0','spr1','spr2','spr3','spr-asm','spr-inv','srd','spr4','spr5'];
   const TOTAL_STEPS = 9 + 5;
   let sceneIdx = 0;
   let problemStep = 0;
@@ -1793,6 +1819,8 @@
   let sm1bStep = 0;
   let s2Step = 0;
   let univStep = 0;
+  let mosaicStep = 0;
+  let constStep = 0;
 
   // ── Universe slide (orbital, all purples, volumetric) ──
   const UNIV_PLANETS = [
@@ -1968,6 +1996,197 @@
     });
   }
 
+  // ── Mosaic slide ──
+  const MOSAIC_ITEMS = [
+    ['01','Тренерское','приложение'],
+    ['02','Клиентское','приложение'],
+    ['03','Маркетплейс','тренеров'],
+    ['04','Маркетплейс','товаров'],
+    ['05','Реклама',''],
+    ['06','Нутрициологи',''],
+    ['07','Бьюти',''],
+  ];
+  const MOSAIC_COLS = [1,2,3,2,3,3,4];
+  const MOSAIC_NFS = ['8vw','5.5vw','4vw','3.5vw','2.8vw','2.4vw','2vw'];
+  const MOSAIC_LFS = ['2.4vw','1.8vw','1.4vw','1.3vw','1.1vw','1vw','0.9vw'];
+
+  function initMosaic() {
+    const grid = document.getElementById('mosaic-grid');
+    const zoom = document.getElementById('mosaic-zoom');
+    if (!grid || grid.dataset.inited) return;
+    grid.dataset.inited = '1';
+    MOSAIC_ITEMS.forEach(([n,l1,l2],i) => {
+      const tile = document.createElement('div');
+      tile.id = 'mtile'+i;
+      tile.style.cssText = 'display:flex;flex-direction:column;justify-content:flex-end;padding:16px 20px 20px;border-radius:14px;border:1px solid rgba(155,89,245,0.2);background:rgba(155,89,245,0.05);transition:opacity 0.5s,border-color 0.4s,background 0.4s;overflow:hidden;opacity:0;box-sizing:border-box';
+      tile.innerHTML = '<div id="mnum'+i+'" style="font-weight:900;color:rgba(155,89,245,0.35);line-height:1;transition:font-size 0.6s ease">'+n+'</div><div id="mlbl'+i+'" style="font-weight:700;color:#fff;margin-top:6px;line-height:1.3;transition:font-size 0.6s ease">'+l1+(l2?'<br>'+l2:'')+'</div>';
+      grid.appendChild(tile);
+    });
+    for (let i = 0; i < 60; i++) {
+      const t = document.createElement('div');
+      const a1 = (0.04 + (i*7%13)/100).toFixed(2);
+      const a2 = (0.1 + (i*11%25)/100).toFixed(2);
+      t.style.cssText = 'border-radius:6px;background:rgba(155,89,245,'+a1+');border:1px solid rgba(155,89,245,'+a2+');transition:opacity 0.3s '+(i*0.015).toFixed(2)+'s;opacity:0';
+      if (i%11===0) t.style.background='rgba(155,89,245,0.16)';
+      if (i%17===0) t.style.borderColor='rgba(155,89,245,0.55)';
+      zoom.appendChild(t);
+    }
+  }
+
+  function renderMosaic(step) {
+    const grid = document.getElementById('mosaic-grid');
+    const zoom = document.getElementById('mosaic-zoom');
+    if (!grid) return;
+    const isZoom = step === 7;
+    if (isZoom) {
+      grid.style.opacity = '0';
+      zoom.style.opacity = '1';
+      zoom.querySelectorAll('div').forEach(t => { t.style.opacity = '1'; });
+      return;
+    }
+    grid.style.opacity = '1';
+    zoom.style.opacity = '0';
+    zoom.querySelectorAll('div').forEach(t => { t.style.opacity = '0'; });
+    const count = step + 1;
+    grid.style.gridTemplateColumns = 'repeat('+MOSAIC_COLS[step]+',1fr)';
+    MOSAIC_ITEMS.forEach((_,i) => {
+      const tile = document.getElementById('mtile'+i);
+      const numEl = document.getElementById('mnum'+i);
+      const lblEl = document.getElementById('mlbl'+i);
+      if (!tile) return;
+      const isNewest = i === count - 1;
+      if (i < count) {
+        tile.style.opacity = '1';
+        tile.style.borderColor = isNewest ? 'rgba(155,89,245,0.7)' : 'rgba(155,89,245,0.2)';
+        tile.style.background = isNewest ? 'rgba(155,89,245,0.14)' : 'rgba(155,89,245,0.05)';
+      } else {
+        tile.style.opacity = '0';
+        tile.style.borderColor = 'rgba(155,89,245,0.2)';
+        tile.style.background = 'rgba(155,89,245,0.05)';
+      }
+      if (numEl) numEl.style.fontSize = MOSAIC_NFS[step];
+      if (lblEl) lblEl.style.fontSize = MOSAIC_LFS[step];
+    });
+  }
+
+  // ── Constellation slide ──
+  const CONST_SD = [
+    // [x, y, l1, l2, textAnchor, lx, ly]
+    [80, 18, 'Тренерское','приложение','middle', 80, 10],
+    [22, 42, 'Клиентское','приложение','start',  26, 41],
+    [112,36, 'Маркетплейс','тренеров', 'middle',112, 28],
+    [12, 66, 'Маркетплейс','товаров',  'start',  16, 65],
+    [130,60, 'Реклама',    '',         'middle', 130,53],
+    [48, 78, 'Нутрициологи','',        'middle',  48,85],
+    [104,75, 'Бьюти',      '',         'middle', 104,84],
+  ];
+  // [starA, starB, stepAdded (1-based)]
+  const CONST_LD = [
+    [0,1,1],[0,2,2],[1,2,2],[0,3,3],[1,3,3],[0,4,4],[2,4,4],[1,5,5],[3,5,5],[2,6,6],[4,6,6],[5,6,6]
+  ];
+  const CONST_ZP = [
+    [5,8],[18,5],[32,11],[45,7],[58,13],[72,6],[88,9],[98,4],[115,10],[135,7],[148,12],[155,5],
+    [8,22],[25,19],[38,25],[52,18],[68,23],[85,17],[100,21],[118,16],[140,24],[152,19],
+    [3,35],[14,40],[28,32],[42,38],[55,30],[70,36],[83,28],[96,33],[110,41],[125,37],[142,31],[158,38],
+    [7,52],[20,47],[35,55],[50,49],[65,53],[78,45],[90,58],[105,50],[120,54],[138,48],[150,56],
+    [10,68],[22,74],[36,62],[51,70],[63,65],[76,72],[88,68],[101,63],[115,71],[128,67],[144,73],[156,65],
+    [4,82],[17,86],[30,79],[44,85],[58,80],[70,87],[82,83],[95,88],[108,84],[122,79],[136,86],[148,81],
+  ];
+
+  function initConst() {
+    const svg = document.getElementById('const-svg');
+    if (!svg || svg.dataset.inited) return;
+    svg.dataset.inited = '1';
+    const ns = 'http://www.w3.org/2000/svg';
+    const linesG  = document.getElementById('const-lines');
+    const starsG  = document.getElementById('const-stars-g');
+    const labelsG = document.getElementById('const-labels-g');
+    const zoomG   = document.getElementById('const-zoom-g');
+
+    CONST_LD.forEach(([a,b],i) => {
+      const line = document.createElementNS(ns,'line');
+      line.id = 'cln'+i;
+      line.setAttribute('x1',CONST_SD[a][0]); line.setAttribute('y1',CONST_SD[a][1]);
+      line.setAttribute('x2',CONST_SD[b][0]); line.setAttribute('y2',CONST_SD[b][1]);
+      line.setAttribute('stroke','rgba(155,89,245,0.45)'); line.setAttribute('stroke-width','0.3');
+      line.style.cssText = 'opacity:0;transition:opacity 0.6s ease';
+      linesG.appendChild(line);
+    });
+
+    CONST_SD.forEach(([x,y],i) => {
+      const glow = document.createElementNS(ns,'circle');
+      glow.id = 'csg'+i; glow.setAttribute('cx',x); glow.setAttribute('cy',y); glow.setAttribute('r','2.8');
+      glow.setAttribute('fill','rgba(200,155,255,0.22)'); glow.setAttribute('filter','url(#cst-glow)');
+      glow.style.cssText = 'opacity:0;transition:opacity 0.6s ease'; starsG.appendChild(glow);
+      const core = document.createElementNS(ns,'circle');
+      core.id = 'csc'+i; core.setAttribute('cx',x); core.setAttribute('cy',y); core.setAttribute('r','1.3');
+      core.setAttribute('fill','#EAD8FF'); core.setAttribute('filter','url(#cst-glow)');
+      core.style.cssText = 'opacity:0;transition:opacity 0.6s ease'; starsG.appendChild(core);
+    });
+
+    CONST_SD.forEach(([x,y,l1,l2,anchor,lx,ly],i) => {
+      const g = document.createElementNS(ns,'g');
+      g.id = 'clb'+i; g.style.cssText = 'opacity:0;transition:opacity 0.5s ease';
+      const mk = (txt,yy) => {
+        const t = document.createElementNS(ns,'text');
+        t.setAttribute('x',lx); t.setAttribute('y',yy);
+        t.setAttribute('text-anchor',anchor);
+        t.setAttribute('fill','rgba(255,255,255,0.85)');
+        t.setAttribute('font-size','2.8'); t.setAttribute('font-weight','700');
+        t.setAttribute('font-family','SF Pro Display,-apple-system,sans-serif');
+        t.textContent = txt; g.appendChild(t);
+      };
+      mk(l1, ly);
+      if (l2) mk(l2, ly+3.5);
+      labelsG.appendChild(g);
+    });
+
+    CONST_ZP.forEach(([x,y],i) => {
+      const c = document.createElementNS(ns,'circle');
+      c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r','0.45');
+      c.setAttribute('fill','rgba(210,175,255,0.75)'); c.setAttribute('filter','url(#cst-glow-sm)');
+      c.style.cssText = 'opacity:0;transition:opacity 0.35s '+(i*0.013).toFixed(2)+'s';
+      zoomG.appendChild(c);
+    });
+    const zlG = document.createElementNS(ns,'g');
+    zlG.id = 'czl'; zlG.style.cssText = 'opacity:0;transition:opacity 0.5s 0.2s';
+    [[0,12],[3,24],[5,36],[8,15],[11,23],[14,30],[18,42],[20,33],[25,50],[28,40],[32,55],[35,48]].forEach(([a,b]) => {
+      if (!CONST_ZP[a]||!CONST_ZP[b]) return;
+      const line = document.createElementNS(ns,'line');
+      line.setAttribute('x1',CONST_ZP[a][0]); line.setAttribute('y1',CONST_ZP[a][1]);
+      line.setAttribute('x2',CONST_ZP[b][0]); line.setAttribute('y2',CONST_ZP[b][1]);
+      line.setAttribute('stroke','rgba(155,89,245,0.2)'); line.setAttribute('stroke-width','0.15');
+      zlG.appendChild(line);
+    });
+    svg.appendChild(zlG);
+  }
+
+  function renderConst(step) {
+    const isZoom = step === 7;
+    CONST_SD.forEach((_,i) => {
+      const core = document.getElementById('csc'+i);
+      const glow = document.getElementById('csg'+i);
+      const lbl  = document.getElementById('clb'+i);
+      const vis  = i <= step;
+      if (core) core.style.opacity = vis ? '1' : '0';
+      if (glow) glow.style.opacity = vis ? (isZoom ? '0.2' : '0.7') : '0';
+      if (lbl)  lbl.style.opacity  = (vis && !isZoom) ? '1' : '0';
+    });
+    CONST_LD.forEach(([a,b,s],i) => {
+      const line = document.getElementById('cln'+i);
+      if (line) line.style.opacity = s<=step ? (isZoom ? '0.08' : '0.9') : '0';
+    });
+    const zoomG = document.getElementById('const-zoom-g');
+    const zlG   = document.getElementById('czl');
+    if (isZoom) {
+      if (zoomG) { zoomG.querySelectorAll('circle').forEach(c => c.style.opacity='1'); }
+      if (zlG)   zlG.style.opacity = '1';
+    } else {
+      if (zoomG) { zoomG.querySelectorAll('circle').forEach(c => c.style.opacity='0'); }
+      if (zlG)   zlG.style.opacity = '0';
+    }
+  }
+
   // Build dots
   const dotsEl = document.getElementById('dots-nav');
   SCENES.forEach((_, i) => {
@@ -2069,6 +2288,31 @@
       document.querySelectorAll('.up-extra').forEach(e => { e.style.opacity = '0'; });
       requestAnimationFrame(() => renderUniverse(0));
     }
+    if (SCENES[idx] === 'smosaic') {
+      mosaicStep = 0;
+      initMosaic();
+      document.getElementById('mosaic-grid').style.opacity = '1';
+      document.getElementById('mosaic-zoom').style.opacity = '0';
+      MOSAIC_ITEMS.forEach((_,i) => {
+        const t = document.getElementById('mtile'+i);
+        if (t) { t.style.opacity='0'; t.style.borderColor='rgba(155,89,245,0.2)'; t.style.background='rgba(155,89,245,0.05)'; }
+      });
+      document.getElementById('mosaic-zoom').querySelectorAll('div').forEach(t => t.style.opacity='0');
+      requestAnimationFrame(() => renderMosaic(0));
+    }
+    if (SCENES[idx] === 'sconst') {
+      constStep = 0;
+      initConst();
+      CONST_SD.forEach((_,i) => {
+        const c = document.getElementById('csc'+i); if (c) c.style.opacity='0';
+        const g = document.getElementById('csg'+i); if (g) g.style.opacity='0';
+        const l = document.getElementById('clb'+i); if (l) l.style.opacity='0';
+      });
+      CONST_LD.forEach((_,i) => { const l=document.getElementById('cln'+i); if(l) l.style.opacity='0'; });
+      const zoomG=document.getElementById('const-zoom-g'); if(zoomG) zoomG.querySelectorAll('circle').forEach(c=>c.style.opacity='0');
+      const zlG=document.getElementById('czl'); if(zlG) zlG.style.opacity='0';
+      requestAnimationFrame(() => renderConst(0));
+    }
     if (SCENES[idx] === 's9') {
       const qr = document.getElementById('s9-qr');
       if (qr) { qr.style.opacity = '0'; qr.style.transform = 'translateY(16px)'; }
@@ -2116,6 +2360,12 @@
     if (SCENES[sceneIdx] === 'suniv') {
       if (univStep < 7) { univStep++; renderUniverse(univStep); return; }
       // univStep === 7 → fall through to next scene
+    }
+    if (SCENES[sceneIdx] === 'smosaic') {
+      if (mosaicStep < 7) { mosaicStep++; renderMosaic(mosaicStep); return; }
+    }
+    if (SCENES[sceneIdx] === 'sconst') {
+      if (constStep < 7) { constStep++; renderConst(constStep); return; }
     }
     // s2: first click shows key phrase, second click goes to next scene
     if (SCENES[sceneIdx] === 's2') {
@@ -2198,6 +2448,8 @@
       renderUniverse(univStep);
       return;
     }
+    if (SCENES[sceneIdx] === 'smosaic' && mosaicStep > 0) { mosaicStep--; renderMosaic(mosaicStep); return; }
+    if (SCENES[sceneIdx] === 'sconst'  && constStep  > 0) { constStep--;  renderConst(constStep);  return; }
     if (SCENES[sceneIdx] === 's2' && s2Step === 1) {
       s2Step = 0;
       document.getElementById('s2-reveal').classList.remove('show');
