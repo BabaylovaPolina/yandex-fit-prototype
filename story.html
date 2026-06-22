@@ -2537,10 +2537,11 @@
       sceneIdx++;
       showScene(sceneIdx);
       if (SCENES[sceneIdx] === 's3') {
-        problemStep = 0;
+        problemStep = 1;
         for (let i = 1; i <= 5; i++) {
           document.getElementById('p' + i).classList.remove('show','dim','converge');
         }
+        setTimeout(() => showProblem(1), 300);
       }
     }
   }
