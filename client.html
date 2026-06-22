@@ -81,10 +81,13 @@
     }
     .streak-box {
       flex: 1; background: var(--card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 14px 12px; text-align: center;
+      border-radius: 16px; padding: 10px 10px; text-align: center;
     }
+    .streak-box.good { background: rgba(67,233,123,0.07); border-color: rgba(67,233,123,0.4); }
+    .streak-box.warn { background: rgba(245,166,35,0.07); border-color: rgba(245,166,35,0.4); }
+    .streak-box.bad  { background: rgba(255,107,107,0.07); border-color: rgba(255,107,107,0.4); }
     .streak-val { font-size: 22px; font-weight: 800; color: var(--text); }
-    .streak-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .streak-lbl { font-size: 10px; color: var(--muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* today workout card */
     .today-workout {
@@ -467,15 +470,15 @@
 
       <!-- streak row -->
       <div class="streak-row">
-        <div class="streak-box">
-          <div class="streak-val">🔥 12</div>
+        <div class="streak-box good">
+          <div class="streak-val">12</div>
           <div class="streak-lbl">Дней подряд</div>
         </div>
-        <div class="streak-box">
+        <div class="streak-box good">
           <div class="streak-val">3/4</div>
-          <div class="streak-lbl">Тренировок на неделе</div>
+          <div class="streak-lbl">Тренировок / нед.</div>
         </div>
-        <div class="streak-box">
+        <div class="streak-box good">
           <div class="streak-val">−2.1</div>
           <div class="streak-lbl">кг за месяц</div>
         </div>
