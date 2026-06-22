@@ -1840,6 +1840,7 @@
 <!-- ── DOTS ── -->
 <div class="dots" id="dots-nav"></div>
 <div class="hint" id="hint">пробел / →</div>
+<button onclick="if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();" title="Fullscreen (F)" style="position:fixed;bottom:20px;right:20px;z-index:9999;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.5);font-size:16px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity 0.2s" id="fs-btn">⛶</button>
 
 <script>
   const SCENES = ['s1','s2','s3','s5','s6','s7','s8','sm1b','sm2','sbm','smkt','sconst','s9','spr0','spr1','spr2','spr3','spr-asm','spr-inv','srd','spr4','spr5'];
@@ -2539,6 +2540,10 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); advance(); }
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); retreat(); }
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
   });
 
   document.body.addEventListener('click', e => {
