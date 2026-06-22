@@ -1110,7 +1110,7 @@
     <div class="tab-bar">
       <div class="tab active" onclick="showTab('clients')"><div class="tab-icon">👥</div><div class="tab-label">Клиенты</div></div>
       <div class="tab" onclick="showTab('schedule')"><div class="tab-icon">📅</div><div class="tab-label">Расписание</div></div>
-      <div class="tab" onclick="showTab('analytics')"><div class="tab-icon">📊</div><div class="tab-label">Упражнения</div></div>
+      <div class="tab" onclick="showTab('exercises')"><div class="tab-icon">🏋️</div><div class="tab-label">Упражнения</div></div>
       <div class="tab" onclick="showTab('profile')"><div class="tab-icon">⚙️</div><div class="tab-label">Профиль</div></div>
     </div>
   </div>
@@ -1721,7 +1721,7 @@
     <div class="tab-bar">
       <div class="tab" onclick="showTab('clients')"><div class="tab-icon">👥</div><div class="tab-label">Клиенты</div></div>
       <div class="tab active" onclick="showTab('schedule')"><div class="tab-icon">📅</div><div class="tab-label">Расписание</div></div>
-      <div class="tab" onclick="showTab('analytics')"><div class="tab-icon">📊</div><div class="tab-label">Упражнения</div></div>
+      <div class="tab" onclick="showTab('exercises')"><div class="tab-icon">🏋️</div><div class="tab-label">Упражнения</div></div>
       <div class="tab" onclick="showTab('profile')"><div class="tab-icon">⚙️</div><div class="tab-label">Профиль</div></div>
     </div>
 
@@ -1769,6 +1769,34 @@
 
         <button class="booking-confirm-btn" id="booking-confirm" onclick="confirmBooking()">Перейти к тренировке →</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SCREEN: EXERCISES LIBRARY ═══════════ -->
+  <div class="screen" id="screen-exercises">
+    <div class="nav-bar">
+      <h1>Упражнения</h1>
+    </div>
+
+    <div class="screen-scroll pb-tab" style="padding:0 16px">
+      <div id="trainer-ex-empty" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:48px 16px 24px;gap:12px">
+        <div style="width:64px;height:64px;border-radius:20px;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11M6.5 6.5v11M17.5 6.5v11M6.5 17.5h11M3 9.5h3M3 14.5h3M18 9.5h3M18 14.5h3"/></svg>
+        </div>
+        <div style="font-size:17px;font-weight:700;color:var(--text)">У вас ещё нет добавленных упражнений</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.5">Создайте своё упражнение — оно появится в библиотеке и будет доступно при составлении тренировок</div>
+      </div>
+
+      <div id="trainer-ex-items" style="display:flex;flex-direction:column;gap:10px"></div>
+
+      <button onclick="openExerciseBuilderFromLibrary()" style="margin-top:16px;width:100%;padding:15px;background:none;border:1.5px dashed var(--border);border-radius:16px;color:var(--muted);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px"><span>＋</span> Создать своё упражнение</button>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab" onclick="showTab('clients')"><div class="tab-icon">👥</div><div class="tab-label">Клиенты</div></div>
+      <div class="tab" onclick="showTab('schedule')"><div class="tab-icon">📅</div><div class="tab-label">Расписание</div></div>
+      <div class="tab active" onclick="showTab('exercises')"><div class="tab-icon">🏋️</div><div class="tab-label">Упражнения</div></div>
+      <div class="tab" onclick="showTab('profile')"><div class="tab-icon">⚙️</div><div class="tab-label">Профиль</div></div>
     </div>
   </div>
 
@@ -2161,10 +2189,65 @@
 
   /* ── TABS ── */
   function showTab(tab) {
-    document.getElementById('screen-clients').classList.remove('active');
-    document.getElementById('screen-schedule').classList.remove('active');
+    ['clients','schedule','exercises'].forEach(t => {
+      const el = document.getElementById('screen-' + t);
+      if (el) el.classList.remove('active');
+    });
     if (tab === 'clients') document.getElementById('screen-clients').classList.add('active');
     if (tab === 'schedule') { document.getElementById('screen-schedule').classList.add('active'); initSchedule(); }
+    if (tab === 'exercises') document.getElementById('screen-exercises').classList.add('active');
+  }
+
+  const trainerCustomExercises = [];
+
+  function openExerciseBuilderFromLibrary() {
+    document.getElementById('builder-name').value = '';
+    document.getElementById('builder-desc').value = '';
+    document.querySelectorAll('.builder-cat-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.rest-chip').forEach((b,i) => { b.classList.toggle('active', i===1); });
+    document.getElementById('screen-builder').dataset.fromLibrary = '1';
+    document.getElementById('screen-builder').style.display = 'flex';
+  }
+
+  const _origSaveCustomExercise = typeof saveCustomExercise === 'function' ? saveCustomExercise : null;
+  function saveCustomExercise() {
+    const name = document.getElementById('builder-name').value.trim();
+    if (!name) { document.getElementById('builder-name').focus(); return; }
+    const cats = [...document.querySelectorAll('.builder-cat-btn.active')].map(b=>b.textContent).join(', ');
+    const desc = document.getElementById('builder-desc').value.trim();
+    const rest = document.querySelector('#screen-builder .rest-chip.active')?.textContent || '90с';
+    const fromLib = document.getElementById('screen-builder').dataset.fromLibrary === '1';
+    if (fromLib) {
+      trainerCustomExercises.push({ name, cats, desc, rest });
+      renderTrainerExercises();
+      delete document.getElementById('screen-builder').dataset.fromLibrary;
+      closeExerciseBuilder();
+      showTab('exercises');
+    } else {
+      closeExerciseBuilder();
+    }
+  }
+
+  function renderTrainerExercises() {
+    const empty = document.getElementById('trainer-ex-empty');
+    const list = document.getElementById('trainer-ex-items');
+    if (!empty || !list) return;
+    empty.style.display = trainerCustomExercises.length === 0 ? '' : 'none';
+    list.innerHTML = trainerCustomExercises.map((ex, i) => `
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px 16px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:15px;font-weight:700;color:var(--text)">${ex.name}</div>
+          <button onclick="deleteTrainerExercise(${i})" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0">×</button>
+        </div>
+        ${ex.cats ? `<div style="font-size:12px;color:var(--accent);font-weight:600;margin-top:4px">${ex.cats}</div>` : ''}
+        ${ex.desc ? `<div style="font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5">${ex.desc}</div>` : ''}
+        <div style="font-size:12px;color:var(--muted);margin-top:8px">Отдых: ${ex.rest}</div>
+      </div>`).join('');
+  }
+
+  function deleteTrainerExercise(i) {
+    trainerCustomExercises.splice(i,1);
+    renderTrainerExercises();
   }
 
   /* ── SCHEDULE ── */
