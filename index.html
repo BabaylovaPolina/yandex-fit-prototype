@@ -1929,29 +1929,9 @@
     scrollChat();
   }
 
-  // Alice icon
-  const ALICE_ICON_SRC = 'data:image/png;base64,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';
-  (function applyAliceIcons() {
-    document.querySelectorAll('.alice-icon').forEach(el => {
-      if (el.querySelector('img')) return;
-      const savedTransform = el.style.transform;
-      el.style.display = 'inline-flex';
-      el.style.alignItems = 'center';
-      el.style.justifyContent = 'center';
-      el.style.width = '18px';
-      el.style.height = '18px';
-      el.style.minWidth = '18px';
-      el.style.minHeight = '18px';
-      el.style.flexShrink = '0';
-      el.style.overflow = 'visible';
-      el.style.verticalAlign = 'middle';
-      if (savedTransform) el.style.transform = savedTransform;
-      const img = document.createElement('img');
-      img.src = ALICE_ICON_SRC;
-      img.style.cssText = 'display:block;width:18px;height:18px;object-fit:contain;flex-shrink:0';
-      el.appendChild(img);
-    });
-  })();
+  // Alice icon SVG
+  const ALICE_ICON = `<svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="alice-g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#9B59F5"/><stop offset="100%" style="stop-color:#6B2FD9"/></linearGradient></defs><circle cx="12" cy="12" r="12" fill="url(#alice-g)"/><path d="M12 5.5 C9 5.5 6.5 8 6.5 11 C6.5 14.5 9.5 17.5 12 18.5 C14.5 17.5 17.5 14.5 17.5 11 C17.5 8 15 5.5 12 5.5Z" fill="white"/></svg>`;
+  document.querySelectorAll('.alice-icon').forEach(el => el.innerHTML = ALICE_ICON);
 
   document.getElementById('ai-textarea').addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); parseWorkout(); }
