@@ -293,6 +293,58 @@
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
 
+    /* ── AI GENERATION ── */
+    .ai-gen-overlay {
+      position: absolute; inset: 0; z-index: 100;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 28px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s;
+    }
+    .ai-gen-overlay.active { opacity: 1; pointer-events: all; }
+    .ai-gen-overlay-title { font-size: 18px; font-weight: 700; color: var(--text); }
+    .ai-gen-overlay-sub { font-size: 13px; color: var(--muted); text-align: center; max-width: 220px; line-height: 1.5; }
+    .ai-analyzing-dots { display: flex; gap: 10px; }
+    .ai-dot {
+      width: 9px; height: 9px; border-radius: 50%; background: var(--accent);
+      animation: ai-bounce 1.2s ease-in-out infinite;
+    }
+    .ai-dot:nth-child(2) { animation-delay: .2s; }
+    .ai-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes ai-bounce { 0%,80%,100%{transform:scale(0.6);opacity:0.3} 40%{transform:scale(1);opacity:1} }
+    .trainer-away-card {
+      margin: 0 16px 16px;
+      background: rgba(255,107,107,0.07);
+      border: 1px solid rgba(255,107,107,0.22);
+      border-radius: 16px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .trainer-away-icon { font-size: 22px; flex-shrink: 0; }
+    .trainer-away-text { font-size: 13px; font-weight: 700; color: var(--text); }
+    .trainer-away-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .ai-generate-card {
+      margin: 0 16px 12px;
+      background: linear-gradient(135deg, rgba(108,99,255,0.18), rgba(155,89,245,0.08));
+      border: 1px solid rgba(108,99,255,0.4);
+      border-radius: 20px; padding: 20px;
+    }
+    .ai-generate-desc { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 16px; }
+    .ai-generate-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #6c63ff, #9B59F5);
+      border: none; border-radius: 14px; color: white;
+      font-size: 15px; font-weight: 800; cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .ai-result-tag { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #9B59F5; margin-bottom: 8px; }
+    .ai-reason-card {
+      background: rgba(108,99,255,0.1); border: 1px solid rgba(108,99,255,0.25);
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 16px;
+      display: flex; gap: 8px; align-items: flex-start;
+    }
+    .ai-reason-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
     /* ── ONLINE WORKOUT CARD ── */
     .online-card {
       margin: 0 16px 16px;
@@ -430,33 +482,48 @@
         </div>
       </div>
 
-      <!-- online workout card -->
-      <div class="online-card">
-        <div class="online-tag"><div class="online-live-dot"></div> Онлайн с тренером</div>
-        <div class="online-title">Функциональная тренировка</div>
-        <div class="online-meta">Сегодня · 18:00 · ~45 мин</div>
-        <div class="online-trainer-row">
-          <div class="online-trainer-av">МС</div>
-          <div>
-            <div class="online-trainer-name">Максим Соколов</div>
-            <div class="online-trainer-status">Готов к сессии</div>
-          </div>
+      <!-- trainer away notice -->
+      <div class="trainer-away-card">
+        <div class="trainer-away-icon">✈️</div>
+        <div>
+          <div class="trainer-away-text">Максим в отпуске</div>
+          <div class="trainer-away-sub">Вернётся 28 июня · план не назначен</div>
         </div>
-        <button class="connect-btn" onclick="showTab('online')">Подключиться</button>
       </div>
 
-      <!-- today workout -->
-      <div class="section-title">Тренировка сегодня</div>
-      <div class="today-workout">
-        <div class="today-tag">📋 Силовая A — Ноги</div>
-        <div class="today-title">Силовая тренировка</div>
-        <div class="today-meta">Запланирована на 10:00 · ~60 мин</div>
-        <div class="today-exercises">
-          <div class="today-ex-row"><span class="today-ex-name">Присед со штангой</span><span class="today-ex-detail">4×8 · 60 кг</span></div>
-          <div class="today-ex-row"><span class="today-ex-name">Жим ногами</span><span class="today-ex-detail">3×12 · 100 кг</span></div>
-          <div class="today-ex-row"><span class="today-ex-name">Румынская тяга</span><span class="today-ex-detail">3×10 · 45 кг</span></div>
+      <!-- ai generate block (shown before generation) -->
+      <div id="today-ai-gen-block">
+        <div class="section-title">Тренировка сегодня</div>
+        <div class="ai-generate-card">
+          <div class="alice-tip-header" style="margin-bottom:12px">
+            <span class="alice-icon"></span>
+            <span class="alice-lbl">Алиса AI</span>
+          </div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">Нет плана от тренера</div>
+          <div class="ai-generate-desc">Алиса сгенерирует тренировку на основе твоих данных: восстановление хорошее, цель — похудение.</div>
+          <button class="ai-generate-btn" onclick="triggerAIGen()">✨ Сгенерировать тренировку</button>
         </div>
-        <button class="start-btn" onclick="showWorkoutInProgress()">Начать тренировку</button>
+      </div>
+
+      <!-- ai result block (shown after generation) -->
+      <div id="today-ai-result-block" style="display:none">
+        <div class="section-title">Тренировка сегодня</div>
+        <div class="today-workout" style="border-color:rgba(155,89,245,0.5)">
+          <div class="ai-result-tag">✨ Алиса AI · Дома · Без оборудования</div>
+          <div class="today-title">Функциональная тренировка</div>
+          <div class="today-meta">Адаптировано под тебя · ~40 мин</div>
+          <div class="today-exercises">
+            <div class="today-ex-row"><span class="today-ex-name">Приседания</span><span class="today-ex-detail">4×15</span></div>
+            <div class="today-ex-row"><span class="today-ex-name">Отжимания</span><span class="today-ex-detail">3×12</span></div>
+            <div class="today-ex-row"><span class="today-ex-name">Планка</span><span class="today-ex-detail">3×45 сек</span></div>
+            <div class="today-ex-row"><span class="today-ex-name">Берпи</span><span class="today-ex-detail">3×10</span></div>
+          </div>
+          <div class="ai-reason-card">
+            <span style="font-size:14px;flex-shrink:0">💡</span>
+            <div class="ai-reason-text">ЧСС покоя 68 уд/мин, восстановление хорошее, сон 7.2 ч. Цель — похудение. Упражнения без оборудования — дома.</div>
+          </div>
+          <button class="start-btn" onclick="showWorkoutInProgress()">Начать тренировку</button>
+        </div>
       </div>
 
       <!-- alice tip -->
@@ -490,11 +557,25 @@
         <div class="trainer-avatar">МС</div>
         <div>
           <div class="trainer-name">Максим Соколов</div>
-          <div class="trainer-meta">Онлайн · отвечает за 10 мин</div>
+          <div class="trainer-meta" style="color:rgba(255,107,107,0.7)">В отпуске до 28 июня</div>
         </div>
         <button class="trainer-chat-btn" onclick="showTab('chat')">Написать</button>
       </div>
 
+    </div>
+
+    <!-- AI generation overlay -->
+    <div id="ai-gen-overlay" class="ai-gen-overlay">
+      <span class="alice-icon" style="transform:scale(1.8);display:block"></span>
+      <div style="text-align:center">
+        <div class="ai-gen-overlay-title">Алиса анализирует данные</div>
+        <div class="ai-gen-overlay-sub">ЧСС · сон · нагрузка · цель</div>
+      </div>
+      <div class="ai-analyzing-dots">
+        <div class="ai-dot"></div>
+        <div class="ai-dot"></div>
+        <div class="ai-dot"></div>
+      </div>
     </div>
 
     <div class="tab-bar">
@@ -1335,6 +1416,19 @@
       }, 2000);
     };
     reader.readAsDataURL(input.files[0]);
+  }
+
+  // AI workout generation
+  function triggerAIGen() {
+    const overlay = document.getElementById('ai-gen-overlay');
+    overlay.classList.add('active');
+    setTimeout(() => {
+      overlay.classList.remove('active');
+      document.getElementById('today-ai-gen-block').style.display = 'none';
+      document.getElementById('today-ai-result-block').style.display = 'block';
+      const scroll = document.querySelector('#screen-today .screen-scroll');
+      if (scroll) scroll.scrollTop = 0;
+    }, 2300);
   }
 
   // workout timer
