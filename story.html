@@ -356,6 +356,32 @@
     }
     .pill.accent { background: rgba(155,89,245,0.15); border-color: rgba(155,89,245,0.3); color: #b48cfc; }
 
+    @keyframes earphone-jiggle {
+      0%   { transform: translate(-50%,-50%) rotate(0deg) scale(1); }
+      10%  { transform: translate(-50%,-50%) rotate(-8deg) scale(1.04); }
+      22%  { transform: translate(-50%,-50%) rotate(7deg) scale(1.04); }
+      34%  { transform: translate(-50%,-50%) rotate(-5deg) scale(1.02); }
+      46%  { transform: translate(-50%,-50%) rotate(4deg) scale(1.02); }
+      58%  { transform: translate(-50%,-50%) rotate(-2deg) scale(1.01); }
+      70%  { transform: translate(-50%,-50%) rotate(1deg) scale(1); }
+      100% { transform: translate(-50%,-50%) rotate(0deg) scale(1); }
+    }
+    #s5-earphones {
+      position: absolute; left: 50%; top: 50%;
+      transform: translate(-50%,-50%);
+      width: min(420px, 44vw); height: auto;
+      opacity: 0; pointer-events: none;
+      filter: drop-shadow(0 0 60px rgba(155,89,245,0.35)) drop-shadow(0 0 120px rgba(155,89,245,0.15));
+      transition: opacity 0.5s ease;
+    }
+    #s5-earphones.show {
+      opacity: 1;
+      animation: earphone-jiggle 0.9s cubic-bezier(0.34,1.1,0.64,1) forwards;
+    }
+    #s5-earphones.rejiggle {
+      animation: none;
+    }
+
     /* ═══════════════════════════════
        SCENE 9 — FINAL
     ═══════════════════════════════ */
@@ -465,11 +491,12 @@
 </div>
 
 <!-- ═══ SCENE 5 — VOICE ═══ -->
-<div class="scene feature-scene" id="s5">
-  <div class="feature-eyebrow">Голосовой ввод</div>
-  <div class="feature-headline big gradient-text">Надиктуй тренировку.<br>Алиса сделает остальное.</div>
-  <div class="feature-sub small">Скажи «присед 4 подхода по 8» — и всё. Упражнения, веса, сеты появятся сами. Никаких форм, никаких таблиц.</div>
-  <div class="feature-pills">
+<div class="scene feature-scene" id="s5" style="overflow:hidden">
+  <img id="s5-earphones" src="earphones.png" alt="наушники"/>
+  <div class="feature-eyebrow" style="position:relative;z-index:2">Голосовой ввод</div>
+  <div class="feature-headline big gradient-text" style="position:relative;z-index:2">Надиктуй тренировку.<br>Алиса сделает остальное.</div>
+  <div class="feature-sub small" style="position:relative;z-index:2">Скажи «присед 4 подхода по 8» — и всё. Упражнения, веса, сеты появятся сами. Никаких форм, никаких таблиц.</div>
+  <div class="feature-pills" style="position:relative;z-index:2">
     <div class="pill accent">SpeechKit</div>
     <div class="pill accent">YandexGPT</div>
   </div>
@@ -2295,6 +2322,10 @@
       document.querySelectorAll('.up-extra').forEach(e => { e.style.opacity = '0'; });
       requestAnimationFrame(() => renderUniverse(0));
     }
+    if (SCENES[idx] === 's5') {
+      const ep = document.getElementById('s5-earphones');
+      if (ep) { ep.classList.remove('show','rejiggle'); ep.style.animation = ''; }
+    }
     if (SCENES[idx] === 'smosaic') {
       mosaicStep = 0;
       initMosaic();
@@ -2367,6 +2398,24 @@
     if (SCENES[sceneIdx] === 'suniv') {
       if (univStep < 7) { univStep++; renderUniverse(univStep); return; }
       // univStep === 7 → fall through to next scene
+    }
+    if (SCENES[sceneIdx] === 's5') {
+      const ep = document.getElementById('s5-earphones');
+      if (ep && !ep.classList.contains('show')) {
+        ep.classList.add('show');
+        return;
+      } else if (ep && ep.classList.contains('show')) {
+        ep.classList.add('rejiggle');
+        ep.offsetHeight;
+        ep.classList.remove('rejiggle');
+        ep.style.animation = 'none';
+        ep.offsetHeight;
+        ep.style.animation = '';
+        ep.classList.remove('show');
+        ep.offsetHeight;
+        ep.classList.add('show');
+        return;
+      }
     }
     if (SCENES[sceneIdx] === 'smosaic') {
       if (mosaicStep < 7) { mosaicStep++; renderMosaic(mosaicStep); return; }
