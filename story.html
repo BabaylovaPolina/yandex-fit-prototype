@@ -601,24 +601,24 @@
       <div class="pill accent">AI-отчёт за секунды</div>
     </div>
   </div>
-  <!-- right: trainer phone image -->
+  <!-- right: trainer phone — absolute, flush to bottom-right corner -->
   <img src="trainer-phone.png" alt="Яндекс Фит — тренерское приложение"
-       style="flex:none;height:calc(100vh - 120px);width:auto;object-fit:contain;
+       style="position:absolute;right:0;bottom:0;height:100%;width:auto;
               opacity:0;transform:translateX(40px);
               transition:opacity 0.8s 0.4s,transform 0.8s 0.4s"
        class="s6-phone">
 </div>
 
 <!-- ═══ SCENE 7 — CLIENT ═══ -->
-<div class="scene feature-scene" id="s7" style="flex-direction:row;align-items:center;padding:60px 72px;gap:64px;text-align:left">
-  <!-- left: client phone image -->
+<div class="scene feature-scene" id="s7" style="flex-direction:row;align-items:center;padding:60px 72px;gap:64px;text-align:left;overflow:hidden">
+  <!-- left: client phone — absolute, flush to bottom-left corner -->
   <img src="client-phone.png" alt="Яндекс Фит — клиентское приложение"
        class="s7-phone"
-       style="flex:none;height:calc(100vh - 120px);width:auto;object-fit:contain;
+       style="position:absolute;left:0;bottom:0;height:100%;width:auto;
               opacity:0;transform:translateX(-40px);
               transition:opacity 0.8s 0.4s,transform 0.8s 0.4s">
-  <!-- right: text -->
-  <div style="flex:1;display:flex;flex-direction:column;gap:22px;align-items:flex-end;min-width:0">
+  <!-- right: text — pushed to right half -->
+  <div style="flex:none;width:48%;margin-left:auto;display:flex;flex-direction:column;gap:22px;align-items:flex-end;min-width:0">
     <div class="feature-eyebrow" style="margin:0">Для клиента</div>
     <div class="feature-headline big" style="color:#fff;text-align:right">Твой прогресс.<br>Твой план.<br><span class="gradient-text">Твой тренер.</span></div>
     <div class="feature-sub small" style="margin:0;max-width:460px;text-align:right">Алиса AI показывает динамику и подсказывает следующий шаг. Нужен эксперт — найди тренера и тренируйся с ним онлайн или офлайн.</div>
