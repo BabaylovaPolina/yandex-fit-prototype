@@ -2404,17 +2404,6 @@
       if (ep && !ep.classList.contains('show')) {
         ep.classList.add('show');
         return;
-      } else if (ep && ep.classList.contains('show')) {
-        ep.classList.add('rejiggle');
-        ep.offsetHeight;
-        ep.classList.remove('rejiggle');
-        ep.style.animation = 'none';
-        ep.offsetHeight;
-        ep.style.animation = '';
-        ep.classList.remove('show');
-        ep.offsetHeight;
-        ep.classList.add('show');
-        return;
       }
     }
     if (SCENES[sceneIdx] === 'smosaic') {
