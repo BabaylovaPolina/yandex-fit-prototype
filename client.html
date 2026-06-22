@@ -484,39 +484,32 @@
         </div>
       </div>
 
-      <!-- ai generate block (shown before generation) -->
-      <div id="today-ai-gen-block">
-        <div class="section-title">Тренировка сегодня</div>
-        <div class="ai-generate-card">
-          <div class="alice-tip-header" style="margin-bottom:12px">
-            <span class="alice-icon"></span>
-            <span class="alice-lbl">Алиса AI</span>
-          </div>
-          <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">Нет плана от тренера</div>
-          <div class="ai-generate-desc">Алиса AI сгенерирует тренировку на основе твоих данных: восстановление хорошее, цель — похудение.</div>
-          <button class="ai-generate-btn" onclick="triggerAIGen()">✨ Сгенерировать тренировку</button>
+      <!-- workout today (trainer plan) -->
+      <div class="section-title">Тренировка сегодня</div>
+      <div class="today-workout">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">МС</div>
+          <span style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent)">План от тренера</span>
         </div>
+        <div class="today-title">Силовая A — Верх</div>
+        <div class="today-meta">Максим Соколов · ~55 мин</div>
+        <div class="today-exercises">
+          <div class="today-ex-row"><span class="today-ex-name">Жим лёжа</span><span class="today-ex-detail">4×8, 50 кг</span></div>
+          <div class="today-ex-row"><span class="today-ex-name">Тяга верхнего блока</span><span class="today-ex-detail">4×10</span></div>
+          <div class="today-ex-row"><span class="today-ex-name">Жим гантелей сидя</span><span class="today-ex-detail">3×12</span></div>
+          <div class="today-ex-row"><span class="today-ex-name">Тяга гантели в наклоне</span><span class="today-ex-detail">3×12</span></div>
+          <div class="today-ex-row"><span class="today-ex-name">Планка</span><span class="today-ex-detail">3×60 сек</span></div>
+        </div>
+        <button class="start-btn" onclick="showWorkoutInProgress()">Начать тренировку</button>
       </div>
 
-      <!-- ai result block (shown after generation) -->
-      <div id="today-ai-result-block" style="display:none">
-        <div class="section-title">Тренировка сегодня</div>
-        <div class="today-workout" style="border-color:rgba(155,89,245,0.5)">
-          <div class="ai-result-tag">✨ Алиса AI · Дома · Без оборудования</div>
-          <div class="today-title">Функциональная тренировка</div>
-          <div class="today-meta">Адаптировано под тебя · ~40 мин</div>
-          <div class="today-exercises">
-            <div class="today-ex-row"><span class="today-ex-name">Приседания</span><span class="today-ex-detail">4×15</span></div>
-            <div class="today-ex-row"><span class="today-ex-name">Отжимания</span><span class="today-ex-detail">3×12</span></div>
-            <div class="today-ex-row"><span class="today-ex-name">Планка</span><span class="today-ex-detail">3×45 сек</span></div>
-            <div class="today-ex-row"><span class="today-ex-name">Берпи</span><span class="today-ex-detail">3×10</span></div>
-          </div>
-          <div class="ai-reason-card">
-            <span style="font-size:14px;flex-shrink:0">💡</span>
-            <div class="ai-reason-text">ЧСС покоя 68 уд/мин, восстановление хорошее, сон 7.2 ч. Цель — похудение. Упражнения без оборудования — дома.</div>
-          </div>
-          <button class="start-btn" onclick="showWorkoutInProgress()">Начать тренировку</button>
+      <!-- alice recommendation -->
+      <div class="alice-tip" style="margin:0 16px 12px">
+        <div class="alice-tip-header">
+          <span class="alice-icon"></span>
+          <span class="alice-lbl">Алиса AI</span>
         </div>
+        <div class="alice-tip-text">ЧСС покоя 68 уд/мин — хорошее восстановление. Сон 7.2 часа. Можно работать в полную силу, но не забудь разминку 5–7 минут перед жимом.</div>
       </div>
 
       <!-- last report -->
