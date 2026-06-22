@@ -357,19 +357,19 @@
     .pill.accent { background: rgba(155,89,245,0.15); border-color: rgba(155,89,245,0.3); color: #b48cfc; }
 
     @keyframes earphone-jiggle {
-      0%   { transform: translate(-50%,-50%) rotate(0deg) scale(1); }
-      10%  { transform: translate(-50%,-50%) rotate(-8deg) scale(1.04); }
-      22%  { transform: translate(-50%,-50%) rotate(7deg) scale(1.04); }
-      34%  { transform: translate(-50%,-50%) rotate(-5deg) scale(1.02); }
-      46%  { transform: translate(-50%,-50%) rotate(4deg) scale(1.02); }
-      58%  { transform: translate(-50%,-50%) rotate(-2deg) scale(1.01); }
-      70%  { transform: translate(-50%,-50%) rotate(1deg) scale(1); }
-      100% { transform: translate(-50%,-50%) rotate(0deg) scale(1); }
+      0%   { transform: rotate(0deg) scale(1); }
+      10%  { transform: rotate(-8deg) scale(1.04); }
+      22%  { transform: rotate(7deg) scale(1.04); }
+      34%  { transform: rotate(-5deg) scale(1.02); }
+      46%  { transform: rotate(4deg) scale(1.02); }
+      58%  { transform: rotate(-2deg) scale(1.01); }
+      70%  { transform: rotate(1deg) scale(1); }
+      100% { transform: rotate(0deg) scale(1); }
     }
     #s5-earphones {
-      position: absolute; left: 50%; top: 50%;
-      transform: translate(-50%,-50%);
-      width: min(420px, 44vw); height: auto;
+      position: absolute; right: 5%; top: 6%;
+      width: min(350px, 36vw); height: auto;
+      transform-origin: center center;
       opacity: 0; pointer-events: none;
       filter: drop-shadow(0 0 60px rgba(155,89,245,0.35)) drop-shadow(0 0 120px rgba(155,89,245,0.15));
       transition: opacity 0.5s ease;
