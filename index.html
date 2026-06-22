@@ -2382,8 +2382,14 @@
 
   function closeExerciseBuilder() {
     const b = document.getElementById('screen-builder');
+    const fromLib = b.dataset.fromLibrary === '1';
     b.style.display = 'none';
-    document.getElementById('picker-overlay').classList.add('open');
+    delete b.dataset.fromLibrary;
+    if (fromLib) {
+      showTab('exercises');
+    } else {
+      document.getElementById('picker-overlay').classList.add('open');
+    }
   }
 
   function toggleBuilderCat(btn) {
