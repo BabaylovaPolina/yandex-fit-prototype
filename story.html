@@ -566,11 +566,16 @@
 </div>
 
 <!-- ═══ SCENE 8 — ANYWHERE ═══ -->
-<div class="scene feature-scene" id="s8">
-  <div class="feature-eyebrow">Всегда с тобой</div>
-  <div class="feature-headline big" style="color:#fff">В зале.<br>Дома. <span class="gradient-text">В поездке.</span></div>
-  <div class="feature-sub small">План всегда под рукой. Тренер — на связи,<br>даже когда ты далеко.<br>Алиса AI соберёт тренировку под твою цель, место и условия.</div>
-  <div class="feature-pills">
+<div class="scene feature-scene" id="s8" style="overflow:hidden">
+  <video autoplay muted loop playsinline
+    style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0.7">
+    <source src="travel.mov" type="video/mp4">
+  </video>
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.1) 60%);z-index:1"></div>
+  <div class="feature-eyebrow" style="position:relative;z-index:2">Всегда с тобой</div>
+  <div class="feature-headline big" style="color:#fff;position:relative;z-index:2">В зале.<br>Дома. <span class="gradient-text">В поездке.</span></div>
+  <div class="feature-sub small" style="position:relative;z-index:2">План всегда под рукой. Тренер — на связи,<br>даже когда ты далеко.<br>Алиса AI соберёт тренировку под твою цель, место и условия.</div>
+  <div class="feature-pills" style="position:relative;z-index:2">
     <div class="pill accent">План тренировок</div>
     <div class="pill">Связь с тренером</div>
     <div class="pill">Тренировки онлайн</div>
