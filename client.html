@@ -851,20 +851,20 @@
       <div style="font-size:18px;font-weight:800;color:var(--text)">Мои упражнения</div>
     </div>
 
-    <div id="ex-list-wrap" style="flex:1;display:flex;flex-direction:column">
+    <div class="screen-scroll pb-tab">
       <!-- empty state -->
-      <div class="ex-empty" id="ex-empty-state">
-        <div class="ex-empty-icon">
+      <div id="ex-empty-state" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:48px 32px 24px;gap:12px">
+        <div style="width:64px;height:64px;border-radius:20px;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:4px">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11M6.5 6.5v11M17.5 6.5v11M6.5 17.5h11M3 9.5h3M3 14.5h3M18 9.5h3M18 14.5h3"/></svg>
         </div>
-        <div class="ex-empty-title">У вас ещё нет добавленных упражнений</div>
-        <div class="ex-empty-sub">Создайте своё упражнение — оно появится в библиотеке и будет доступно при составлении тренировок</div>
+        <div style="font-size:17px;font-weight:700;color:var(--text)">У вас ещё нет добавленных упражнений</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.5">Создайте своё упражнение — оно появится в библиотеке и будет доступно при составлении тренировок</div>
       </div>
       <!-- exercises list (filled dynamically) -->
       <div id="ex-items" style="display:flex;flex-direction:column;gap:10px;padding:0 16px 8px"></div>
-    </div>
 
-    <button class="ex-add-btn" onclick="openExBuilder()">+ Добавить упражнение</button>
+      <button class="ex-add-btn" onclick="openExBuilder()">+ Добавить упражнение</button>
+    </div>
 
     <div class="tab-bar">
       <div class="tab" onclick="showTab('today')"><div class="tab-icon">🏠</div><div class="tab-label">Сегодня</div></div>
