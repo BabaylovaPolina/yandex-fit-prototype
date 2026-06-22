@@ -69,13 +69,13 @@
       opacity: 0; transform: scale(0.92);
       transition: opacity 1s ease, transform 1s ease;
     }
-    #s1.active .year { opacity: 1; transform: scale(1); }
+    #s1.show-year .year { opacity: 1; transform: scale(1); }
     #s1 .year-sub {
       font-size: clamp(16px, 2.5vw, 28px); color: #555;
       margin-top: 16px; letter-spacing: 2px; text-transform: uppercase;
-      opacity: 0; transition: opacity 1s 0.6s;
+      opacity: 0; transition: opacity 1s;
     }
-    #s1.active .year-sub { opacity: 1; }
+    #s1.show-sub .year-sub { opacity: 1; }
 
     /* ═══════════════════════════════
        SCENE 2 — CONTEXT
@@ -1850,6 +1850,7 @@
   let revealShown = false;
   let sm1Step = 0;
   let sm1bStep = 0;
+  let s1Step = 0;
   let s2Step = 0;
   let univStep = 0;
   let mosaicStep = 0;
@@ -2311,6 +2312,10 @@
     updateDots();
     document.getElementById('hint').style.opacity = idx === SCENES.length - 1 ? '0' : '1';
     // reset sm1 projection when re-entering
+    if (SCENES[idx] === 's1') {
+      s1Step = 0;
+      document.getElementById('s1').classList.remove('show-year', 'show-sub');
+    }
     if (SCENES[idx] === 's2') {
       s2Step = 0;
       document.getElementById('s2-reveal').classList.remove('show');
@@ -2419,6 +2424,11 @@
     }
     if (SCENES[sceneIdx] === 'sconst') {
       if (constStep < 7) { constStep++; renderConst(constStep); return; }
+    }
+    // s1: click 1 → 2026, click 2 → subtitle, click 3 → next scene
+    if (SCENES[sceneIdx] === 's1') {
+      if (s1Step === 0) { s1Step = 1; document.getElementById('s1').classList.add('show-year'); return; }
+      if (s1Step === 1) { s1Step = 2; document.getElementById('s1').classList.add('show-sub'); return; }
     }
     // s2: first click shows key phrase, second click goes to next scene
     if (SCENES[sceneIdx] === 's2') {
