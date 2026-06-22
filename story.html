@@ -356,30 +356,22 @@
     }
     .pill.accent { background: rgba(155,89,245,0.15); border-color: rgba(155,89,245,0.3); color: #b48cfc; }
 
-    @keyframes earphone-jiggle {
-      0%   { transform: rotate(0deg) scale(1); }
-      10%  { transform: rotate(-8deg) scale(1.04); }
-      22%  { transform: rotate(7deg) scale(1.04); }
-      34%  { transform: rotate(-5deg) scale(1.02); }
-      46%  { transform: rotate(4deg) scale(1.02); }
-      58%  { transform: rotate(-2deg) scale(1.01); }
-      70%  { transform: rotate(1deg) scale(1); }
-      100% { transform: rotate(0deg) scale(1); }
+    @keyframes earphone-drop {
+      0%   { transform: translateY(-140%) rotate(-6deg); opacity: 0; }
+      55%  { opacity: 1; }
+      70%  { transform: translateY(6%) rotate(2deg); }
+      85%  { transform: translateY(-3%) rotate(-1deg); }
+      100% { transform: translateY(0) rotate(0deg); opacity: 1; }
     }
     #s5-earphones {
       position: absolute; right: 5%; top: 6%;
       width: min(350px, 36vw); height: auto;
-      transform-origin: center center;
+      transform-origin: center top;
       opacity: 0; pointer-events: none;
       filter: drop-shadow(0 0 60px rgba(155,89,245,0.35)) drop-shadow(0 0 120px rgba(155,89,245,0.15));
-      transition: opacity 0.5s ease;
     }
     #s5-earphones.show {
-      opacity: 1;
-      animation: earphone-jiggle 0.9s cubic-bezier(0.34,1.1,0.64,1) forwards;
-    }
-    #s5-earphones.rejiggle {
-      animation: none;
+      animation: earphone-drop 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
     /* ═══════════════════════════════
@@ -1851,6 +1843,7 @@
   let sm1Step = 0;
   let sm1bStep = 0;
   let s1Step = 0;
+  let s5Timer = null;
   let s2Step = 0;
   let univStep = 0;
   let mosaicStep = 0;
@@ -2337,7 +2330,14 @@
     }
     if (SCENES[idx] === 's5') {
       const ep = document.getElementById('s5-earphones');
-      if (ep) { ep.classList.remove('show','rejiggle'); ep.style.animation = ''; }
+      if (ep) { ep.classList.remove('show'); ep.style.animation = ''; }
+      if (s5Timer) { clearTimeout(s5Timer); s5Timer = null; }
+      s5Timer = setTimeout(() => {
+        document.getElementById('s5-earphones').classList.add('show');
+        s5Timer = null;
+      }, 3000);
+    } else {
+      if (s5Timer) { clearTimeout(s5Timer); s5Timer = null; }
     }
     if (SCENES[idx] === 'smosaic') {
       mosaicStep = 0;
@@ -2411,13 +2411,6 @@
     if (SCENES[sceneIdx] === 'suniv') {
       if (univStep < 7) { univStep++; renderUniverse(univStep); return; }
       // univStep === 7 → fall through to next scene
-    }
-    if (SCENES[sceneIdx] === 's5') {
-      const ep = document.getElementById('s5-earphones');
-      if (ep && !ep.classList.contains('show')) {
-        ep.classList.add('show');
-        return;
-      }
     }
     if (SCENES[sceneIdx] === 'smosaic') {
       if (mosaicStep < 7) { mosaicStep++; renderMosaic(mosaicStep); return; }
