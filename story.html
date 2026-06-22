@@ -1599,9 +1599,13 @@
       <text x="40"  y="200" fill="#6c63ff" font-size="11" text-anchor="middle" font-weight="700">3.55%</text>
       <text x="528" y="181" fill="#43e97b" font-size="11" text-anchor="middle" font-weight="700">5.4%</text>
 
-      <!-- +20% badge near 2024 point -->
-      <rect x="361" y="187" width="90" height="14" rx="5" fill="rgba(67,233,123,0.1)"/>
-      <text x="406" y="198" fill="#43e97b" font-size="9.5" text-anchor="middle" font-weight="700">↑ +20% за 1.5 года</text>
+      <!-- Delta annotation 2024(y=203)→2026П(y=194) = +20% -->
+      <line x1="408" y1="203" x2="558" y2="203" stroke="#43e97b" stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.5"/>
+      <line x1="530" y1="194" x2="558" y2="194" stroke="#43e97b" stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.5"/>
+      <polygon points="558,191 555,196 561,196" fill="#43e97b"/>
+      <line x1="558" y1="196" x2="558" y2="201" stroke="#43e97b" stroke-width="1.5"/>
+      <polygon points="558,206 555,201 561,201" fill="#43e97b"/>
+      <text x="565" y="199" fill="#43e97b" font-size="10" text-anchor="start" font-weight="700" dominant-baseline="middle">+20%</text>
 
       <!-- X labels: even years only -->
       <text x="40"  y="258" fill="#444"    font-size="9.5" text-anchor="middle">2018</text>
