@@ -218,10 +218,11 @@
 
     #s4 .s4-phones img {
       width: 100%; max-width: 1267px; object-fit: contain;
-      opacity: 0; transform: translateY(40px);
+      transform-origin: top center;
+      opacity: 0; transform: scale(1.15) translateY(40px);
       transition: opacity 0.9s 0.6s, transform 0.9s 0.6s cubic-bezier(0.34,1.1,0.64,1);
     }
-    #s4.active .s4-phones img { opacity: 1; transform: none; }
+    #s4.active .s4-phones img { opacity: 1; transform: scale(1.15); }
 
     /* Phone reveal at center */
     .phone-reveal {
