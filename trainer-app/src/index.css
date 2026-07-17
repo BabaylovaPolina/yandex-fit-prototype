@@ -25,6 +25,39 @@ body {
 
 #root {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-frame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+}
+
+@media (min-width: 481px) {
+  body {
+    display: flex;
+    justify-content: center;
+  }
+
+  #root {
+    min-height: 100vh;
+    background: #ddd9e0;
+    display: flex;
+    align-items: center;
+  }
+
+  .phone-frame {
+    flex: none;
+    width: 420px;
+    height: 844px;
+    margin: 32px 0;
+    border-radius: 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+  }
 }
 
 input,
@@ -47,14 +80,12 @@ button:disabled {
 }
 
 .auth-screen {
-  min-height: 100vh;
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 8px;
   padding: 24px;
-  max-width: 400px;
-  margin: 0 auto;
 }
 
 .auth-subtitle {
@@ -96,7 +127,7 @@ button:disabled {
 }
 
 .home-screen {
-  min-height: 100vh;
+  flex: 1;
   display: flex;
   flex-direction: column;
 }

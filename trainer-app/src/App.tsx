@@ -12,7 +12,9 @@ function AppShell() {
 function App() {
   return (
     <AuthProvider>
-      <AppShell />
+      <div className="phone-frame">
+        <AppShell />
+      </div>
     </AuthProvider>
   )
 }
