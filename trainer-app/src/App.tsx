@@ -5,6 +5,7 @@ import { ClientsListPage } from './pages/ClientsListPage'
 import { AddClientPage } from './pages/AddClientPage'
 import { ClientDetailPage } from './pages/ClientDetailPage'
 import { WorkoutFormPage } from './pages/WorkoutFormPage'
+import { TabBar } from './components/TabBar'
 import type { Client } from './lib/clients'
 
 type View =
@@ -59,11 +60,14 @@ function TrainerHome() {
   }
 
   return (
-    <ClientsListPage
-      onAddClient={() => setView({ name: 'add-client' })}
-      onOpenClient={(client) => setView({ name: 'client-detail', client })}
-      refreshKey={clientsRefreshKey}
-    />
+    <>
+      <ClientsListPage
+        onAddClient={() => setView({ name: 'add-client' })}
+        onOpenClient={(client) => setView({ name: 'client-detail', client })}
+        refreshKey={clientsRefreshKey}
+      />
+      <TabBar active="clients" />
+    </>
   )
 }
 
