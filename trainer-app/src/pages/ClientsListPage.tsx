@@ -11,10 +11,11 @@ const genderLabel: Record<Client['gender'], string> = {
 type Props = {
   onAddClient: () => void
   onOpenClient: (client: Client) => void
+  onEditClient: (client: Client) => void
   refreshKey: number
 }
 
-export function ClientsListPage({ onAddClient, onOpenClient, refreshKey }: Props) {
+export function ClientsListPage({ onAddClient, onOpenClient, onEditClient, refreshKey }: Props) {
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -31,7 +32,7 @@ export function ClientsListPage({ onAddClient, onOpenClient, refreshKey }: Props
   return (
     <div className="clients-screen">
       <header className="home-header">
-        <span>Спортсмены</span>
+        <span>Мои клиенты</span>
         <button type="button" onClick={onAddClient}>
           + Клиент
         </button>
@@ -63,6 +64,22 @@ export function ClientsListPage({ onAddClient, onOpenClient, refreshKey }: Props
                   {genderLabel[client.gender]}, {client.age} лет · {client.height_cm} см ·{' '}
                   {client.weight_kg} кг
                 </span>
+              </button>
+              <button
+                type="button"
+                className="clients-list-edit"
+                aria-label="Редактировать клиента"
+                onClick={() => onEditClient(client)}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M4 20h4l10.5-10.5a2.121 2.121 0 0 0-3-3L5 17v3Z"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </button>
             </li>
           ))}
