@@ -4,7 +4,6 @@ import {
   updateWorkout,
   deleteWorkout,
   getWorkout,
-  deleteWorkout,
   type WorkoutStatus,
   type SetInput,
 } from '../lib/workouts'
@@ -60,7 +59,6 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [loading, setLoading] = useState(workoutId !== undefined)
-  const [deleting, setDeleting] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
 
   useEffect(() => {
@@ -168,7 +166,7 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
   }
 
   async function handleDelete() {
-    if (!workoutId) return
+    if (workoutId === undefined) return
     if (!window.confirm('Вы уверены? Тренировка будет удалена безвозвратно.')) return
 
     setError(null)
@@ -176,16 +174,6 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
     try {
       await deleteWorkout(workoutId)
       logEvent('workout_deleted', { workout_id: workoutId })
-      onSaved()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Не удалось удалить тренировку')
-    if (workoutId === undefined) return
-    if (!window.confirm('Удалить тренировку?')) return
-    setDeleting(true)
-    setError(null)
-    try {
-      await deleteWorkout(workoutId)
-      logEvent('workout_deleted')
       onSaved()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось удалить тренировку')
@@ -353,17 +341,6 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
             {saving ? 'Сохранение…' : 'Сохранить'}
           </button>
         </div>
-
-        {workoutId !== undefined && (
-          <button
-            type="button"
-            className="btn-delete"
-            disabled={deleting}
-            onClick={handleDelete}
-          >
-            {deleting ? 'Удаление…' : 'Удалить тренировку'}
-          </button>
-        )}
       </form>
 
       {pickerOpen && (
