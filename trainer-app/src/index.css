@@ -265,12 +265,18 @@ button:disabled {
 
 .workout-copy-button {
   margin: 0 10px;
-  background: var(--surface);
-  color: var(--accent);
-  border: 1px solid var(--border);
-  font-size: 13px;
+  background: var(--accent);
+  color: var(--accent-text);
+  border: none;
+  font-size: 20px;
   padding: 8px 12px;
   white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.workout-copy-button:active {
+  box-shadow: none;
+  transform: translateY(1px);
 }
 
 .client-detail-meta {
@@ -406,6 +412,13 @@ button:disabled {
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
+}
+
+.btn-delete {
+  background: var(--error);
+  color: var(--accent-text);
+  width: 100%;
+  margin-top: 12px;
 }
 
 .tab-bar {

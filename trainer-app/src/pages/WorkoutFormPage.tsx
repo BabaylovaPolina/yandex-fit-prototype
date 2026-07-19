@@ -3,6 +3,7 @@ import {
   createWorkout,
   updateWorkout,
   getWorkout,
+  deleteWorkout,
   type WorkoutStatus,
   type SetInput,
 } from '../lib/workouts'
@@ -50,6 +51,7 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(workoutId !== undefined)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (workoutId === undefined) return
@@ -153,6 +155,22 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
       setError(err instanceof Error ? err.message : 'Не удалось сохранить тренировку')
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleDelete() {
+    if (!workoutId) return
+    if (!window.confirm('Вы уверены? Тренировка будет удалена безвозвратно.')) return
+
+    setError(null)
+    setDeleting(true)
+    try {
+      await deleteWorkout(workoutId)
+      logEvent('workout_deleted', { workout_id: workoutId })
+      onSaved()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Не удалось удалить тренировку')
+      setDeleting(false)
     }
   }
 
@@ -299,6 +317,17 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
             {saving ? 'Сохранение…' : 'Сохранить'}
           </button>
         </div>
+
+        {workoutId !== undefined && (
+          <button
+            type="button"
+            className="btn-delete"
+            disabled={deleting}
+            onClick={handleDelete}
+          >
+            {deleting ? 'Удаление…' : 'Удалить тренировку'}
+          </button>
+        )}
       </form>
     </div>
   )

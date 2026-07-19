@@ -173,6 +173,20 @@ export async function copyWorkout(sourceWorkoutId: number, workoutDate: string):
   })
 }
 
+export async function deleteWorkout(workoutId: number): Promise<void> {
+  const { error: exercisesError } = await supabase
+    .from('workout_exercises')
+    .delete()
+    .eq('workout_id', workoutId)
+  if (exercisesError) throw exercisesError
+
+  const { error: workoutError } = await supabase
+    .from('workouts')
+    .delete()
+    .eq('id', workoutId)
+  if (workoutError) throw workoutError
+}
+
 async function writeExercises(workoutId: number, exercises: ExerciseInput[]) {
   for (let i = 0; i < exercises.length; i++) {
     const exerciseInput = exercises[i]
