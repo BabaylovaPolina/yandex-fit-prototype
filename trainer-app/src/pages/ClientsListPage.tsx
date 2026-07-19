@@ -32,7 +32,6 @@ export function ClientsListPage({ onAddClient, onOpenClient, onEditClient, refre
   return (
     <div className="clients-screen">
       <header className="home-header">
-        <span>Мои клиенты</span>
         <button type="button" onClick={onAddClient}>
           + Клиент
         </button>

@@ -192,8 +192,10 @@ button:disabled {
 .clients-placeholder {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   color: var(--text-muted);
   padding: 24px;
   text-align: center;
@@ -498,4 +500,109 @@ button:disabled {
 .week-day.active .day-num,
 .week-day.active .day-num.today {
   color: var(--accent-text);
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px 16px;
+}
+
+.week-nav-arrow {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: none;
+  color: var(--text-muted);
+}
+
+.week-nav .week-strip {
+  flex: 1;
+  padding: 0;
+}
+
+.day-grid-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.day-grid-untimed {
+  padding-bottom: 8px;
+}
+
+.day-grid {
+  position: relative;
+  margin: 0 16px;
+}
+
+.day-grid-hour {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  height: 0;
+}
+
+.day-grid-hour-label {
+  width: 40px;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  transform: translateY(-6px);
+}
+
+.day-grid-hour-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  margin-top: 2px;
+}
+
+.day-grid-event {
+  position: absolute;
+  left: 48px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(170, 59, 255, 0.15);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  overflow: hidden;
+  text-align: left;
+}
+
+.day-grid-event-time {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.day-grid-event-name {
+  font-size: 13px;
+  font-weight: 600;
 }

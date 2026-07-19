@@ -1,13 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { listWorkoutsForDate, type WorkoutWithClientName } from '../lib/workouts'
 import { logEvent } from '../lib/analytics'
 
 const DAY_LABELS = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ']
-
-const statusLabel: Record<WorkoutWithClientName['status'], string> = {
-  planned: 'Запланирована',
-  done: 'Выполнена',
-}
+const HOURS = Array.from({ length: 24 }, (_, i) => i)
+const HOUR_HEIGHT = 56
 
 function toDateKey(date: Date): string {
   return date.toISOString().slice(0, 10)
@@ -19,6 +16,11 @@ function startOfWeek(date: Date): Date {
   result.setDate(result.getDate() - day)
   result.setHours(0, 0, 0, 0)
   return result
+}
+
+function timeToMinutes(time: string): number {
+  const [h, m] = time.split(':').map(Number)
+  return h * 60 + m
 }
 
 function formatTimeRange(workout: WorkoutWithClientName): string {
@@ -36,6 +38,7 @@ type Props = {
 
 export function SchedulePage({ onAddWorkout, onOpenClient, refreshKey }: Props) {
   const todayKey = toDateKey(new Date())
+  const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()))
   const [selectedDate, setSelectedDate] = useState(todayKey)
   const [workouts, setWorkouts] = useState<WorkoutWithClientName[]>([])
   const [loading, setLoading] = useState(true)
@@ -50,39 +53,66 @@ export function SchedulePage({ onAddWorkout, onOpenClient, refreshKey }: Props) 
       .finally(() => setLoading(false))
   }, [selectedDate, refreshKey])
 
-  const weekStart = startOfWeek(new Date(selectedDate + 'T00:00:00'))
-  const weekDays = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(weekStart)
-    d.setDate(d.getDate() + i)
-    return d
-  })
+  const weekDays = useMemo(
+    () =>
+      Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(weekStart)
+        d.setDate(d.getDate() + i)
+        return d
+      }),
+    [weekStart],
+  )
+
+  function goToWeek(offsetWeeks: number) {
+    const next = new Date(weekStart)
+    next.setDate(next.getDate() + offsetWeeks * 7)
+    setWeekStart(next)
+  }
+
+  function goToToday() {
+    setWeekStart(startOfWeek(new Date()))
+    setSelectedDate(todayKey)
+  }
+
+  const timedWorkouts = workouts.filter((w) => w.start_time)
+  const untimedWorkouts = workouts.filter((w) => !w.start_time)
 
   return (
     <div className="clients-screen">
       <header className="home-header">
-        <span>Расписание</span>
         <button type="button" onClick={() => onAddWorkout(selectedDate)}>
           + Тренировка
         </button>
+        <button type="button" className="icon-button" onClick={goToToday} aria-label="Сегодня">
+          📅
+        </button>
       </header>
 
-      <div className="week-strip">
-        {weekDays.map((day) => {
-          const key = toDateKey(day)
-          const isActive = key === selectedDate
-          const isToday = key === todayKey
-          return (
-            <button
-              key={key}
-              type="button"
-              className={isActive ? 'week-day active' : 'week-day'}
-              onClick={() => setSelectedDate(key)}
-            >
-              <span className="day-label">{DAY_LABELS[day.getDay()]}</span>
-              <span className={isToday ? 'day-num today' : 'day-num'}>{day.getDate()}</span>
-            </button>
-          )
-        })}
+      <div className="week-nav">
+        <button type="button" className="week-nav-arrow" onClick={() => goToWeek(-1)} aria-label="Предыдущая неделя">
+          ‹
+        </button>
+        <div className="week-strip">
+          {weekDays.map((day) => {
+            const key = toDateKey(day)
+            const isActive = key === selectedDate
+            const isToday = key === todayKey
+            return (
+              <button
+                key={key}
+                type="button"
+                className={isActive ? 'week-day active' : 'week-day'}
+                onClick={() => setSelectedDate(key)}
+              >
+                <span className="day-label">{DAY_LABELS[day.getDay()]}</span>
+                <span className={isToday ? 'day-num today' : 'day-num'}>{day.getDate()}</span>
+              </button>
+            )
+          })}
+        </div>
+        <button type="button" className="week-nav-arrow" onClick={() => goToWeek(1)} aria-label="Следующая неделя">
+          ›
+        </button>
       </div>
 
       {loading && <div className="clients-placeholder">Загрузка…</div>}
@@ -98,23 +128,55 @@ export function SchedulePage({ onAddWorkout, onOpenClient, refreshKey }: Props) 
         </div>
       )}
 
-      {!loading && workouts.length > 0 && (
-        <ul className="clients-list">
-          {workouts.map((workout) => (
-            <li key={workout.id} className="clients-list-item">
-              <button
-                type="button"
-                className="workout-card-open"
-                onClick={() => onOpenClient(workout.client_id)}
-              >
-                <span className="clients-list-name">
-                  {formatTimeRange(workout)} · {workout.client_name}
-                </span>
-                <span className="clients-list-meta">{statusLabel[workout.status]}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+      {!loading && !error && workouts.length > 0 && (
+        <div className="day-grid-scroll">
+          {untimedWorkouts.length > 0 && (
+            <ul className="clients-list day-grid-untimed">
+              {untimedWorkouts.map((workout) => (
+                <li key={workout.id} className="clients-list-item">
+                  <button
+                    type="button"
+                    className="workout-card-open"
+                    onClick={() => onOpenClient(workout.client_id)}
+                  >
+                    <span className="clients-list-name">{workout.client_name}</span>
+                    <span className="clients-list-meta">без времени</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="day-grid" style={{ height: HOURS.length * HOUR_HEIGHT }}>
+            {HOURS.map((hour) => (
+              <div key={hour} className="day-grid-hour" style={{ top: hour * HOUR_HEIGHT }}>
+                <span className="day-grid-hour-label">{String(hour).padStart(2, '0')}:00</span>
+                <div className="day-grid-hour-line" />
+              </div>
+            ))}
+
+            {timedWorkouts.map((workout) => {
+              const startMin = timeToMinutes(workout.start_time!.slice(0, 5))
+              const endMin = workout.end_time
+                ? timeToMinutes(workout.end_time.slice(0, 5))
+                : startMin + 60
+              const top = (startMin / 60) * HOUR_HEIGHT
+              const height = Math.max(((endMin - startMin) / 60) * HOUR_HEIGHT, 28)
+              return (
+                <button
+                  key={workout.id}
+                  type="button"
+                  className="day-grid-event"
+                  style={{ top, height }}
+                  onClick={() => onOpenClient(workout.client_id)}
+                >
+                  <span className="day-grid-event-time">{formatTimeRange(workout)}</span>
+                  <span className="day-grid-event-name">{workout.client_name}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
       )}
     </div>
   )
