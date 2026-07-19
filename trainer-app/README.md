@@ -11,31 +11,10 @@ Supabase client.
 2. In the SQL editor, run `supabase/migrations/0001_init.sql` — it creates:
    - `profiles` (one row per user, auto-created on sign-up)
    - `events` (append-only action log for future analytics)
-3. `npm install`
-4. Get the Supabase URL and anon key into your shell via Doppler (see below),
-   then `npm run dev`.
-
-### Secrets (Doppler)
-
-Env vars (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) are shared through
-[Doppler](https://doppler.com) instead of passing `.env` files around.
-`npm run dev` runs `doppler run -- vite`, which injects them automatically —
-there's no `.env.local` to create or copy.
-
-**One-time, project owner:**
-1. Sign up at doppler.com, install the CLI (`brew install dopplerhq/cli/doppler`).
-2. `doppler login`
-3. `doppler projects create trainer-app`
-4. `doppler secrets set VITE_SUPABASE_URL VITE_SUPABASE_ANON_KEY --config dev`
-   (paste the values from Supabase Project Settings → API)
-5. Invite collaborators to the `trainer-app` project on the Doppler dashboard
-   (Project → Access).
-
-**Each collaborator, once:**
-1. Install the CLI, `doppler login`.
-2. From `trainer-app/`, run `doppler setup` and pick project `trainer-app`,
-   config `dev`. This writes a local `doppler.yaml` (gitignored, no secrets in it).
-3. `npm run dev` now has the real Supabase credentials injected.
+3. Copy `.env.example` to `.env.local` and fill in your project's URL and anon key
+   (Project Settings → API).
+4. `npm install`
+5. `npm run dev`
 
 **Temporary fallback (no Doppler seat yet):** the anon key is safe to share —
 it's the same public key that ends up in the client bundle, not the secret
