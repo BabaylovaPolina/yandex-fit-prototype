@@ -90,34 +90,36 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
           />
         </label>
 
-        <label>
-          Рост, см
-          <input
-            type="number"
-            required
-            min={1}
-            max={259}
-            value={heightCm}
-            onChange={(e) => setHeightCm(e.target.value)}
-          />
-        </label>
+        <div className="form-row">
+          <label>
+            Рост, см
+            <input
+              type="number"
+              required
+              min={1}
+              max={259}
+              value={heightCm}
+              onChange={(e) => setHeightCm(e.target.value)}
+            />
+          </label>
 
-        <label>
-          Вес, кг
-          <input
-            type="number"
-            required
-            min={1}
-            max={399}
-            step="0.1"
-            value={weightKg}
-            onChange={(e) => setWeightKg(e.target.value)}
-          />
-        </label>
+          <label>
+            Вес, кг
+            <input
+              type="number"
+              required
+              min={1}
+              max={399}
+              step="0.1"
+              value={weightKg}
+              onChange={(e) => setWeightKg(e.target.value)}
+            />
+          </label>
+        </div>
 
         <label>
           Цель
-          <textarea value={goal} onChange={(e) => setGoal(e.target.value)} />
+          <input type="text" value={goal} onChange={(e) => setGoal(e.target.value)} />
         </label>
 
         <label>

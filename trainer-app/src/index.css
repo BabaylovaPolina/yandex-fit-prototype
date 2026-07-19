@@ -240,6 +240,15 @@ button:disabled {
   gap: 14px;
 }
 
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-row label {
+  flex: 1;
+}
+
 .gender-choice {
   display: flex;
   gap: 8px;
