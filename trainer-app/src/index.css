@@ -228,6 +228,118 @@ button:disabled {
   color: var(--text-muted);
 }
 
+.clients-list-item {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  overflow: hidden;
+}
+
+.workout-card-open {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  background: none;
+  color: var(--text);
+  border-radius: 0;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.workout-copy-button {
+  margin: 0 10px;
+  background: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.client-detail-meta {
+  padding: 12px 20px 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.client-detail-actions {
+  padding: 12px 20px;
+}
+
+.workout-exercises {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.workout-exercise-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.workout-exercise-header {
+  display: flex;
+  gap: 8px;
+}
+
+.workout-exercise-header input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.workout-set-row {
+  display: grid;
+  grid-template-columns: 20px 1fr 1fr 20px;
+  gap: 8px;
+  align-items: center;
+}
+
+.workout-set-row-labels {
+  margin-bottom: -2px;
+}
+
+.workout-set-group-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.workout-set-index {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.workout-set-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.workout-set-row input {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 13px;
+}
+
+.workout-set-row button {
+  padding: 4px;
+  background: none;
+  color: var(--text-muted);
+}
+
 .form-screen {
   flex: 1;
   display: flex;
