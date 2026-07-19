@@ -30,6 +30,7 @@ body {
 }
 
 .phone-frame {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -185,6 +186,7 @@ button:disabled {
 
 .clients-screen {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -605,4 +607,72 @@ button:disabled {
 .day-grid-event-name {
   font-size: 13px;
   font-weight: 600;
+}
+
+.sheet-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-end;
+  z-index: 10;
+}
+
+.sheet {
+  width: 100%;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sheet-title {
+  font-weight: 700;
+}
+
+.month-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 8px;
+}
+
+.month-weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.month-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.month-day.today {
+  color: var(--accent);
+}
+
+.month-day.active {
+  background: var(--accent);
+  color: var(--accent-text);
 }

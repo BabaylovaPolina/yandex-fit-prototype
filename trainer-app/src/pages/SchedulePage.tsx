@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { listWorkoutsForDate, type WorkoutWithClientName } from '../lib/workouts'
 import { logEvent } from '../lib/analytics'
+import { MonthPickerSheet } from './MonthPickerSheet'
 
 const DAY_LABELS = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ']
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
@@ -43,6 +44,8 @@ export function SchedulePage({ onAddWorkout, onOpenClient, refreshKey }: Props) 
   const [workouts, setWorkouts] = useState<WorkoutWithClientName[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [monthPickerOpen, setMonthPickerOpen] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     logEvent('schedule_viewed', { date: selectedDate })
@@ -69,13 +72,24 @@ export function SchedulePage({ onAddWorkout, onOpenClient, refreshKey }: Props) 
     setWeekStart(next)
   }
 
-  function goToToday() {
-    setWeekStart(startOfWeek(new Date()))
-    setSelectedDate(todayKey)
+  function selectDateFromMonth(date: Date) {
+    setWeekStart(startOfWeek(date))
+    setSelectedDate(toDateKey(date))
+    setMonthPickerOpen(false)
   }
 
   const timedWorkouts = workouts.filter((w) => w.start_time)
   const untimedWorkouts = workouts.filter((w) => !w.start_time)
+
+  useEffect(() => {
+    if (loading || !scrollRef.current) return
+    const firstWorkoutMinutes =
+      timedWorkouts.length > 0 ? timeToMinutes(timedWorkouts[0].start_time!.slice(0, 5)) : null
+    const targetMinutes =
+      firstWorkoutMinutes !== null ? Math.min(firstWorkoutMinutes, 7 * 60) : 7 * 60
+    scrollRef.current.scrollTop = (targetMinutes / 60) * HOUR_HEIGHT
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, selectedDate])
 
   return (
     <div className="clients-screen">
@@ -83,7 +97,12 @@ export function SchedulePage({ onAddWorkout, onOpenClient, refreshKey }: Props) 
         <button type="button" onClick={() => onAddWorkout(selectedDate)}>
           + Тренировка
         </button>
-        <button type="button" className="icon-button" onClick={goToToday} aria-label="Сегодня">
+        <button
+          type="button"
+          className="icon-button"
+          onClick={() => setMonthPickerOpen(true)}
+          aria-label="Открыть календарь"
+        >
           📅
         </button>
       </header>
@@ -121,7 +140,6 @@ export function SchedulePage({ onAddWorkout, onOpenClient, refreshKey }: Props) 
       {!loading && !error && workouts.length === 0 && (
         <div className="clients-placeholder">
           Тренировок нет
-          <br />
           <button type="button" onClick={() => onAddWorkout(selectedDate)}>
             + Запланировать тренировку
           </button>
@@ -129,7 +147,7 @@ export function SchedulePage({ onAddWorkout, onOpenClient, refreshKey }: Props) 
       )}
 
       {!loading && !error && workouts.length > 0 && (
-        <div className="day-grid-scroll">
+        <div className="day-grid-scroll" ref={scrollRef}>
           {untimedWorkouts.length > 0 && (
             <ul className="clients-list day-grid-untimed">
               {untimedWorkouts.map((workout) => (
@@ -177,6 +195,14 @@ export function SchedulePage({ onAddWorkout, onOpenClient, refreshKey }: Props) 
             })}
           </div>
         </div>
+      )}
+
+      {monthPickerOpen && (
+        <MonthPickerSheet
+          selectedDate={selectedDate}
+          onPick={selectDateFromMonth}
+          onClose={() => setMonthPickerOpen(false)}
+        />
       )}
     </div>
   )
