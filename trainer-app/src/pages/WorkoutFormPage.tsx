@@ -158,19 +158,16 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
 
   if (loading) {
     return (
-      <div className="auth-screen">
+      <div className="form-screen">
         <div className="clients-placeholder">Загрузка…</div>
       </div>
     )
   }
 
   return (
-    <div className="auth-screen">
+    <div className="form-screen">
       <header className="home-header">
         <span>{workoutId === undefined ? 'Новая тренировка' : 'Тренировка'}</span>
-        <button type="button" onClick={onCancel}>
-          Отмена
-        </button>
       </header>
 
       <form className="auth-form" onSubmit={handleSubmit}>
@@ -186,15 +183,27 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
 
         <label>
           Статус
-          <select value={status} onChange={(e) => setStatus(e.target.value as WorkoutStatus)}>
-            <option value="planned">Запланирована</option>
-            <option value="done">Выполнена</option>
-          </select>
+          <div className="gender-choice">
+            <button
+              type="button"
+              className={status === 'planned' ? 'gender-option selected' : 'gender-option'}
+              onClick={() => setStatus('planned')}
+            >
+              Запланирована
+            </button>
+            <button
+              type="button"
+              className={status === 'done' ? 'gender-option selected' : 'gender-option'}
+              onClick={() => setStatus('done')}
+            >
+              Выполнена
+            </button>
+          </div>
         </label>
 
         <label>
           Заметки
-          <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)} />
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
         </label>
 
         <div className="workout-exercises">
@@ -282,9 +291,14 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
 
         {error && <p className="auth-error">{error}</p>}
 
-        <button type="submit" disabled={saving}>
-          {saving ? 'Сохранение…' : 'Сохранить'}
-        </button>
+        <div className="form-actions">
+          <button type="button" className="btn-secondary" onClick={onCancel}>
+            Отмена
+          </button>
+          <button type="submit" disabled={saving}>
+            {saving ? 'Сохранение…' : 'Сохранить'}
+          </button>
+        </div>
       </form>
     </div>
   )
