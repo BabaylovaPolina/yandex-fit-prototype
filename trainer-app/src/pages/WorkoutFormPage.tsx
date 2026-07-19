@@ -7,6 +7,8 @@ import {
   type SetInput,
 } from '../lib/workouts'
 import { logEvent } from '../lib/analytics'
+import { ExercisePickerSheet } from './ExercisePickerSheet'
+import type { Exercise } from '../lib/exercises'
 
 type SetDraft = SetInput & { key: string }
 type ExerciseDraft = {
@@ -31,8 +33,8 @@ function emptySet(): SetDraft {
   }
 }
 
-function emptyExercise(): ExerciseDraft {
-  return { key: nextKey(), exerciseName: '', sets: [emptySet()] }
+function emptyExercise(name: string): ExerciseDraft {
+  return { key: nextKey(), exerciseName: name, sets: [emptySet()] }
 }
 
 type Props = {
@@ -51,10 +53,11 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
   const [endTime, setEndTime] = useState('')
   const [status, setStatus] = useState<WorkoutStatus>('planned')
   const [notes, setNotes] = useState('')
-  const [exercises, setExercises] = useState<ExerciseDraft[]>([emptyExercise()])
+  const [exercises, setExercises] = useState<ExerciseDraft[]>([])
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(workoutId !== undefined)
+  const [pickerOpen, setPickerOpen] = useState(false)
 
   useEffect(() => {
     if (workoutId === undefined) return
@@ -66,31 +69,25 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
         setStatus(workout.status)
         setNotes(workout.notes ?? '')
         setExercises(
-          workout.exercises.length === 0
-            ? [emptyExercise()]
-            : workout.exercises.map((ex) => ({
-                key: nextKey(),
-                exerciseName: ex.exercise_name,
-                sets:
-                  ex.sets.length === 0
-                    ? [emptySet()]
-                    : ex.sets.map((s) => ({
-                        key: nextKey(),
-                        plan_weight_kg: s.plan_weight_kg,
-                        plan_reps: s.plan_reps,
-                        fact_weight_kg: s.fact_weight_kg,
-                        fact_reps: s.fact_reps,
-                      })),
-              })),
+          workout.exercises.map((ex) => ({
+            key: nextKey(),
+            exerciseName: ex.exercise_name,
+            sets:
+              ex.sets.length === 0
+                ? [emptySet()]
+                : ex.sets.map((s) => ({
+                    key: nextKey(),
+                    plan_weight_kg: s.plan_weight_kg,
+                    plan_reps: s.plan_reps,
+                    fact_weight_kg: s.fact_weight_kg,
+                    fact_reps: s.fact_reps,
+                  })),
+          })),
         )
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Не удалось загрузить тренировку'))
       .finally(() => setLoading(false))
   }, [workoutId])
-
-  function updateExercise(key: string, patch: Partial<ExerciseDraft>) {
-    setExercises((prev) => prev.map((ex) => (ex.key === key ? { ...ex, ...patch } : ex)))
-  }
 
   function updateSet(exerciseKey: string, setKey: string, patch: Partial<SetDraft>) {
     setExercises((prev) =>
@@ -102,8 +99,9 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
     )
   }
 
-  function addExercise() {
-    setExercises((prev) => [...prev, emptyExercise()])
+  function handlePickExercise(exercise: Exercise) {
+    setExercises((prev) => [...prev, emptyExercise(exercise.name)])
+    setPickerOpen(false)
   }
 
   function removeExercise(key: string) {
@@ -230,12 +228,7 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
           {exercises.map((exercise) => (
             <div key={exercise.key} className="workout-exercise-block">
               <div className="workout-exercise-header">
-                <input
-                  type="text"
-                  placeholder="Название упражнения"
-                  value={exercise.exerciseName}
-                  onChange={(e) => updateExercise(exercise.key, { exerciseName: e.target.value })}
-                />
+                <span className="workout-exercise-name">{exercise.exerciseName}</span>
                 <button type="button" onClick={() => removeExercise(exercise.key)}>
                   Удалить
                 </button>
@@ -304,7 +297,7 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
             </div>
           ))}
 
-          <button type="button" onClick={addExercise}>
+          <button type="button" onClick={() => setPickerOpen(true)}>
             + Упражнение
           </button>
         </div>
@@ -320,6 +313,10 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
           </button>
         </div>
       </form>
+
+      {pickerOpen && (
+        <ExercisePickerSheet onPick={handlePickExercise} onClose={() => setPickerOpen(false)} />
+      )}
     </div>
   )
 }
