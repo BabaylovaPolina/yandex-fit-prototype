@@ -38,12 +38,17 @@ function emptyExercise(): ExerciseDraft {
 type Props = {
   clientId: number
   workoutId?: number
+  initialDate?: string
   onSaved: () => void
   onCancel: () => void
 }
 
-export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Props) {
-  const [workoutDate, setWorkoutDate] = useState(() => new Date().toISOString().slice(0, 10))
+export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onCancel }: Props) {
+  const [workoutDate, setWorkoutDate] = useState(
+    () => initialDate ?? new Date().toISOString().slice(0, 10),
+  )
+  const [startTime, setStartTime] = useState('')
+  const [endTime, setEndTime] = useState('')
   const [status, setStatus] = useState<WorkoutStatus>('planned')
   const [notes, setNotes] = useState('')
   const [exercises, setExercises] = useState<ExerciseDraft[]>([emptyExercise()])
@@ -56,6 +61,8 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
     getWorkout(workoutId)
       .then((workout) => {
         setWorkoutDate(workout.workout_date)
+        setStartTime(workout.start_time?.slice(0, 5) ?? '')
+        setEndTime(workout.end_time?.slice(0, 5) ?? '')
         setStatus(workout.status)
         setNotes(workout.notes ?? '')
         setExercises(
@@ -131,6 +138,8 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
       const input = {
         client_id: clientId,
         workout_date: workoutDate,
+        start_time: startTime || null,
+        end_time: endTime || null,
         status,
         notes: notes.trim() || null,
         exercises: exercises
@@ -180,6 +189,17 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
             onChange={(e) => setWorkoutDate(e.target.value)}
           />
         </label>
+
+        <div className="form-row">
+          <label>
+            Начало
+            <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+          </label>
+          <label>
+            Конец
+            <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+          </label>
+        </div>
 
         <label>
           Статус

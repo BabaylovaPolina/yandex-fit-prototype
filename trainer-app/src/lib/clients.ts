@@ -62,3 +62,9 @@ export async function updateClientRecord(id: number, input: NewClient): Promise<
   if (error) throw error
   return data
 }
+
+export async function getClient(id: number): Promise<Client> {
+  const { data, error } = await supabase.from('clients').select('*').eq('id', id).single()
+  if (error) throw error
+  return data
+}
