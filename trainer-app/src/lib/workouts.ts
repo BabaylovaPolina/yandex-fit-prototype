@@ -24,6 +24,8 @@ export type Workout = {
   id: number
   client_id: number
   workout_date: string
+  start_time: string | null
+  end_time: string | null
   status: WorkoutStatus
   notes: string | null
   created_at: string
@@ -48,6 +50,8 @@ export type ExerciseInput = {
 export type WorkoutInput = {
   client_id: number
   workout_date: string
+  start_time: string | null
+  end_time: string | null
   status: WorkoutStatus
   notes: string | null
   exercises: ExerciseInput[]
@@ -62,6 +66,22 @@ export async function listWorkouts(clientId: number): Promise<Workout[]> {
 
   if (error) throw error
   return data
+}
+
+export type WorkoutWithClientName = Workout & { client_name: string }
+
+export async function listWorkoutsForDate(date: string): Promise<WorkoutWithClientName[]> {
+  const { data, error } = await supabase
+    .from('workouts')
+    .select('*, clients(full_name)')
+    .eq('workout_date', date)
+    .order('start_time', { ascending: true, nullsFirst: false })
+
+  if (error) throw error
+  return data.map((row) => {
+    const { clients, ...workout } = row as Workout & { clients: { full_name: string } | null }
+    return { ...workout, client_name: clients?.full_name ?? '—' }
+  })
 }
 
 export async function getWorkout(workoutId: number): Promise<WorkoutWithExercises> {
@@ -122,6 +142,8 @@ export async function createWorkout(input: WorkoutInput): Promise<number> {
       trainer_id: trainerId,
       client_id: input.client_id,
       workout_date: input.workout_date,
+      start_time: input.start_time,
+      end_time: input.end_time,
       status: input.status,
       notes: input.notes,
     })
@@ -139,6 +161,8 @@ export async function updateWorkout(workoutId: number, input: WorkoutInput): Pro
     .update({
       client_id: input.client_id,
       workout_date: input.workout_date,
+      start_time: input.start_time,
+      end_time: input.end_time,
       status: input.status,
       notes: input.notes,
     })
@@ -154,11 +178,18 @@ export async function updateWorkout(workoutId: number, input: WorkoutInput): Pro
   await writeExercises(workoutId, input.exercises)
 }
 
+export async function deleteWorkout(workoutId: number): Promise<void> {
+  const { error } = await supabase.from('workouts').delete().eq('id', workoutId)
+  if (error) throw error
+}
+
 export async function copyWorkout(sourceWorkoutId: number, workoutDate: string): Promise<number> {
   const source = await getWorkout(sourceWorkoutId)
   return createWorkout({
     client_id: source.client_id,
     workout_date: workoutDate,
+    start_time: source.start_time,
+    end_time: source.end_time,
     status: 'planned',
     notes: source.notes,
     exercises: source.exercises.map((exercise) => ({

@@ -2,12 +2,15 @@ import { useEffect, useState, type FormEvent } from 'react'
 import {
   createWorkout,
   updateWorkout,
+  deleteWorkout,
   getWorkout,
   deleteWorkout,
   type WorkoutStatus,
   type SetInput,
 } from '../lib/workouts'
 import { logEvent } from '../lib/analytics'
+import { ExercisePickerSheet } from './ExercisePickerSheet'
+import type { Exercise } from '../lib/exercises'
 
 type SetDraft = SetInput & { key: string }
 type ExerciseDraft = {
@@ -32,60 +35,63 @@ function emptySet(): SetDraft {
   }
 }
 
-function emptyExercise(): ExerciseDraft {
-  return { key: nextKey(), exerciseName: '', sets: [emptySet()] }
+function emptyExercise(name: string): ExerciseDraft {
+  return { key: nextKey(), exerciseName: name, sets: [emptySet()] }
 }
 
 type Props = {
   clientId: number
   workoutId?: number
+  initialDate?: string
   onSaved: () => void
   onCancel: () => void
 }
 
-export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Props) {
-  const [workoutDate, setWorkoutDate] = useState(() => new Date().toISOString().slice(0, 10))
+export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onCancel }: Props) {
+  const [workoutDate, setWorkoutDate] = useState(
+    () => initialDate ?? new Date().toISOString().slice(0, 10),
+  )
+  const [startTime, setStartTime] = useState('')
+  const [endTime, setEndTime] = useState('')
   const [status, setStatus] = useState<WorkoutStatus>('planned')
   const [notes, setNotes] = useState('')
-  const [exercises, setExercises] = useState<ExerciseDraft[]>([emptyExercise()])
+  const [exercises, setExercises] = useState<ExerciseDraft[]>([])
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [loading, setLoading] = useState(workoutId !== undefined)
   const [deleting, setDeleting] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
 
   useEffect(() => {
     if (workoutId === undefined) return
     getWorkout(workoutId)
       .then((workout) => {
         setWorkoutDate(workout.workout_date)
+        setStartTime(workout.start_time?.slice(0, 5) ?? '')
+        setEndTime(workout.end_time?.slice(0, 5) ?? '')
         setStatus(workout.status)
         setNotes(workout.notes ?? '')
         setExercises(
-          workout.exercises.length === 0
-            ? [emptyExercise()]
-            : workout.exercises.map((ex) => ({
-                key: nextKey(),
-                exerciseName: ex.exercise_name,
-                sets:
-                  ex.sets.length === 0
-                    ? [emptySet()]
-                    : ex.sets.map((s) => ({
-                        key: nextKey(),
-                        plan_weight_kg: s.plan_weight_kg,
-                        plan_reps: s.plan_reps,
-                        fact_weight_kg: s.fact_weight_kg,
-                        fact_reps: s.fact_reps,
-                      })),
-              })),
+          workout.exercises.map((ex) => ({
+            key: nextKey(),
+            exerciseName: ex.exercise_name,
+            sets:
+              ex.sets.length === 0
+                ? [emptySet()]
+                : ex.sets.map((s) => ({
+                    key: nextKey(),
+                    plan_weight_kg: s.plan_weight_kg,
+                    plan_reps: s.plan_reps,
+                    fact_weight_kg: s.fact_weight_kg,
+                    fact_reps: s.fact_reps,
+                  })),
+          })),
         )
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Не удалось загрузить тренировку'))
       .finally(() => setLoading(false))
   }, [workoutId])
-
-  function updateExercise(key: string, patch: Partial<ExerciseDraft>) {
-    setExercises((prev) => prev.map((ex) => (ex.key === key ? { ...ex, ...patch } : ex)))
-  }
 
   function updateSet(exerciseKey: string, setKey: string, patch: Partial<SetDraft>) {
     setExercises((prev) =>
@@ -97,8 +103,9 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
     )
   }
 
-  function addExercise() {
-    setExercises((prev) => [...prev, emptyExercise()])
+  function handlePickExercise(exercise: Exercise) {
+    setExercises((prev) => [...prev, emptyExercise(exercise.name)])
+    setPickerOpen(false)
   }
 
   function removeExercise(key: string) {
@@ -133,6 +140,8 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
       const input = {
         client_id: clientId,
         workout_date: workoutDate,
+        start_time: startTime || null,
+        end_time: endTime || null,
         status,
         notes: notes.trim() || null,
         exercises: exercises
@@ -170,6 +179,17 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
       onSaved()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось удалить тренировку')
+    if (workoutId === undefined) return
+    if (!window.confirm('Удалить тренировку?')) return
+    setDeleting(true)
+    setError(null)
+    try {
+      await deleteWorkout(workoutId)
+      logEvent('workout_deleted')
+      onSaved()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Не удалось удалить тренировку')
+    } finally {
       setDeleting(false)
     }
   }
@@ -186,6 +206,16 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
     <div className="form-screen">
       <header className="home-header">
         <span>{workoutId === undefined ? 'Новая тренировка' : 'Тренировка'}</span>
+        {workoutId !== undefined && (
+          <button
+            type="button"
+            className="workout-delete-button"
+            disabled={deleting}
+            onClick={handleDelete}
+          >
+            {deleting ? 'Удаление…' : 'Удалить'}
+          </button>
+        )}
       </header>
 
       <form className="auth-form" onSubmit={handleSubmit}>
@@ -198,6 +228,17 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
             onChange={(e) => setWorkoutDate(e.target.value)}
           />
         </label>
+
+        <div className="form-row">
+          <label>
+            Начало
+            <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+          </label>
+          <label>
+            Конец
+            <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+          </label>
+        </div>
 
         <label>
           Статус
@@ -228,12 +269,7 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
           {exercises.map((exercise) => (
             <div key={exercise.key} className="workout-exercise-block">
               <div className="workout-exercise-header">
-                <input
-                  type="text"
-                  placeholder="Название упражнения"
-                  value={exercise.exerciseName}
-                  onChange={(e) => updateExercise(exercise.key, { exerciseName: e.target.value })}
-                />
+                <span className="workout-exercise-name">{exercise.exerciseName}</span>
                 <button type="button" onClick={() => removeExercise(exercise.key)}>
                   Удалить
                 </button>
@@ -302,7 +338,7 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
             </div>
           ))}
 
-          <button type="button" onClick={addExercise}>
+          <button type="button" onClick={() => setPickerOpen(true)}>
             + Упражнение
           </button>
         </div>
@@ -329,6 +365,10 @@ export function WorkoutFormPage({ clientId, workoutId, onSaved, onCancel }: Prop
           </button>
         )}
       </form>
+
+      {pickerOpen && (
+        <ExercisePickerSheet onPick={handlePickExercise} onClose={() => setPickerOpen(false)} />
+      )}
     </div>
   )
 }
