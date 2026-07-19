@@ -4,8 +4,8 @@
   --bg: #fafafa;
   --surface: #fff;
   --border: #e5e4e7;
-  --accent: #aa3bff;
-  --accent-text: #fff;
+  --accent: #ffcc00;
+  --accent-text: #1c1b20;
   --error: #d92d20;
 
   font: 16px/1.45 system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -591,7 +591,7 @@ button:disabled {
   gap: 2px;
   padding: 6px 10px;
   border-radius: 8px;
-  background: rgba(170, 59, 255, 0.15);
+  background: rgba(255, 204, 0, 0.2);
   border: 1px solid var(--accent);
   color: var(--text);
   overflow: hidden;
