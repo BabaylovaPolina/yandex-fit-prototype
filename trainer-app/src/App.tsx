@@ -7,8 +7,9 @@ import { ClientDetailPage } from './pages/ClientDetailPage'
 import { WorkoutFormPage } from './pages/WorkoutFormPage'
 import { SchedulePage } from './pages/SchedulePage'
 import { PickClientPage } from './pages/PickClientPage'
-import { TabBar } from './components/TabBar'
+import { TabBar, type TabKey } from './components/TabBar'
 import { ClientCardPage } from './pages/ClientCardPage'
+import { ProfilePage } from './pages/ProfilePage'
 import { getClient, type Client } from './lib/clients'
 
 type View =
@@ -25,6 +26,13 @@ type View =
     }
   | { name: 'schedule' }
   | { name: 'pick-client'; workoutDate: string }
+  | { name: 'profile' }
+
+function tabViewFor(tab: TabKey): View {
+  if (tab === 'schedule') return { name: 'schedule' }
+  if (tab === 'profile') return { name: 'profile' }
+  return { name: 'list' }
+}
 
 function TrainerHome() {
   const [view, setView] = useState<View>({ name: 'list' })
@@ -120,10 +128,16 @@ function TrainerHome() {
           refreshKey={workoutsRefreshKey}
         />
         {clientLoadError && <p className="auth-error">{clientLoadError}</p>}
-        <TabBar
-          active="schedule"
-          onSelectTab={(tab) => setView(tab === 'clients' ? { name: 'list' } : { name: 'schedule' })}
-        />
+        <TabBar active="schedule" onSelectTab={(tab) => setView(tabViewFor(tab))} />
+      </>
+    )
+  }
+
+  if (view.name === 'profile') {
+    return (
+      <>
+        <ProfilePage />
+        <TabBar active="profile" onSelectTab={(tab) => setView(tabViewFor(tab))} />
       </>
     )
   }
@@ -136,7 +150,7 @@ function TrainerHome() {
         onEditClient={(client) => setView({ name: 'edit-client', client })}
         refreshKey={clientsRefreshKey}
       />
-      <TabBar active="clients" onSelectTab={(tab) => setView(tab === 'schedule' ? { name: 'schedule' } : { name: 'list' })} />
+      <TabBar active="clients" onSelectTab={(tab) => setView(tabViewFor(tab))} />
     </>
   )
 }

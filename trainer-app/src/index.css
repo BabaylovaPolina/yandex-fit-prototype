@@ -835,3 +835,52 @@ button:disabled {
   font-size: 14px;
   padding: 8px 12px;
 }
+
+.profile-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.profile-body label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.profile-body input {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  font: inherit;
+  color: var(--text);
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-field-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.profile-field-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.profile-signout {
+  margin: auto 24px 24px;
+  background: var(--surface);
+  color: var(--error);
+  border: 1px solid var(--border);
+}
