@@ -10,10 +10,11 @@ const genderLabel: Record<Client['gender'], string> = {
 
 type Props = {
   onAddClient: () => void
+  onOpenClient: (client: Client) => void
   refreshKey: number
 }
 
-export function ClientsListPage({ onAddClient, refreshKey }: Props) {
+export function ClientsListPage({ onAddClient, onOpenClient, refreshKey }: Props) {
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -52,11 +53,17 @@ export function ClientsListPage({ onAddClient, refreshKey }: Props) {
         <ul className="clients-list">
           {clients.map((client) => (
             <li key={client.id} className="clients-list-item">
-              <span className="clients-list-name">{client.full_name}</span>
-              <span className="clients-list-meta">
-                {genderLabel[client.gender]}, {client.age} лет · {client.height_cm} см ·{' '}
-                {client.weight_kg} кг
-              </span>
+              <button
+                type="button"
+                className="workout-card-open"
+                onClick={() => onOpenClient(client)}
+              >
+                <span className="clients-list-name">{client.full_name}</span>
+                <span className="clients-list-meta">
+                  {genderLabel[client.gender]}, {client.age} лет · {client.height_cm} см ·{' '}
+                  {client.weight_kg} кг
+                </span>
+              </button>
             </li>
           ))}
         </ul>
