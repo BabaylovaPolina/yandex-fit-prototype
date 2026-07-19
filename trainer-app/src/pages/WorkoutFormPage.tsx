@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import {
   createWorkout,
   updateWorkout,
+  deleteWorkout,
   getWorkout,
   type WorkoutStatus,
   type SetInput,
@@ -56,6 +57,7 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
   const [exercises, setExercises] = useState<ExerciseDraft[]>([])
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [loading, setLoading] = useState(workoutId !== undefined)
   const [pickerOpen, setPickerOpen] = useState(false)
 
@@ -163,6 +165,22 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
     }
   }
 
+  async function handleDelete() {
+    if (workoutId === undefined) return
+    if (!window.confirm('Удалить тренировку?')) return
+    setDeleting(true)
+    setError(null)
+    try {
+      await deleteWorkout(workoutId)
+      logEvent('workout_deleted')
+      onSaved()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Не удалось удалить тренировку')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="form-screen">
@@ -175,6 +193,16 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
     <div className="form-screen">
       <header className="home-header">
         <span>{workoutId === undefined ? 'Новая тренировка' : 'Тренировка'}</span>
+        {workoutId !== undefined && (
+          <button
+            type="button"
+            className="workout-delete-button"
+            disabled={deleting}
+            onClick={handleDelete}
+          >
+            {deleting ? 'Удаление…' : 'Удалить'}
+          </button>
+        )}
       </header>
 
       <form className="auth-form" onSubmit={handleSubmit}>
