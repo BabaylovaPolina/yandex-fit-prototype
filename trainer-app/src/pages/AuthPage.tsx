@@ -22,6 +22,15 @@ export function AuthPage() {
     if (error) setError(error.message)
   }
 
+  async function handleGoogleSignIn() {
+    setError(null)
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    })
+    if (error) setError(error.message)
+  }
+
   return (
     <div className="auth-screen">
       <h1>CoachSpace</h1>
@@ -66,6 +75,12 @@ export function AuthPage() {
         onClick={() => setMode(mode === 'sign-in' ? 'sign-up' : 'sign-in')}
       >
         {mode === 'sign-in' ? 'Нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти'}
+      </button>
+
+      <div className="auth-divider">или</div>
+
+      <button type="button" className="auth-google" onClick={handleGoogleSignIn}>
+        Войти через Google
       </button>
     </div>
   )
