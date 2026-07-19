@@ -270,7 +270,7 @@ button:disabled {
 .workout-copy-button {
   margin: 0 10px;
   background: var(--surface);
-  color: var(--accent);
+  color: var(--text);
   border: 1px solid var(--border);
   font-size: 13px;
   padding: 8px 12px;
@@ -683,7 +683,8 @@ button:disabled {
 }
 
 .exercise-picker-sheet {
-  max-height: 80vh;
+  max-height: 75%;
+  margin-top: auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -779,6 +780,8 @@ button:disabled {
   list-style: none;
   margin: 0;
   padding: 0;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -802,4 +805,11 @@ button:disabled {
   font-size: 12px;
   color: var(--text-muted);
   font-weight: 400;
+}
+
+.workout-delete-button {
+  background: none;
+  color: var(--error);
+  font-size: 14px;
+  padding: 8px 12px;
 }
