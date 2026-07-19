@@ -16,13 +16,6 @@ Supabase client.
 4. `npm install`
 5. `npm run dev`
 
-**Temporary fallback (no Doppler seat yet):** the anon key is safe to share —
-it's the same public key that ends up in the client bundle, not the secret
-service-role key. Copy `.env.example` to `.env.local`, fill in
-`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (ask the project owner for
-the values), and `npm run dev` will pick it up without Doppler.
-Switch to Doppler once everyone has a seat — `.env.local` is gitignored.
-
 ## Structure
 
 - `src/lib/supabase.ts` — Supabase client, reads config from env
