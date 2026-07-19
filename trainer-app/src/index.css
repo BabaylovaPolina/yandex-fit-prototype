@@ -691,6 +691,7 @@ button:disabled {
 }
 
 .exercise-picker-sheet .sheet-header {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -727,6 +728,7 @@ button:disabled {
 }
 
 .picker-search-input {
+  flex-shrink: 0;
   width: 100%;
   padding: 12px 14px;
   border: 1px solid var(--border);
@@ -738,10 +740,12 @@ button:disabled {
 }
 
 .picker-cats {
+  flex-shrink: 0;
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  padding-bottom: 12px;
+  overflow-y: visible;
+  padding: 2px 0 12px;
 }
 
 .picker-cat {
@@ -762,6 +766,7 @@ button:disabled {
 }
 
 .picker-create-btn {
+  flex-shrink: 0;
   width: 100%;
   padding: 10px;
   background: none;
