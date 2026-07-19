@@ -6,11 +6,13 @@ import { AddClientPage } from './pages/AddClientPage'
 import { ClientDetailPage } from './pages/ClientDetailPage'
 import { WorkoutFormPage } from './pages/WorkoutFormPage'
 import { TabBar } from './components/TabBar'
+import { ClientCardPage } from './pages/ClientCardPage'
 import type { Client } from './lib/clients'
 
 type View =
   | { name: 'list' }
   | { name: 'add-client' }
+  | { name: 'edit-client'; client: Client }
   | { name: 'client-detail'; client: Client }
   | { name: 'workout-form'; client: Client; workoutId?: number }
 
@@ -22,6 +24,19 @@ function TrainerHome() {
   if (view.name === 'add-client') {
     return (
       <AddClientPage
+        onSaved={() => {
+          setClientsRefreshKey((key) => key + 1)
+          setView({ name: 'list' })
+        }}
+        onCancel={() => setView({ name: 'list' })}
+      />
+    )
+  }
+
+  if (view.name === 'edit-client') {
+    return (
+      <ClientCardPage
+        client={view.client}
         onSaved={() => {
           setClientsRefreshKey((key) => key + 1)
           setView({ name: 'list' })
@@ -64,6 +79,7 @@ function TrainerHome() {
       <ClientsListPage
         onAddClient={() => setView({ name: 'add-client' })}
         onOpenClient={(client) => setView({ name: 'client-detail', client })}
+        onEditClient={(client) => setView({ name: 'edit-client', client })}
         refreshKey={clientsRefreshKey}
       />
       <TabBar active="clients" />
