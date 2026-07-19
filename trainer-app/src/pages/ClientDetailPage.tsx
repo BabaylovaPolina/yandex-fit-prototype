@@ -97,8 +97,9 @@ export function ClientDetailPage({ client, onBack, onAddWorkout, onOpenWorkout }
                 className="workout-copy-button"
                 disabled={copyingId === workout.id}
                 onClick={() => handleCopy(workout.id)}
+                title="Копировать тренировку"
               >
-                {copyingId === workout.id ? 'Копирование…' : 'Копировать'}
+                {copyingId === workout.id ? '⏳' : '📋'}
               </button>
             </li>
           ))}
