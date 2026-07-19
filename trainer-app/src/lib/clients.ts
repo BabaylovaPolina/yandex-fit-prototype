@@ -10,6 +10,8 @@ export type Client = {
   age: number
   height_cm: number
   weight_kg: number
+  goal: string | null
+  note: string | null
   created_at: string
 }
 
@@ -19,6 +21,8 @@ export type NewClient = {
   age: number
   height_cm: number
   weight_kg: number
+  goal: string | null
+  note: string | null
 }
 
 export async function listClients(): Promise<Client[]> {

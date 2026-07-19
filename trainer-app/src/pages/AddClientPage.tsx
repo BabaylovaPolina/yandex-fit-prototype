@@ -13,6 +13,8 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
   const [age, setAge] = useState('')
   const [heightCm, setHeightCm] = useState('')
   const [weightKg, setWeightKg] = useState('')
+  const [goal, setGoal] = useState('')
+  const [note, setNote] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
@@ -27,6 +29,8 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
         age: Number(age),
         height_cm: Number(heightCm),
         weight_kg: Number(weightKg),
+        goal: goal.trim() || null,
+        note: note.trim() || null,
       })
       logEvent('client_added')
       onSaved()
@@ -38,17 +42,14 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
   }
 
   return (
-    <div className="auth-screen">
+    <div className="form-screen">
       <header className="home-header">
         <span>Новый клиент</span>
-        <button type="button" onClick={onCancel}>
-          Отмена
-        </button>
       </header>
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <label>
-          ФИО
+          Имя
           <input
             type="text"
             required
@@ -59,10 +60,22 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
 
         <label>
           Пол
-          <select value={gender} onChange={(e) => setGender(e.target.value as Gender)}>
-            <option value="male">Мужской</option>
-            <option value="female">Женский</option>
-          </select>
+          <div className="gender-choice">
+            <button
+              type="button"
+              className={gender === 'male' ? 'gender-option selected' : 'gender-option'}
+              onClick={() => setGender('male')}
+            >
+              Мужской
+            </button>
+            <button
+              type="button"
+              className={gender === 'female' ? 'gender-option selected' : 'gender-option'}
+              onClick={() => setGender('female')}
+            >
+              Женский
+            </button>
+          </div>
         </label>
 
         <label>
@@ -102,11 +115,26 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
           />
         </label>
 
+        <label>
+          Цель
+          <textarea value={goal} onChange={(e) => setGoal(e.target.value)} />
+        </label>
+
+        <label>
+          Заметка
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} />
+        </label>
+
         {error && <p className="auth-error">{error}</p>}
 
-        <button type="submit" disabled={saving}>
-          {saving ? 'Сохранение…' : 'Сохранить'}
-        </button>
+        <div className="form-actions">
+          <button type="button" className="btn-secondary" onClick={onCancel}>
+            Отмена
+          </button>
+          <button type="submit" disabled={saving}>
+            {saving ? 'Сохранение…' : 'Сохранить'}
+          </button>
+        </div>
       </form>
     </div>
   )
