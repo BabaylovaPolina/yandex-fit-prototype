@@ -84,19 +84,17 @@ export function WorkoutViewPage({ workoutId, onEdit, onDeleted, onBack }: Props)
         <button type="button" onClick={onBack}>
           Назад
         </button>
-        <div className="workout-view-header-actions">
-          <button type="button" onClick={onEdit}>
-            Редактировать
-          </button>
-          <button
-            type="button"
-            className="workout-delete-button"
-            disabled={deleting}
-            onClick={handleDelete}
-          >
-            {deleting ? 'Удаление…' : 'Удалить'}
-          </button>
-        </div>
+        <button type="button" className="icon-button" aria-label="Редактировать тренировку" onClick={onEdit}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 20h4l10.5-10.5a2.121 2.121 0 0 0-3-3L5 17v3Z"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
       </header>
 
       <div className="workout-view-summary">
@@ -124,42 +122,63 @@ export function WorkoutViewPage({ workoutId, onEdit, onDeleted, onBack }: Props)
             <span className="workout-exercise-name">{exercise.exercise_name}</span>
 
             {exercise.sets.length > 0 && (
-              <>
-                <div className="workout-set-row workout-set-row-labels workout-view-set-row">
-                  <span />
-                  <span className="workout-set-group-label">План</span>
-                  <span className="workout-set-group-label">Факт</span>
-                </div>
-                <div className="workout-set-row workout-set-row-sublabels workout-view-set-row">
-                  <span />
-                  <div className="workout-set-pair">
-                    <span className="workout-set-unit-label">кг</span>
-                    <span className="workout-set-unit-label">повт.</span>
+              <div className="workout-view-sets-grid">
+                <div className="workout-view-sets-index-col">
+                  <div className="workout-view-sets-capsule-header">
+                    <span className="workout-set-group-label">Подход</span>
                   </div>
-                  <div className="workout-set-pair">
-                    <span className="workout-set-unit-label">кг</span>
-                    <span className="workout-set-unit-label">повт.</span>
-                  </div>
+                  {exercise.sets.map((set) => (
+                    <span key={set.id} className="workout-set-index">
+                      {set.position + 1}
+                    </span>
+                  ))}
                 </div>
-              </>
-            )}
 
-            {exercise.sets.map((set, index) => (
-              <div key={set.id} className="workout-set-row workout-view-set-row">
-                <span className="workout-set-index">#{index + 1}</span>
-                <div className="workout-set-pair workout-set-pair-plan">
-                  <span>{set.plan_weight_kg ?? '—'}</span>
-                  <span>{set.plan_reps ?? '—'}</span>
+                <div className="workout-view-sets-capsule plan">
+                  <div className="workout-view-sets-capsule-header">
+                    <span className="workout-set-group-label">План</span>
+                    <div className="workout-set-pair">
+                      <span className="workout-set-unit-label">кг</span>
+                      <span className="workout-set-unit-label">повт.</span>
+                    </div>
+                  </div>
+                  {exercise.sets.map((set) => (
+                    <div key={set.id} className="workout-set-pair">
+                      <span>{set.plan_weight_kg ?? '—'}</span>
+                      <span>{set.plan_reps ?? '—'}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="workout-set-pair workout-set-pair-fact">
-                  <span>{set.fact_weight_kg ?? '—'}</span>
-                  <span>{set.fact_reps ?? '—'}</span>
+
+                <div className="workout-view-sets-capsule fact">
+                  <div className="workout-view-sets-capsule-header">
+                    <span className="workout-set-group-label">Факт</span>
+                    <div className="workout-set-pair">
+                      <span className="workout-set-unit-label">кг</span>
+                      <span className="workout-set-unit-label">повт.</span>
+                    </div>
+                  </div>
+                  {exercise.sets.map((set) => (
+                    <div key={set.id} className="workout-set-pair">
+                      <span>{set.fact_weight_kg ?? '—'}</span>
+                      <span>{set.fact_reps ?? '—'}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
+            )}
           </div>
         ))}
       </div>
+
+      <button
+        type="button"
+        className="workout-delete-button"
+        disabled={deleting}
+        onClick={handleDelete}
+      >
+        {deleting ? 'Удаление…' : 'Удалить тренировку'}
+      </button>
     </div>
   )
 }
