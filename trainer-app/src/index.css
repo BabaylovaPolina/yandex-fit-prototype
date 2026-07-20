@@ -954,7 +954,7 @@ button:disabled {
 
 .workout-view-sets-grid {
   display: grid;
-  grid-template-columns: 44px 1fr 1fr;
+  grid-template-columns: 56px 1fr 1fr;
   gap: 8px;
   margin-top: 8px;
 }
