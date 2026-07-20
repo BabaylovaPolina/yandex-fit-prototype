@@ -69,11 +69,11 @@ export function ClientDetailPage({ client, onBack, onAddWorkout, onOpenWorkout }
     [workouts],
   )
   const upcoming = useMemo(
-    () => workouts.filter((w) => w.workout_date >= todayKey()).reverse(),
+    () => workouts.filter((w) => w.workout_date >= todayKey() && w.status === 'planned').reverse(),
     [workouts],
   )
   const history = useMemo(
-    () => workouts.filter((w) => w.workout_date < todayKey()),
+    () => workouts.filter((w) => w.workout_date < todayKey() || w.status === 'done'),
     [workouts],
   )
 
