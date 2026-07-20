@@ -29,7 +29,6 @@ export const MUSCLE_GROUPS: MuscleGroup[] = [
   'arms',
   'core',
   'cardio',
-  'other',
 ]
 
 export type InputKind = 'distance' | 'reps' | null

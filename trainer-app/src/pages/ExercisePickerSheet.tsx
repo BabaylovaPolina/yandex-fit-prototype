@@ -25,7 +25,7 @@ export function ExercisePickerSheet({ onPick, onClose }: Props) {
   const [search, setSearch] = useState('')
   const [creating, setCreating] = useState(false)
   const [newName, setNewName] = useState('')
-  const [newGroup, setNewGroup] = useState<MuscleGroup>('other')
+  const [newGroup, setNewGroup] = useState<MuscleGroup | null>(null)
   const [newInputKind, setNewInputKind] = useState<InputKind>('distance')
   const [saving, setSaving] = useState(false)
 
@@ -46,7 +46,7 @@ export function ExercisePickerSheet({ onPick, onClose }: Props) {
   }, [exercises, category, search])
 
   async function handleCreate() {
-    if (newName.trim() === '') return
+    if (newName.trim() === '' || newGroup === null) return
     setSaving(true)
     setError(null)
     try {
@@ -114,7 +114,7 @@ export function ExercisePickerSheet({ onPick, onClose }: Props) {
             <button
               type="button"
               className="picker-create-save"
-              disabled={saving || newName.trim() === ''}
+              disabled={saving || newName.trim() === '' || newGroup === null}
               onClick={handleCreate}
             >
               {saving ? 'Сохранение…' : 'Сохранить упражнение'}
