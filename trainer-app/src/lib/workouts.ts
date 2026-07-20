@@ -214,6 +214,70 @@ export async function deleteWorkout(workoutId: number): Promise<void> {
   if (error) throw error
 }
 
+export async function updateSetFact(
+  setId: number,
+  fact: { fact_weight_kg: number | null; fact_reps: number | null },
+): Promise<void> {
+  const { error } = await supabase.from('workout_sets').update(fact).eq('id', setId)
+  if (error) throw error
+}
+
+export async function updateWorkoutStatus(workoutId: number, status: WorkoutStatus): Promise<void> {
+  const { error } = await supabase.from('workouts').update({ status }).eq('id', workoutId)
+  if (error) throw error
+}
+
+export async function addExerciseToWorkout(
+  workoutId: number,
+  exerciseName: string,
+): Promise<WorkoutExercise> {
+  const exercise = await findOrCreateExercise(exerciseName)
+
+  const { count } = await supabase
+    .from('workout_exercises')
+    .select('id', { count: 'exact', head: true })
+    .eq('workout_id', workoutId)
+
+  const { data: workoutExercise, error } = await supabase
+    .from('workout_exercises')
+    .insert({ workout_id: workoutId, exercise_id: exercise.id, position: count ?? 0 })
+    .select()
+    .single()
+  if (error) throw error
+
+  return { id: workoutExercise.id, position: workoutExercise.position, exercise_id: exercise.id, exercise_name: exercise.name, sets: [] }
+}
+
+export async function addSetToExercise(workoutExerciseId: number): Promise<WorkoutSet> {
+  const { count } = await supabase
+    .from('workout_sets')
+    .select('id', { count: 'exact', head: true })
+    .eq('workout_exercise_id', workoutExerciseId)
+
+  const { data, error } = await supabase
+    .from('workout_sets')
+    .insert({
+      workout_exercise_id: workoutExerciseId,
+      position: count ?? 0,
+      plan_weight_kg: null,
+      plan_reps: null,
+      fact_weight_kg: null,
+      fact_reps: null,
+    })
+    .select()
+    .single()
+  if (error) throw error
+
+  return {
+    id: data.id,
+    position: data.position,
+    plan_weight_kg: data.plan_weight_kg,
+    plan_reps: data.plan_reps,
+    fact_weight_kg: data.fact_weight_kg,
+    fact_reps: data.fact_reps,
+  }
+}
+
 export async function copyWorkout(sourceWorkoutId: number, workoutDate: string): Promise<number> {
   const source = await getWorkout(sourceWorkoutId)
   return createWorkout({

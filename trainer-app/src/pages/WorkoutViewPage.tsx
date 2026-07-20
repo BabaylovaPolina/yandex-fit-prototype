@@ -22,11 +22,12 @@ function formatTimeRange(workout: WorkoutWithExercises): string | null {
 type Props = {
   workoutId: number
   onEdit: () => void
+  onStart: () => void
   onDeleted: () => void
   onBack: () => void
 }
 
-export function WorkoutViewPage({ workoutId, onEdit, onDeleted, onBack }: Props) {
+export function WorkoutViewPage({ workoutId, onEdit, onStart, onDeleted, onBack }: Props) {
   const [workout, setWorkout] = useState<WorkoutWithExercises | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -111,6 +112,12 @@ export function WorkoutViewPage({ workoutId, onEdit, onDeleted, onBack }: Props)
       </div>
 
       {workout.notes && <div className="workout-view-notes">{workout.notes}</div>}
+
+      {workout.status === 'planned' && (
+        <button type="button" className="live-workout-start-button" onClick={onStart}>
+          ▶ Начать тренировку
+        </button>
+      )}
 
       <div className="workout-view-exercises">
         {workout.exercises.length === 0 && (
