@@ -81,12 +81,32 @@ export function ClientDetailPage({ client, onBack, onAddWorkout, onOpenWorkout }
     return (
       <button
         type="button"
-        className="workout-copy-button"
+        className="icon-button workout-copy-button"
         disabled={copyingId === workout.id}
         onClick={() => handleCopy(workout.id)}
         title="Копировать тренировку"
       >
-        {copyingId === workout.id ? '⏳' : '📋'}
+        {copyingId === workout.id ? (
+          '⏳'
+        ) : (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <rect
+              x="3"
+              y="3"
+              width="13"
+              height="13"
+              rx="3"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            />
+            <path
+              d="M8 21h10a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+        )}
       </button>
     )
   }
