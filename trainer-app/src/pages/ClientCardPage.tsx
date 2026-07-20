@@ -1,20 +1,21 @@
 import { useState, type FormEvent } from 'react'
-import { createClientRecord, type Gender } from '../lib/clients'
+import { updateClientRecord, type Client, type Gender } from '../lib/clients'
 import { logEvent } from '../lib/analytics'
 
 type Props = {
+  client: Client
   onSaved: () => void
   onCancel: () => void
 }
 
-export function AddClientPage({ onSaved, onCancel }: Props) {
-  const [fullName, setFullName] = useState('')
-  const [gender, setGender] = useState<Gender>('male')
-  const [age, setAge] = useState('')
-  const [heightCm, setHeightCm] = useState('')
-  const [weightKg, setWeightKg] = useState('')
-  const [goal, setGoal] = useState('')
-  const [note, setNote] = useState('')
+export function ClientCardPage({ client, onSaved, onCancel }: Props) {
+  const [fullName, setFullName] = useState(client.full_name)
+  const [gender, setGender] = useState<Gender>(client.gender)
+  const [age, setAge] = useState(String(client.age))
+  const [heightCm, setHeightCm] = useState(String(client.height_cm))
+  const [weightKg, setWeightKg] = useState(String(client.weight_kg))
+  const [goal, setGoal] = useState(client.goal ?? '')
+  const [note, setNote] = useState(client.note ?? '')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
@@ -23,7 +24,7 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
     setError(null)
     setSaving(true)
     try {
-      await createClientRecord({
+      await updateClientRecord(client.id, {
         full_name: fullName.trim(),
         gender,
         age: Number(age),
@@ -32,7 +33,7 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
         goal: goal.trim() || null,
         note: note.trim() || null,
       })
-      logEvent('client_added')
+      logEvent('client_updated')
       onSaved()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось сохранить клиента')
@@ -44,7 +45,7 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
   return (
     <div className="form-screen">
       <header className="home-header">
-        <span>Новый клиент</span>
+        <span>Карточка клиента</span>
       </header>
 
       <form className="auth-form" onSubmit={handleSubmit}>
@@ -90,36 +91,34 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
           />
         </label>
 
-        <div className="form-row">
-          <label>
-            Рост, см
-            <input
-              type="number"
-              required
-              min={1}
-              max={259}
-              value={heightCm}
-              onChange={(e) => setHeightCm(e.target.value)}
-            />
-          </label>
+        <label>
+          Рост, см
+          <input
+            type="number"
+            required
+            min={1}
+            max={259}
+            value={heightCm}
+            onChange={(e) => setHeightCm(e.target.value)}
+          />
+        </label>
 
-          <label>
-            Вес, кг
-            <input
-              type="number"
-              required
-              min={1}
-              max={399}
-              step="0.1"
-              value={weightKg}
-              onChange={(e) => setWeightKg(e.target.value)}
-            />
-          </label>
-        </div>
+        <label>
+          Вес, кг
+          <input
+            type="number"
+            required
+            min={1}
+            max={399}
+            step="0.1"
+            value={weightKg}
+            onChange={(e) => setWeightKg(e.target.value)}
+          />
+        </label>
 
         <label>
           Цель
-          <input type="text" value={goal} onChange={(e) => setGoal(e.target.value)} />
+          <textarea value={goal} onChange={(e) => setGoal(e.target.value)} />
         </label>
 
         <label>

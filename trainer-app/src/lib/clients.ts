@@ -50,3 +50,21 @@ export async function createClientRecord(input: NewClient): Promise<Client> {
   if (error) throw error
   return data
 }
+
+export async function updateClientRecord(id: number, input: NewClient): Promise<Client> {
+  const { data, error } = await supabase
+    .from('clients')
+    .update(input)
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+export async function getClient(id: number): Promise<Client> {
+  const { data, error } = await supabase.from('clients').select('*').eq('id', id).single()
+  if (error) throw error
+  return data
+}
