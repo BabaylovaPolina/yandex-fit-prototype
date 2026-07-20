@@ -130,42 +130,44 @@ export function ClientDetailPage({
         <span>{client.full_name}</span>
       </header>
 
-      <div className="client-detail-meta">
-        {genderLabel[client.gender]}, {client.age} лет · {client.height_cm} см · {client.weight_kg} кг
-      </div>
+      <div className="client-detail-scroll">
+        <div className="client-detail-meta">
+          {genderLabel[client.gender]}, {client.age} лет · {client.height_cm} см · {client.weight_kg} кг
+        </div>
 
-      <div className="client-detail-actions">
-        {todaysWorkout ? (
-          <button type="button" onClick={() => onOpenWorkout(todaysWorkout.id)}>
-            Тренировка на сегодня
-          </button>
-        ) : (
-          <button type="button" onClick={onAddWorkout}>
-            + Тренировка
-          </button>
+        <div className="client-detail-actions">
+          {todaysWorkout ? (
+            <button type="button" onClick={() => onOpenWorkout(todaysWorkout.id)}>
+              Тренировка на сегодня
+            </button>
+          ) : (
+            <button type="button" onClick={onAddWorkout}>
+              + Тренировка
+            </button>
+          )}
+        </div>
+
+        {loading && <div className="clients-placeholder">Загрузка…</div>}
+        {error && <p className="auth-error">{error}</p>}
+
+        {!loading && !error && workouts.length === 0 && (
+          <div className="clients-placeholder">Пока нет ни одной тренировки.</div>
+        )}
+
+        {!loading && !error && upcoming.length > 0 && (
+          <>
+            <div className="client-detail-section-title">Предстоит</div>
+            <ul className="clients-list">{upcoming.map(renderUpcomingItem)}</ul>
+          </>
+        )}
+
+        {!loading && !error && history.length > 0 && (
+          <>
+            <div className="client-detail-section-title">История</div>
+            <ul className="clients-list">{history.map(renderHistoryItem)}</ul>
+          </>
         )}
       </div>
-
-      {loading && <div className="clients-placeholder">Загрузка…</div>}
-      {error && <p className="auth-error">{error}</p>}
-
-      {!loading && !error && workouts.length === 0 && (
-        <div className="clients-placeholder">Пока нет ни одной тренировки.</div>
-      )}
-
-      {!loading && !error && upcoming.length > 0 && (
-        <>
-          <div className="client-detail-section-title">Предстоит</div>
-          <ul className="clients-list">{upcoming.map(renderUpcomingItem)}</ul>
-        </>
-      )}
-
-      {!loading && !error && history.length > 0 && (
-        <>
-          <div className="client-detail-section-title">История</div>
-          <ul className="clients-list">{history.map(renderHistoryItem)}</ul>
-        </>
-      )}
     </div>
   )
 }

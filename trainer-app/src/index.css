@@ -24,7 +24,8 @@ body {
 }
 
 #root {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
 }
@@ -32,9 +33,11 @@ body {
 .phone-frame {
   position: relative;
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--surface);
+  overflow: hidden;
 }
 
 @media (min-width: 481px) {
@@ -44,7 +47,7 @@ body {
   }
 
   #root {
-    min-height: 100vh;
+    height: 100vh;
     background: #ddd9e0;
     display: flex;
     align-items: center;
@@ -57,7 +60,6 @@ body {
     margin: 32px 0;
     border-radius: 32px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
   }
 }
 
@@ -211,6 +213,18 @@ button:disabled {
   flex-direction: column;
   gap: 8px;
   overflow-y: auto;
+}
+
+.client-detail-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.client-detail-scroll .clients-list {
+  overflow-y: visible;
 }
 
 .clients-list-item {
