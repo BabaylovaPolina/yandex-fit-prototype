@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - 'trainer-app/supabase/migrations/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'trainer-app/supabase/migrations/**'
 
 jobs:
   migrate:
@@ -26,7 +31,16 @@ jobs:
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Run database migrations
+      - name: Run database migrations (dry-run on PR)
+        if: github.event_name == 'pull_request'
+        run: supabase db push --dry-run
+        working-directory: trainer-app
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+      - name: Run database migrations (apply on push to main)
+        if: github.event_name == 'push'
         run: supabase db push
         working-directory: trainer-app
         env:
