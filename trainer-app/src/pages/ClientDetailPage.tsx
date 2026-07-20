@@ -9,11 +9,6 @@ const genderLabel: Record<Client['gender'], string> = {
   female: 'Ж',
 }
 
-const statusLabel: Record<WorkoutWithSummary['status'], string> = {
-  planned: 'Запланирована',
-  done: 'Выполнена',
-}
-
 function formatSummary(workout: WorkoutWithSummary): string {
   if (workout.muscleGroups.length === 0) return 'Без упражнений'
   return workout.muscleGroups.map((group) => MUSCLE_GROUP_LABELS[group]).join(' · ')
@@ -21,6 +16,11 @@ function formatSummary(workout: WorkoutWithSummary): string {
 
 function todayKey(): string {
   return new Date().toISOString().slice(0, 10)
+}
+
+function formatDateRu(dateKey: string): string {
+  const [year, month, day] = dateKey.split('-')
+  return `${day}.${month}.${year.slice(2)}`
 }
 
 type Props = {
@@ -77,24 +77,47 @@ export function ClientDetailPage({ client, onBack, onAddWorkout, onOpenWorkout }
     [workouts],
   )
 
-  function renderWorkoutItem(workout: WorkoutWithSummary) {
+  function renderCopyButton(workout: WorkoutWithSummary) {
+    return (
+      <button
+        type="button"
+        className="workout-copy-button"
+        disabled={copyingId === workout.id}
+        onClick={() => handleCopy(workout.id)}
+        title="Копировать тренировку"
+      >
+        {copyingId === workout.id ? '⏳' : '📋'}
+      </button>
+    )
+  }
+
+  function renderUpcomingItem(workout: WorkoutWithSummary) {
+    return (
+      <li key={workout.id} className="clients-list-item">
+        <button type="button" className="workout-card-open" onClick={() => onOpenWorkout(workout.id)}>
+          <span className="clients-list-name">{formatDateRu(workout.workout_date)}</span>
+          <span className="clients-list-meta">{formatSummary(workout)}</span>
+        </button>
+        {renderCopyButton(workout)}
+      </li>
+    )
+  }
+
+  function renderHistoryItem(workout: WorkoutWithSummary) {
+    const done = workout.status === 'done'
     return (
       <li key={workout.id} className="clients-list-item">
         <button type="button" className="workout-card-open" onClick={() => onOpenWorkout(workout.id)}>
           <span className="clients-list-name">
-            {workout.workout_date} · {statusLabel[workout.status]}
+            <span
+              className={done ? 'workout-status-dot done' : 'workout-status-dot missed'}
+              title={done ? 'Выполнена' : 'Не выполнена'}
+            />
+            {formatDateRu(workout.workout_date)}
           </span>
           <span className="clients-list-meta">{formatSummary(workout)}</span>
         </button>
-        <button
-          type="button"
-          className="workout-copy-button"
-          disabled={copyingId === workout.id}
-          onClick={() => handleCopy(workout.id)}
-          title="Копировать тренировку"
-        >
-          {copyingId === workout.id ? '⏳' : '📋'}
-        </button>
+        {renderCopyButton(workout)}
       </li>
     )
   }
@@ -134,14 +157,14 @@ export function ClientDetailPage({ client, onBack, onAddWorkout, onOpenWorkout }
       {!loading && !error && upcoming.length > 0 && (
         <>
           <div className="client-detail-section-title">Предстоит</div>
-          <ul className="clients-list">{upcoming.map(renderWorkoutItem)}</ul>
+          <ul className="clients-list">{upcoming.map(renderUpcomingItem)}</ul>
         </>
       )}
 
       {!loading && !error && history.length > 0 && (
         <>
           <div className="client-detail-section-title">История</div>
-          <ul className="clients-list">{history.map(renderWorkoutItem)}</ul>
+          <ul className="clients-list">{history.map(renderHistoryItem)}</ul>
         </>
       )}
     </div>
