@@ -5,6 +5,7 @@ import { ClientsListPage } from './pages/ClientsListPage'
 import { AddClientPage } from './pages/AddClientPage'
 import { ClientDetailPage } from './pages/ClientDetailPage'
 import { WorkoutFormPage } from './pages/WorkoutFormPage'
+import { WorkoutViewPage } from './pages/WorkoutViewPage'
 import { SchedulePage } from './pages/SchedulePage'
 import { PickClientPage } from './pages/PickClientPage'
 import { TabBar, type TabKey } from './components/TabBar'
@@ -18,11 +19,17 @@ type View =
   | { name: 'edit-client'; client: Client }
   | { name: 'client-detail'; client: Client }
   | {
+      name: 'workout-view'
+      client: Client
+      workoutId: number
+      returnTo: 'client-detail' | 'schedule'
+    }
+  | {
       name: 'workout-form'
       client: Client
       workoutId?: number
       workoutDate?: string
-      returnTo: 'client-detail' | 'schedule'
+      returnTo: 'client-detail' | 'schedule' | 'workout-view'
     }
   | { name: 'schedule' }
   | { name: 'pick-client'; workoutDate: string }
@@ -75,14 +82,38 @@ function TrainerHome() {
           setView({ name: 'workout-form', client: view.client, returnTo: 'client-detail' })
         }
         onOpenWorkout={(workoutId) =>
-          setView({ name: 'workout-form', client: view.client, workoutId, returnTo: 'client-detail' })
+          setView({ name: 'workout-view', client: view.client, workoutId, returnTo: 'client-detail' })
         }
+      />
+    )
+  }
+
+  if (view.name === 'workout-view') {
+    const { client, workoutId, returnTo } = view
+    return (
+      <WorkoutViewPage
+        key={workoutId}
+        workoutId={workoutId}
+        onBack={() => setView(returnTo === 'schedule' ? { name: 'schedule' } : { name: 'client-detail', client })}
+        onEdit={() =>
+          setView({ name: 'workout-form', client, workoutId, returnTo: 'workout-view' })
+        }
+        onDeleted={() => {
+          setWorkoutsRefreshKey((key) => key + 1)
+          setView(returnTo === 'schedule' ? { name: 'schedule' } : { name: 'client-detail', client })
+        }}
       />
     )
   }
 
   if (view.name === 'workout-form') {
     const { client, workoutId, workoutDate, returnTo } = view
+    const backView: View =
+      returnTo === 'workout-view' && workoutId !== undefined
+        ? { name: 'workout-view', client, workoutId, returnTo: 'client-detail' }
+        : returnTo === 'schedule'
+          ? { name: 'schedule' }
+          : { name: 'client-detail', client }
     return (
       <WorkoutFormPage
         clientId={client.id}
@@ -90,11 +121,9 @@ function TrainerHome() {
         initialDate={workoutDate}
         onSaved={() => {
           setWorkoutsRefreshKey((key) => key + 1)
-          setView(returnTo === 'schedule' ? { name: 'schedule' } : { name: 'client-detail', client })
+          setView(backView)
         }}
-        onCancel={() =>
-          setView(returnTo === 'schedule' ? { name: 'schedule' } : { name: 'client-detail', client })
-        }
+        onCancel={() => setView(backView)}
       />
     )
   }

@@ -264,20 +264,33 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
               </div>
 
               {exercise.sets.length > 0 && (
-                <div className="workout-set-row workout-set-row-labels">
-                  <span />
-                  <span className="workout-set-group-label">План</span>
-                  <span className="workout-set-group-label">Факт</span>
-                  <span />
-                </div>
+                <>
+                  <div className="workout-set-row workout-set-row-labels">
+                    <span />
+                    <span className="workout-set-group-label">План</span>
+                    <span className="workout-set-group-label">Факт</span>
+                    <span />
+                  </div>
+                  <div className="workout-set-row workout-set-row-sublabels">
+                    <span />
+                    <div className="workout-set-pair">
+                      <span className="workout-set-unit-label">кг</span>
+                      <span className="workout-set-unit-label">повт.</span>
+                    </div>
+                    <div className="workout-set-pair">
+                      <span className="workout-set-unit-label">кг</span>
+                      <span className="workout-set-unit-label">повт.</span>
+                    </div>
+                    <span />
+                  </div>
+                </>
               )}
               {exercise.sets.map((set, index) => (
                 <div key={set.key} className="workout-set-row">
                   <span className="workout-set-index">#{index + 1}</span>
-                  <div className="workout-set-pair">
+                  <div className="workout-set-pair workout-set-pair-plan">
                     <input
                       type="number"
-                      placeholder="кг"
                       value={set.plan_weight_kg ?? ''}
                       onChange={(e) =>
                         updateSet(exercise.key, set.key, {
@@ -287,17 +300,15 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
                     />
                     <input
                       type="number"
-                      placeholder="повт."
                       value={set.plan_reps ?? ''}
                       onChange={(e) =>
                         updateSet(exercise.key, set.key, { plan_reps: numberOrNull(e.target.value) })
                       }
                     />
                   </div>
-                  <div className="workout-set-pair">
+                  <div className="workout-set-pair workout-set-pair-fact">
                     <input
                       type="number"
-                      placeholder="кг"
                       value={set.fact_weight_kg ?? ''}
                       onChange={(e) =>
                         updateSet(exercise.key, set.key, {
@@ -307,7 +318,6 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
                     />
                     <input
                       type="number"
-                      placeholder="повт."
                       value={set.fact_reps ?? ''}
                       onChange={(e) =>
                         updateSet(exercise.key, set.key, { fact_reps: numberOrNull(e.target.value) })
