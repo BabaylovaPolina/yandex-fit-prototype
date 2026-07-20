@@ -293,6 +293,15 @@ button:disabled {
   padding: 12px 20px;
 }
 
+.client-detail-section-title {
+  padding: 12px 20px 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
 .workout-exercises {
   display: flex;
   flex-direction: column;

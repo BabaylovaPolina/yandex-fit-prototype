@@ -68,6 +68,57 @@ export async function listWorkouts(clientId: number): Promise<Workout[]> {
   return data
 }
 
+export type ExerciseSummary = {
+  exercise_name: string
+  set_count: number
+}
+
+export type WorkoutWithSummary = Workout & { exerciseSummary: ExerciseSummary[] }
+
+export async function listWorkoutsWithSummary(clientId: number): Promise<WorkoutWithSummary[]> {
+  const { data: workoutRows, error: workoutsError } = await supabase
+    .from('workouts')
+    .select('*')
+    .eq('client_id', clientId)
+    .order('workout_date', { ascending: false })
+  if (workoutsError) throw workoutsError
+
+  const workoutIds = workoutRows.map((w) => w.id)
+  if (workoutIds.length === 0) return []
+
+  const { data: exerciseRows, error: exercisesError } = await supabase
+    .from('workout_exercises')
+    .select('id, workout_id, position, exercises(name)')
+    .in('workout_id', workoutIds)
+    .order('position')
+  if (exercisesError) throw exercisesError
+
+  const exerciseIds = exerciseRows.map((row) => row.id)
+  const { data: setCountRows, error: setsError } =
+    exerciseIds.length === 0
+      ? { data: [] as { workout_exercise_id: number }[], error: null }
+      : await supabase
+          .from('workout_sets')
+          .select('workout_exercise_id')
+          .in('workout_exercise_id', exerciseIds)
+  if (setsError) throw setsError
+
+  const setCountByExerciseId = new Map<number, number>()
+  for (const row of setCountRows) {
+    setCountByExerciseId.set(row.workout_exercise_id, (setCountByExerciseId.get(row.workout_exercise_id) ?? 0) + 1)
+  }
+
+  return workoutRows.map((workout) => ({
+    ...workout,
+    exerciseSummary: exerciseRows
+      .filter((row) => row.workout_id === workout.id)
+      .map((row) => ({
+        exercise_name: (row.exercises as unknown as { name: string }).name,
+        set_count: setCountByExerciseId.get(row.id) ?? 0,
+      })),
+  }))
+}
+
 export type WorkoutWithClientName = Workout & { client_name: string }
 
 export async function listWorkoutsForDate(date: string): Promise<WorkoutWithClientName[]> {
