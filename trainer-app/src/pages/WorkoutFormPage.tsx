@@ -10,12 +10,13 @@ import {
 } from '../lib/workouts'
 import { logEvent } from '../lib/analytics'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
-import type { Exercise } from '../lib/exercises'
+import type { Exercise, InputKind } from '../lib/exercises'
 
 type SetDraft = SetInput & { key: string }
 type ExerciseDraft = {
   key: string
   exerciseName: string
+  inputKind: InputKind
   sets: SetDraft[]
 }
 
@@ -32,11 +33,15 @@ function emptySet(): SetDraft {
     plan_reps: null,
     fact_weight_kg: null,
     fact_reps: null,
+    plan_duration_min: null,
+    plan_distance_km: null,
+    fact_duration_min: null,
+    fact_distance_km: null,
   }
 }
 
-function emptyExercise(name: string): ExerciseDraft {
-  return { key: nextKey(), exerciseName: name, sets: [emptySet()] }
+function emptyExercise(name: string, inputKind: InputKind): ExerciseDraft {
+  return { key: nextKey(), exerciseName: name, inputKind, sets: [emptySet()] }
 }
 
 function roundToStep(value: number, step: number): number {
@@ -87,6 +92,7 @@ export function WorkoutFormPage({
           workout.exercises.map((ex) => ({
             key: nextKey(),
             exerciseName: ex.exercise_name,
+            inputKind: ex.input_kind,
             sets:
               ex.sets.length === 0
                 ? [emptySet()]
@@ -96,6 +102,10 @@ export function WorkoutFormPage({
                     plan_reps: s.plan_reps,
                     fact_weight_kg: s.fact_weight_kg,
                     fact_reps: s.fact_reps,
+                    plan_duration_min: s.plan_duration_min,
+                    plan_distance_km: s.plan_distance_km,
+                    fact_duration_min: s.fact_duration_min,
+                    fact_distance_km: s.fact_distance_km,
                   })),
           })),
         )
@@ -114,6 +124,7 @@ export function WorkoutFormPage({
           draft.map((ex) => ({
             key: nextKey(),
             exerciseName: ex.exercise_name,
+            inputKind: ex.input_kind,
             sets:
               ex.sets.length === 0
                 ? [emptySet()]
@@ -135,6 +146,10 @@ export function WorkoutFormPage({
           plan_reps: null,
           fact_weight_kg: null,
           fact_reps: null,
+          plan_duration_min: null,
+          plan_distance_km: null,
+          fact_duration_min: null,
+          fact_distance_km: null,
         })),
       })),
     )
@@ -164,7 +179,7 @@ export function WorkoutFormPage({
   }
 
   function handlePickExercise(exercise: Exercise) {
-    setExercises((prev) => [...prev, emptyExercise(exercise.name)])
+    setExercises((prev) => [...prev, emptyExercise(exercise.name, exercise.input_kind)])
     setPickerOpen(false)
   }
 
@@ -336,87 +351,108 @@ export function WorkoutFormPage({
         )}
 
         <div className="workout-exercises">
-          {exercises.map((exercise) => (
-            <div key={exercise.key} className="workout-exercise-block">
-              <div className="workout-exercise-header">
-                <span className="workout-exercise-name">{exercise.exerciseName}</span>
-                <button type="button" onClick={() => removeExercise(exercise.key)}>
-                  Удалить
-                </button>
-              </div>
+          {exercises.map((exercise) => {
+            const units =
+              exercise.inputKind === 'distance'
+                ? { first: 'мин', second: 'км' }
+                : exercise.inputKind === 'reps'
+                  ? { first: 'мин', second: 'прыжков' }
+                  : { first: 'кг', second: 'повт.' }
+            const planFirstKey =
+              exercise.inputKind === null ? 'plan_weight_kg' : 'plan_duration_min'
+            const planSecondKey =
+              exercise.inputKind === 'distance' ? 'plan_distance_km' : 'plan_reps'
+            const factFirstKey =
+              exercise.inputKind === null ? 'fact_weight_kg' : 'fact_duration_min'
+            const factSecondKey =
+              exercise.inputKind === 'distance' ? 'fact_distance_km' : 'fact_reps'
 
-              {exercise.sets.length > 0 && (
-                <>
-                  <div className="workout-set-row workout-set-row-labels">
-                    <span />
-                    <span className="workout-set-group-label">План</span>
-                    <span className="workout-set-group-label">Факт</span>
-                    <span />
-                  </div>
-                  <div className="workout-set-row workout-set-row-sublabels">
-                    <span />
-                    <div className="workout-set-pair">
-                      <span className="workout-set-unit-label">кг</span>
-                      <span className="workout-set-unit-label">повт.</span>
-                    </div>
-                    <div className="workout-set-pair">
-                      <span className="workout-set-unit-label">кг</span>
-                      <span className="workout-set-unit-label">повт.</span>
-                    </div>
-                    <span />
-                  </div>
-                </>
-              )}
-              {exercise.sets.map((set, index) => (
-                <div key={set.key} className="workout-set-row">
-                  <span className="workout-set-index">#{index + 1}</span>
-                  <div className="workout-set-pair workout-set-pair-plan">
-                    <input
-                      type="number"
-                      value={set.plan_weight_kg ?? ''}
-                      onChange={(e) =>
-                        updateSet(exercise.key, set.key, {
-                          plan_weight_kg: numberOrNull(e.target.value),
-                        })
-                      }
-                    />
-                    <input
-                      type="number"
-                      value={set.plan_reps ?? ''}
-                      onChange={(e) =>
-                        updateSet(exercise.key, set.key, { plan_reps: numberOrNull(e.target.value) })
-                      }
-                    />
-                  </div>
-                  <div className="workout-set-pair workout-set-pair-fact">
-                    <input
-                      type="number"
-                      value={set.fact_weight_kg ?? ''}
-                      onChange={(e) =>
-                        updateSet(exercise.key, set.key, {
-                          fact_weight_kg: numberOrNull(e.target.value),
-                        })
-                      }
-                    />
-                    <input
-                      type="number"
-                      value={set.fact_reps ?? ''}
-                      onChange={(e) =>
-                        updateSet(exercise.key, set.key, { fact_reps: numberOrNull(e.target.value) })
-                      }
-                    />
-                  </div>
-                  <button type="button" onClick={() => removeSet(exercise.key, set.key)}>
-                    ×
+            return (
+              <div key={exercise.key} className="workout-exercise-block">
+                <div className="workout-exercise-header">
+                  <span className="workout-exercise-name">{exercise.exerciseName}</span>
+                  <button type="button" onClick={() => removeExercise(exercise.key)}>
+                    Удалить
                   </button>
                 </div>
-              ))}
 
-              <button type="button" onClick={() => addSet(exercise.key)}>
-                + Подход
-              </button>
-            </div>
-          ))}
+                {exercise.sets.length > 0 && (
+                  <>
+                    <div className="workout-set-row workout-set-row-labels">
+                      <span />
+                      <span className="workout-set-group-label">План</span>
+                      <span className="workout-set-group-label">Факт</span>
+                      <span />
+                    </div>
+                    <div className="workout-set-row workout-set-row-sublabels">
+                      <span />
+                      <div className="workout-set-pair">
+                        <span className="workout-set-unit-label">{units.first}</span>
+                        <span className="workout-set-unit-label">{units.second}</span>
+                      </div>
+                      <div className="workout-set-pair">
+                        <span className="workout-set-unit-label">{units.first}</span>
+                        <span className="workout-set-unit-label">{units.second}</span>
+                      </div>
+                      <span />
+                    </div>
+                  </>
+                )}
+                {exercise.sets.map((set, index) => (
+                  <div key={set.key} className="workout-set-row">
+                    <span className="workout-set-index">#{index + 1}</span>
+                    <div className="workout-set-pair workout-set-pair-plan">
+                      <input
+                        type="number"
+                        value={set[planFirstKey] ?? ''}
+                        onChange={(e) =>
+                          updateSet(exercise.key, set.key, {
+                            [planFirstKey]: numberOrNull(e.target.value),
+                          })
+                        }
+                      />
+                      <input
+                        type="number"
+                        value={set[planSecondKey] ?? ''}
+                        onChange={(e) =>
+                          updateSet(exercise.key, set.key, {
+                            [planSecondKey]: numberOrNull(e.target.value),
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="workout-set-pair workout-set-pair-fact">
+                      <input
+                        type="number"
+                        value={set[factFirstKey] ?? ''}
+                        onChange={(e) =>
+                          updateSet(exercise.key, set.key, {
+                            [factFirstKey]: numberOrNull(e.target.value),
+                          })
+                        }
+                      />
+                      <input
+                        type="number"
+                        value={set[factSecondKey] ?? ''}
+                        onChange={(e) =>
+                          updateSet(exercise.key, set.key, {
+                            [factSecondKey]: numberOrNull(e.target.value),
+                          })
+                        }
+                      />
+                    </div>
+                    <button type="button" onClick={() => removeSet(exercise.key, set.key)}>
+                      ×
+                    </button>
+                  </div>
+                ))}
+
+                <button type="button" onClick={() => addSet(exercise.key)}>
+                  + Подход
+                </button>
+              </div>
+            )
+          })}
 
           <button type="button" onClick={() => setPickerOpen(true)}>
             + Упражнение

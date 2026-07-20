@@ -32,11 +32,19 @@ export const MUSCLE_GROUPS: MuscleGroup[] = [
   'other',
 ]
 
+export type InputKind = 'distance' | 'reps' | null
+
+export const INPUT_KIND_LABELS: Record<NonNullable<InputKind>, string> = {
+  distance: 'Время + дистанция',
+  reps: 'Время + прыжки',
+}
+
 export type Exercise = {
   id: number
   trainer_id: string
   name: string
   muscle_group: MuscleGroup
+  input_kind: InputKind
   created_at: string
 }
 
@@ -46,7 +54,11 @@ export async function listExercises(): Promise<Exercise[]> {
   return data
 }
 
-export async function createExercise(name: string, muscleGroup: MuscleGroup): Promise<Exercise> {
+export async function createExercise(
+  name: string,
+  muscleGroup: MuscleGroup,
+  inputKind: InputKind = null,
+): Promise<Exercise> {
   const { data: userData, error: userError } = await supabase.auth.getUser()
   if (userError) throw userError
   const trainerId = userData.user?.id
@@ -54,7 +66,12 @@ export async function createExercise(name: string, muscleGroup: MuscleGroup): Pr
 
   const { data, error } = await supabase
     .from('exercises')
-    .insert({ name: name.trim(), muscle_group: muscleGroup, trainer_id: trainerId })
+    .insert({
+      name: name.trim(),
+      muscle_group: muscleGroup,
+      input_kind: inputKind,
+      trainer_id: trainerId,
+    })
     .select()
     .single()
 

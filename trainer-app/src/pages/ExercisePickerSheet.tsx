@@ -4,8 +4,10 @@ import {
   listExercises,
   MUSCLE_GROUP_LABELS,
   MUSCLE_GROUPS,
+  INPUT_KIND_LABELS,
   type Exercise,
   type MuscleGroup,
+  type InputKind,
 } from '../lib/exercises'
 
 type Category = 'all' | MuscleGroup
@@ -24,6 +26,7 @@ export function ExercisePickerSheet({ onPick, onClose }: Props) {
   const [creating, setCreating] = useState(false)
   const [newName, setNewName] = useState('')
   const [newGroup, setNewGroup] = useState<MuscleGroup>('other')
+  const [newInputKind, setNewInputKind] = useState<InputKind>('distance')
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -47,7 +50,7 @@ export function ExercisePickerSheet({ onPick, onClose }: Props) {
     setSaving(true)
     setError(null)
     try {
-      const exercise = await createExercise(newName, newGroup)
+      const exercise = await createExercise(newName, newGroup, newGroup === 'cardio' ? newInputKind : null)
       onPick(exercise)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось создать упражнение')
@@ -90,6 +93,21 @@ export function ExercisePickerSheet({ onPick, onClose }: Props) {
                 </button>
               ))}
             </div>
+
+            {newGroup === 'cardio' && (
+              <div className="picker-cats">
+                {(Object.keys(INPUT_KIND_LABELS) as (keyof typeof INPUT_KIND_LABELS)[]).map((kind) => (
+                  <button
+                    key={kind}
+                    type="button"
+                    className={kind === newInputKind ? 'picker-cat active' : 'picker-cat'}
+                    onClick={() => setNewInputKind(kind)}
+                  >
+                    {INPUT_KIND_LABELS[kind]}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {error && <p className="auth-error">{error}</p>}
 

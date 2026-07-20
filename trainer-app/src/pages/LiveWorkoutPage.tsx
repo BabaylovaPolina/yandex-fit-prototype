@@ -11,9 +11,34 @@ import {
 import { logEvent } from '../lib/analytics'
 import { playGong } from '../lib/gong'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
-import type { Exercise } from '../lib/exercises'
+import type { Exercise, InputKind } from '../lib/exercises'
 
 const REST_SECONDS = 90
+
+type FactField = 'fact_weight_kg' | 'fact_reps' | 'fact_duration_min' | 'fact_distance_km'
+type PlanField = 'plan_weight_kg' | 'plan_reps' | 'plan_duration_min' | 'plan_distance_km'
+
+function stepperFields(inputKind: InputKind): {
+  first: { label: string; plan: PlanField; fact: FactField; step: number }
+  second: { label: string; plan: PlanField; fact: FactField; step: number }
+} {
+  if (inputKind === 'distance') {
+    return {
+      first: { label: 'мин', plan: 'plan_duration_min', fact: 'fact_duration_min', step: 1 },
+      second: { label: 'км', plan: 'plan_distance_km', fact: 'fact_distance_km', step: 0.5 },
+    }
+  }
+  if (inputKind === 'reps') {
+    return {
+      first: { label: 'мин', plan: 'plan_duration_min', fact: 'fact_duration_min', step: 1 },
+      second: { label: 'прыжков', plan: 'plan_reps', fact: 'fact_reps', step: 10 },
+    }
+  }
+  return {
+    first: { label: 'кг', plan: 'plan_weight_kg', fact: 'fact_weight_kg', step: 2.5 },
+    second: { label: 'повт.', plan: 'plan_reps', fact: 'fact_reps', step: 1 },
+  }
+}
 
 function formatDuration(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60)
@@ -76,15 +101,12 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
     )
   }
 
-  async function handleFactChange(setId: number, patch: { fact_weight_kg?: number | null; fact_reps?: number | null }) {
+  async function handleFactChange(setId: number, patch: Partial<Record<FactField, number | null>>) {
     if (!exercise) return
     const set = exercise.sets.find((s) => s.id === setId)
     if (!set) return
 
-    const nextFact = {
-      fact_weight_kg: patch.fact_weight_kg ?? set.fact_weight_kg,
-      fact_reps: patch.fact_reps ?? set.fact_reps,
-    }
+    const nextFact = { ...patch }
 
     updateExerciseInState({
       ...exercise,
@@ -99,13 +121,18 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
   }
 
   function handleSetAsPlan(setId: number) {
-    const set = exercise?.sets.find((s) => s.id === setId)
+    if (!exercise) return
+    const set = exercise.sets.find((s) => s.id === setId)
     if (!set) return
-    handleFactChange(setId, { fact_weight_kg: set.plan_weight_kg, fact_reps: set.plan_reps })
+    const { first, second } = stepperFields(exercise.input_kind)
+    handleFactChange(setId, {
+      [first.fact]: set[first.plan],
+      [second.fact]: set[second.plan],
+    })
     setRestRemaining(REST_SECONDS)
   }
 
-  function handleStep(setId: number, field: 'fact_weight_kg' | 'fact_reps', delta: number) {
+  function handleStep(setId: number, field: FactField, delta: number) {
     const set = exercise?.sets.find((s) => s.id === setId)
     if (!set) return
     const current = set[field] ?? 0
@@ -222,53 +249,57 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
           )}
 
           <div className="live-workout-sets">
-            {exercise.sets.map((set, index) => (
-              <div key={set.id} className="live-workout-set-card">
-                <div className="live-workout-set-header">
-                  <span>Подход {index + 1}</span>
-                  <span className="live-workout-set-plan">
-                    План: {set.plan_weight_kg ?? '—'} кг × {set.plan_reps ?? '—'}
-                  </span>
-                </div>
+            {exercise.sets.map((set, index) => {
+              const { first, second } = stepperFields(exercise.input_kind)
+              return (
+                <div key={set.id} className="live-workout-set-card">
+                  <div className="live-workout-set-header">
+                    <span>Подход {index + 1}</span>
+                    <span className="live-workout-set-plan">
+                      План: {set[first.plan] ?? '—'} {first.label} × {set[second.plan] ?? '—'}{' '}
+                      {second.label}
+                    </span>
+                  </div>
 
-                <div className="live-workout-steppers">
-                  <div className="live-workout-stepper">
-                    <span className="live-workout-stepper-label">кг</span>
-                    <div className="live-workout-stepper-controls">
-                      <button type="button" onClick={() => handleStep(set.id, 'fact_weight_kg', -2.5)}>
-                        −
-                      </button>
-                      <span className="live-workout-stepper-value">{set.fact_weight_kg ?? '—'}</span>
-                      <button type="button" onClick={() => handleStep(set.id, 'fact_weight_kg', 2.5)}>
-                        +
-                      </button>
+                  <div className="live-workout-steppers">
+                    <div className="live-workout-stepper">
+                      <span className="live-workout-stepper-label">{first.label}</span>
+                      <div className="live-workout-stepper-controls">
+                        <button type="button" onClick={() => handleStep(set.id, first.fact, -first.step)}>
+                          −
+                        </button>
+                        <span className="live-workout-stepper-value">{set[first.fact] ?? '—'}</span>
+                        <button type="button" onClick={() => handleStep(set.id, first.fact, first.step)}>
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="live-workout-stepper">
+                      <span className="live-workout-stepper-label">{second.label}</span>
+                      <div className="live-workout-stepper-controls">
+                        <button type="button" onClick={() => handleStep(set.id, second.fact, -second.step)}>
+                          −
+                        </button>
+                        <span className="live-workout-stepper-value">{set[second.fact] ?? '—'}</span>
+                        <button type="button" onClick={() => handleStep(set.id, second.fact, second.step)}>
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="live-workout-stepper">
-                    <span className="live-workout-stepper-label">повт.</span>
-                    <div className="live-workout-stepper-controls">
-                      <button type="button" onClick={() => handleStep(set.id, 'fact_reps', -1)}>
-                        −
-                      </button>
-                      <span className="live-workout-stepper-value">{set.fact_reps ?? '—'}</span>
-                      <button type="button" onClick={() => handleStep(set.id, 'fact_reps', 1)}>
-                        +
-                      </button>
-                    </div>
+                  <div className="live-workout-set-actions">
+                    <button type="button" className="live-workout-as-plan" onClick={() => handleSetAsPlan(set.id)}>
+                      ✓ Как план
+                    </button>
+                    <button type="button" className="live-workout-set-done" onClick={handleSetDone}>
+                      Готово, отдых
+                    </button>
                   </div>
                 </div>
-
-                <div className="live-workout-set-actions">
-                  <button type="button" className="live-workout-as-plan" onClick={() => handleSetAsPlan(set.id)}>
-                    ✓ Как план
-                  </button>
-                  <button type="button" className="live-workout-set-done" onClick={handleSetDone}>
-                    Готово, отдых
-                  </button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           <button type="button" className="live-workout-add-set" onClick={handleAddSet}>
