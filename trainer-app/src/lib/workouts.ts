@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import { findOrCreateExercise } from './exercises'
+import { findOrCreateExercise, type MuscleGroup } from './exercises'
 
 export type WorkoutStatus = 'planned' | 'done'
 
@@ -66,6 +66,37 @@ export async function listWorkouts(clientId: number): Promise<Workout[]> {
 
   if (error) throw error
   return data
+}
+
+export type WorkoutWithSummary = Workout & { muscleGroups: MuscleGroup[] }
+
+export async function listWorkoutsWithSummary(clientId: number): Promise<WorkoutWithSummary[]> {
+  const { data: workoutRows, error: workoutsError } = await supabase
+    .from('workouts')
+    .select('*')
+    .eq('client_id', clientId)
+    .order('workout_date', { ascending: false })
+  if (workoutsError) throw workoutsError
+
+  const workoutIds = workoutRows.map((w) => w.id)
+  if (workoutIds.length === 0) return []
+
+  const { data: exerciseRows, error: exercisesError } = await supabase
+    .from('workout_exercises')
+    .select('workout_id, position, exercises(muscle_group)')
+    .in('workout_id', workoutIds)
+    .order('position')
+  if (exercisesError) throw exercisesError
+
+  return workoutRows.map((workout) => {
+    const groups: MuscleGroup[] = []
+    for (const row of exerciseRows) {
+      if (row.workout_id !== workout.id) continue
+      const group = (row.exercises as unknown as { muscle_group: MuscleGroup }).muscle_group
+      if (!groups.includes(group)) groups.push(group)
+    }
+    return { ...workout, muscleGroups: groups }
+  })
 }
 
 export type WorkoutWithClientName = Workout & { client_name: string }
