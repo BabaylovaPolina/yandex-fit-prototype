@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase } from '../lib/supabase'
 import { findOrCreateExercise, type MuscleGroup, type InputKind } from './exercises'
 
 export type WorkoutStatus = 'planned' | 'done'

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
-import { createProfile } from '../lib/profile'
-import { seedDefaultExercises } from '../lib/exercises'
+import { createProfile } from '../api/profile'
+import { seedDefaultExercises } from '../api/exercises'
 
 export function AuthPage() {
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in')

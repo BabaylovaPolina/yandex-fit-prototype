@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { listClients, type Client } from '../lib/clients'
+import { listClients, type Client } from '../api/clients'
 
 type Props = {
   onPick: (client: Client) => void

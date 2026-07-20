@@ -21,11 +21,11 @@ vi.mock('../lib/supabase', () => ({
 const mockCreateProfile = vi.fn()
 const mockSeedDefaultExercises = vi.fn()
 
-vi.mock('../lib/profile', () => ({
+vi.mock('../api/profile', () => ({
   createProfile: (...args: unknown[]) => mockCreateProfile(...args),
 }))
 
-vi.mock('../lib/exercises', () => ({
+vi.mock('../api/exercises', () => ({
   seedDefaultExercises: (...args: unknown[]) => mockSeedDefaultExercises(...args),
 }))
 
