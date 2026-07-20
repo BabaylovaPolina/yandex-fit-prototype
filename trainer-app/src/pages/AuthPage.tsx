@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
+import { createProfile } from '../lib/profile'
+import { seedDefaultExercises } from '../lib/exercises'
 
 export function AuthPage() {
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in')
@@ -13,13 +15,26 @@ export function AuthPage() {
     setError(null)
     setSubmitting(true)
 
-    const { error } =
-      mode === 'sign-in'
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password })
-
-    setSubmitting(false)
-    if (error) setError(error.message)
+    if (mode === 'sign-in') {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      setSubmitting(false)
+      if (error) setError(error.message)
+    } else {
+      const { data, error } = await supabase.auth.signUp({ email, password })
+      setSubmitting(false)
+      if (error) {
+        setError(error.message)
+      } else if (data.user) {
+        // Profile and exercise library are created here, not in a DB trigger,
+        // so a failure never blocks registration.
+        try {
+          await createProfile(data.user.id, null)
+          await seedDefaultExercises(data.user.id)
+        } catch (err) {
+          console.error('Post-signup setup failed', err)
+        }
+      }
+    }
   }
 
   async function handleGoogleSignIn() {
