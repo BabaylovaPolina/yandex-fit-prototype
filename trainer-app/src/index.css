@@ -959,32 +959,6 @@ button:disabled {
   margin-top: 8px;
 }
 
-.workout-view-sets-index-col {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding-top: 8px;
-}
-
-.workout-view-sets-index-col .workout-view-sets-capsule-header {
-  justify-content: flex-start;
-  margin-bottom: 2px;
-}
-
-.workout-view-sets-index-col .workout-set-group-label {
-  white-space: nowrap;
-}
-
-.workout-view-sets-index-col .workout-set-index {
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
 .workout-view-sets-capsule {
   display: flex;
   flex-direction: column;
@@ -999,6 +973,24 @@ button:disabled {
 
 .workout-view-sets-capsule.fact {
   background: rgba(255, 204, 0, 0.16);
+}
+
+.workout-view-sets-capsule.index .workout-set-group-label {
+  white-space: nowrap;
+}
+
+.workout-view-sets-capsule.index .workout-set-unit-label {
+  visibility: hidden;
+}
+
+.workout-view-sets-capsule.index .workout-set-index {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .workout-view-sets-capsule-header {
