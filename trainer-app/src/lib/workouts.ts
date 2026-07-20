@@ -278,25 +278,16 @@ export async function addSetToExercise(workoutExerciseId: number): Promise<Worko
   }
 }
 
-export async function copyWorkout(sourceWorkoutId: number, workoutDate: string): Promise<number> {
-  const source = await getWorkout(sourceWorkoutId)
-  return createWorkout({
-    client_id: source.client_id,
-    workout_date: workoutDate,
-    start_time: source.start_time,
-    end_time: source.end_time,
-    status: 'planned',
-    notes: source.notes,
-    exercises: source.exercises.map((exercise) => ({
-      exercise_name: exercise.exercise_name,
-      sets: exercise.sets.map((set) => ({
-        plan_weight_kg: set.plan_weight_kg,
-        plan_reps: set.plan_reps,
-        fact_weight_kg: set.fact_weight_kg,
-        fact_reps: set.fact_reps,
-      })),
+export function buildCopyDraft(source: WorkoutWithExercises): ExerciseInput[] {
+  return source.exercises.map((exercise) => ({
+    exercise_name: exercise.exercise_name,
+    sets: exercise.sets.map((set) => ({
+      plan_weight_kg: set.fact_weight_kg ?? set.plan_weight_kg,
+      plan_reps: set.fact_reps ?? set.plan_reps,
+      fact_weight_kg: null,
+      fact_reps: null,
     })),
-  })
+  }))
 }
 
 async function writeExercises(workoutId: number, exercises: ExerciseInput[]) {

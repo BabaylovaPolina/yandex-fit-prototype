@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { listWorkoutsWithSummary, copyWorkout, type WorkoutWithSummary } from '../lib/workouts'
+import { listWorkoutsWithSummary, type WorkoutWithSummary } from '../lib/workouts'
 import { type Client } from '../lib/clients'
 import { MUSCLE_GROUP_LABELS } from '../lib/exercises'
 import { logEvent } from '../lib/analytics'
@@ -28,13 +28,19 @@ type Props = {
   onBack: () => void
   onAddWorkout: () => void
   onOpenWorkout: (workoutId: number) => void
+  onCopyWorkout: (workoutId: number) => void
 }
 
-export function ClientDetailPage({ client, onBack, onAddWorkout, onOpenWorkout }: Props) {
+export function ClientDetailPage({
+  client,
+  onBack,
+  onAddWorkout,
+  onOpenWorkout,
+  onCopyWorkout,
+}: Props) {
   const [workouts, setWorkouts] = useState<WorkoutWithSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [copyingId, setCopyingId] = useState<number | null>(null)
 
   function reload() {
     setLoading(true)
@@ -49,20 +55,6 @@ export function ClientDetailPage({ client, onBack, onAddWorkout, onOpenWorkout }
     reload()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client.id])
-
-  async function handleCopy(workoutId: number) {
-    setCopyingId(workoutId)
-    try {
-      const today = todayKey()
-      await copyWorkout(workoutId, today)
-      logEvent('workout_copied', { workout_id: workoutId })
-      reload()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Не удалось скопировать тренировку')
-    } finally {
-      setCopyingId(null)
-    }
-  }
 
   const todaysWorkout = useMemo(
     () => workouts.find((w) => w.workout_date === todayKey() && w.status === 'planned'),
@@ -82,31 +74,18 @@ export function ClientDetailPage({ client, onBack, onAddWorkout, onOpenWorkout }
       <button
         type="button"
         className="icon-button workout-copy-button"
-        disabled={copyingId === workout.id}
-        onClick={() => handleCopy(workout.id)}
+        onClick={() => onCopyWorkout(workout.id)}
         title="Копировать тренировку"
       >
-        {copyingId === workout.id ? (
-          '⏳'
-        ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <rect
-              x="3"
-              y="3"
-              width="13"
-              height="13"
-              rx="3"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            />
-            <path
-              d="M8 21h10a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            />
-          </svg>
-        )}
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="13" height="13" rx="3" stroke="currentColor" strokeWidth="1.8" />
+          <path
+            d="M8 21h10a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+        </svg>
       </button>
     )
   }

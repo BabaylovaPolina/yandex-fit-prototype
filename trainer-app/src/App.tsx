@@ -35,6 +35,7 @@ type View =
       name: 'workout-form'
       client: Client
       workoutId?: number
+      copyFromWorkoutId?: number
       workoutDate?: string
       returnTo: 'client-detail' | 'schedule' | 'workout-view'
     }
@@ -91,6 +92,14 @@ function TrainerHome() {
         onOpenWorkout={(workoutId) =>
           setView({ name: 'workout-view', client: view.client, workoutId, returnTo: 'client-detail' })
         }
+        onCopyWorkout={(workoutId) =>
+          setView({
+            name: 'workout-form',
+            client: view.client,
+            copyFromWorkoutId: workoutId,
+            returnTo: 'client-detail',
+          })
+        }
       />
     )
   }
@@ -130,7 +139,7 @@ function TrainerHome() {
   }
 
   if (view.name === 'workout-form') {
-    const { client, workoutId, workoutDate, returnTo } = view
+    const { client, workoutId, copyFromWorkoutId, workoutDate, returnTo } = view
     const backView: View =
       returnTo === 'workout-view' && workoutId !== undefined
         ? { name: 'workout-view', client, workoutId, returnTo: 'client-detail' }
@@ -141,6 +150,7 @@ function TrainerHome() {
       <WorkoutFormPage
         clientId={client.id}
         workoutId={workoutId}
+        copyFromWorkoutId={copyFromWorkoutId}
         initialDate={workoutDate}
         onSaved={() => {
           setWorkoutsRefreshKey((key) => key + 1)
