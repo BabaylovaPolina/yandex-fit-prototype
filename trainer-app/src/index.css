@@ -246,12 +246,30 @@ button:disabled {
 }
 
 .clients-list-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 600;
 }
 
 .clients-list-meta {
   font-size: 14px;
   color: var(--text-muted);
+}
+
+.workout-status-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.workout-status-dot.done {
+  background: #2ea043;
+}
+
+.workout-status-dot.missed {
+  background: #ffcc00;
 }
 
 .workout-card-open {
