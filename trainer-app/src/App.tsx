@@ -7,6 +7,7 @@ import { ClientDetailPage } from './pages/ClientDetailPage'
 import { WorkoutFormPage } from './pages/WorkoutFormPage'
 import { WorkoutViewPage } from './pages/WorkoutViewPage'
 import { LiveWorkoutPage } from './pages/LiveWorkoutPage'
+import { ExerciseHistoryPage } from './pages/ExerciseHistoryPage'
 import { SchedulePage } from './pages/SchedulePage'
 import { PickClientPage } from './pages/PickClientPage'
 import { TabBar, type TabKey } from './components/TabBar'
@@ -29,6 +30,14 @@ type View =
       name: 'live-workout'
       client: Client
       workoutId: number
+      returnTo: 'client-detail' | 'schedule'
+    }
+  | {
+      name: 'exercise-history'
+      client: Client
+      workoutId: number
+      exerciseId: number
+      exerciseName: string
       returnTo: 'client-detail' | 'schedule'
     }
   | {
@@ -119,6 +128,21 @@ function TrainerHome() {
           setWorkoutsRefreshKey((key) => key + 1)
           setView(returnTo === 'schedule' ? { name: 'schedule' } : { name: 'client-detail', client })
         }}
+        onOpenExerciseHistory={(exerciseId, exerciseName) =>
+          setView({ name: 'exercise-history', client, workoutId, exerciseId, exerciseName, returnTo })
+        }
+      />
+    )
+  }
+
+  if (view.name === 'exercise-history') {
+    const { client, workoutId, exerciseId, exerciseName, returnTo } = view
+    return (
+      <ExerciseHistoryPage
+        clientId={client.id}
+        exerciseId={exerciseId}
+        exerciseName={exerciseName}
+        onBack={() => setView({ name: 'workout-view', client, workoutId, returnTo })}
       />
     )
   }

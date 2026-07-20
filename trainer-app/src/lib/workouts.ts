@@ -290,6 +290,55 @@ export function buildCopyDraft(source: WorkoutWithExercises): ExerciseInput[] {
   }))
 }
 
+export type ExerciseHistoryEntry = {
+  workout_id: number
+  workout_date: string
+  sets: WorkoutSet[]
+}
+
+export async function getExerciseHistory(
+  clientId: number,
+  exerciseId: number,
+): Promise<ExerciseHistoryEntry[]> {
+  const { data: exerciseRows, error: exercisesError } = await supabase
+    .from('workout_exercises')
+    .select('id, workout_id, workouts!inner(id, workout_date, client_id, status)')
+    .eq('exercise_id', exerciseId)
+    .eq('workouts.client_id', clientId)
+    .eq('workouts.status', 'done')
+  if (exercisesError) throw exercisesError
+
+  if (exerciseRows.length === 0) return []
+
+  const exerciseIds = exerciseRows.map((row) => row.id)
+  const { data: setRows, error: setsError } = await supabase
+    .from('workout_sets')
+    .select('*')
+    .in('workout_exercise_id', exerciseIds)
+    .order('position')
+  if (setsError) throw setsError
+
+  return exerciseRows
+    .map((row) => {
+      const workout = row.workouts as unknown as { workout_date: string }
+      return {
+        workout_id: row.workout_id,
+        workout_date: workout.workout_date,
+        sets: setRows
+          .filter((set) => set.workout_exercise_id === row.id)
+          .map((set) => ({
+            id: set.id,
+            position: set.position,
+            plan_weight_kg: set.plan_weight_kg,
+            plan_reps: set.plan_reps,
+            fact_weight_kg: set.fact_weight_kg,
+            fact_reps: set.fact_reps,
+          })),
+      }
+    })
+    .sort((a, b) => a.workout_date.localeCompare(b.workout_date))
+}
+
 async function writeExercises(workoutId: number, exercises: ExerciseInput[]) {
   for (let i = 0; i < exercises.length; i++) {
     const exerciseInput = exercises[i]
