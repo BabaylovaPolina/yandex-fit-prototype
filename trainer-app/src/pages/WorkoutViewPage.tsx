@@ -25,9 +25,17 @@ type Props = {
   onStart: () => void
   onDeleted: () => void
   onBack: () => void
+  onOpenExerciseHistory: (exerciseId: number, exerciseName: string) => void
 }
 
-export function WorkoutViewPage({ workoutId, onEdit, onStart, onDeleted, onBack }: Props) {
+export function WorkoutViewPage({
+  workoutId,
+  onEdit,
+  onStart,
+  onDeleted,
+  onBack,
+  onOpenExerciseHistory,
+}: Props) {
   const [workout, setWorkout] = useState<WorkoutWithExercises | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -126,7 +134,13 @@ export function WorkoutViewPage({ workoutId, onEdit, onStart, onDeleted, onBack 
 
         {workout.exercises.map((exercise) => (
           <div key={exercise.id} className="workout-exercise-block">
-            <span className="workout-exercise-name">{exercise.exercise_name}</span>
+            <button
+              type="button"
+              className="workout-exercise-name workout-exercise-name-button"
+              onClick={() => onOpenExerciseHistory(exercise.exercise_id, exercise.exercise_name)}
+            >
+              {exercise.exercise_name}
+            </button>
 
             {exercise.sets.length > 0 && (
               <div className="workout-view-sets-grid">
