@@ -178,11 +178,6 @@ export async function updateWorkout(workoutId: number, input: WorkoutInput): Pro
   await writeExercises(workoutId, input.exercises)
 }
 
-export async function deleteWorkout(workoutId: number): Promise<void> {
-  const { error } = await supabase.from('workouts').delete().eq('id', workoutId)
-  if (error) throw error
-}
-
 export async function copyWorkout(sourceWorkoutId: number, workoutDate: string): Promise<number> {
   const source = await getWorkout(sourceWorkoutId)
   return createWorkout({

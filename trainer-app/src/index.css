@@ -273,10 +273,6 @@ button:disabled {
   color: var(--accent-text);
   border: none;
   font-size: 20px;
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
-  font-size: 13px;
   padding: 8px 12px;
   white-space: nowrap;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
