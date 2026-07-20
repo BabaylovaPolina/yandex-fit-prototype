@@ -124,10 +124,12 @@ export function WorkoutViewPage({ workoutId, onEdit, onDeleted, onBack }: Props)
             {exercise.sets.length > 0 && (
               <div className="workout-view-sets-grid">
                 <div className="workout-view-sets-index-col">
-                  <span className="workout-view-sets-col-spacer" />
+                  <div className="workout-view-sets-capsule-header">
+                    <span className="workout-set-group-label">Подход</span>
+                  </div>
                   {exercise.sets.map((set) => (
                     <span key={set.id} className="workout-set-index">
-                      #{set.position + 1}
+                      {set.position + 1}
                     </span>
                   ))}
                 </div>
