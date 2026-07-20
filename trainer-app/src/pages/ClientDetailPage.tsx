@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { listWorkoutsWithSummary, copyWorkout, type WorkoutWithSummary } from '../lib/workouts'
 import { type Client } from '../lib/clients'
+import { MUSCLE_GROUP_LABELS } from '../lib/exercises'
 import { logEvent } from '../lib/analytics'
 
 const genderLabel: Record<Client['gender'], string> = {
@@ -14,10 +15,8 @@ const statusLabel: Record<WorkoutWithSummary['status'], string> = {
 }
 
 function formatSummary(workout: WorkoutWithSummary): string {
-  if (workout.exerciseSummary.length === 0) return 'Без упражнений'
-  return workout.exerciseSummary
-    .map((ex) => `${ex.exercise_name} ×${ex.set_count}`)
-    .join(' · ')
+  if (workout.muscleGroups.length === 0) return 'Без упражнений'
+  return workout.muscleGroups.map((group) => MUSCLE_GROUP_LABELS[group]).join(' · ')
 }
 
 function todayKey(): string {

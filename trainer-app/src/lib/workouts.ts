@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import { findOrCreateExercise } from './exercises'
+import { findOrCreateExercise, type MuscleGroup } from './exercises'
 
 export type WorkoutStatus = 'planned' | 'done'
 
@@ -68,12 +68,7 @@ export async function listWorkouts(clientId: number): Promise<Workout[]> {
   return data
 }
 
-export type ExerciseSummary = {
-  exercise_name: string
-  set_count: number
-}
-
-export type WorkoutWithSummary = Workout & { exerciseSummary: ExerciseSummary[] }
+export type WorkoutWithSummary = Workout & { muscleGroups: MuscleGroup[] }
 
 export async function listWorkoutsWithSummary(clientId: number): Promise<WorkoutWithSummary[]> {
   const { data: workoutRows, error: workoutsError } = await supabase
@@ -88,35 +83,20 @@ export async function listWorkoutsWithSummary(clientId: number): Promise<Workout
 
   const { data: exerciseRows, error: exercisesError } = await supabase
     .from('workout_exercises')
-    .select('id, workout_id, position, exercises(name)')
+    .select('workout_id, position, exercises(muscle_group)')
     .in('workout_id', workoutIds)
     .order('position')
   if (exercisesError) throw exercisesError
 
-  const exerciseIds = exerciseRows.map((row) => row.id)
-  const { data: setCountRows, error: setsError } =
-    exerciseIds.length === 0
-      ? { data: [] as { workout_exercise_id: number }[], error: null }
-      : await supabase
-          .from('workout_sets')
-          .select('workout_exercise_id')
-          .in('workout_exercise_id', exerciseIds)
-  if (setsError) throw setsError
-
-  const setCountByExerciseId = new Map<number, number>()
-  for (const row of setCountRows) {
-    setCountByExerciseId.set(row.workout_exercise_id, (setCountByExerciseId.get(row.workout_exercise_id) ?? 0) + 1)
-  }
-
-  return workoutRows.map((workout) => ({
-    ...workout,
-    exerciseSummary: exerciseRows
-      .filter((row) => row.workout_id === workout.id)
-      .map((row) => ({
-        exercise_name: (row.exercises as unknown as { name: string }).name,
-        set_count: setCountByExerciseId.get(row.id) ?? 0,
-      })),
-  }))
+  return workoutRows.map((workout) => {
+    const groups: MuscleGroup[] = []
+    for (const row of exerciseRows) {
+      if (row.workout_id !== workout.id) continue
+      const group = (row.exercises as unknown as { muscle_group: MuscleGroup }).muscle_group
+      if (!groups.includes(group)) groups.push(group)
+    }
+    return { ...workout, muscleGroups: groups }
+  })
 }
 
 export type WorkoutWithClientName = Workout & { client_name: string }
