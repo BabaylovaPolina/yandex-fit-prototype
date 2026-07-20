@@ -963,10 +963,12 @@ button:disabled {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding-top: 8px;
 }
 
 .workout-view-sets-index-col .workout-view-sets-capsule-header {
-  justify-content: center;
+  justify-content: flex-start;
+  margin-bottom: 2px;
 }
 
 .workout-view-sets-index-col .workout-set-group-label {
