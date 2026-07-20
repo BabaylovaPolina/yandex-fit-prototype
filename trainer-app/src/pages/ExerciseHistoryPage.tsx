@@ -1,39 +1,52 @@
 import { useEffect, useState } from 'react'
-import { getExerciseHistory, type ExerciseHistoryEntry } from '../lib/workouts'
+import { getExerciseHistory, type ExerciseHistoryEntry, type WorkoutSet } from '../lib/workouts'
 import { logEvent } from '../lib/analytics'
+import type { InputKind } from '../lib/exercises'
 
 function formatDateRu(dateKey: string): string {
   const [year, month, day] = dateKey.split('-')
   return `${day}.${month}.${year.slice(2)}`
 }
 
-function maxFactWeight(entry: ExerciseHistoryEntry): number | null {
-  const weights = entry.sets.map((s) => s.fact_weight_kg).filter((w): w is number => w !== null)
-  return weights.length === 0 ? null : Math.max(...weights)
+function chartValue(inputKind: InputKind, set: WorkoutSet): number | null {
+  if (inputKind === null) return set.fact_weight_kg
+  if (inputKind === 'distance') return set.fact_distance_km
+  return set.fact_reps
 }
 
-function buildChartPoints(entries: ExerciseHistoryEntry[]) {
+function chartUnit(inputKind: InputKind): string {
+  if (inputKind === null) return 'кг'
+  if (inputKind === 'distance') return 'км'
+  return 'прыжков'
+}
+
+function maxChartValue(inputKind: InputKind, entry: ExerciseHistoryEntry): number | null {
+  const values = entry.sets.map((s) => chartValue(inputKind, s)).filter((v): v is number => v !== null)
+  return values.length === 0 ? null : Math.max(...values)
+}
+
+function buildChartPoints(inputKind: InputKind, entries: ExerciseHistoryEntry[]) {
   return entries
-    .map((entry) => ({ date: entry.workout_date, weight: maxFactWeight(entry) }))
-    .filter((point): point is { date: string; weight: number } => point.weight !== null)
+    .map((entry) => ({ date: entry.workout_date, value: maxChartValue(inputKind, entry) }))
+    .filter((point): point is { date: string; value: number } => point.value !== null)
 }
 
-function ExerciseChart({ points }: { points: { date: string; weight: number }[] }) {
+function ExerciseChart({ points, unit }: { points: { date: string; value: number }[]; unit: string }) {
   const width = 320
   const height = 140
   const padding = 24
 
-  const weights = points.map((p) => p.weight)
-  const minWeight = Math.min(...weights)
-  const maxWeight = Math.max(...weights)
-  const range = maxWeight - minWeight || 1
+  const values = points.map((p) => p.value)
+  const minValue = Math.min(...values)
+  const maxValue = Math.max(...values)
+  const range = maxValue - minValue || 1
 
   const coords = points.map((point, index) => {
     const x =
       points.length === 1
         ? width / 2
         : padding + (index / (points.length - 1)) * (width - padding * 2)
-    const y = height - padding - ((point.weight - minWeight) / range) * (height - padding * 2)
+    const y = height - padding - ((point.value - minValue) / range) * (height - padding * 2)
     return { x, y, point }
   })
 
@@ -47,7 +60,7 @@ function ExerciseChart({ points }: { points: { date: string; weight: number }[] 
       ))}
       {coords.map((c) => (
         <text key={`${c.point.date}-label`} x={c.x} y={c.y - 10} textAnchor="middle" className="exercise-chart-label">
-          {c.point.weight}
+          {c.point.value} {unit}
         </text>
       ))}
     </svg>
@@ -58,10 +71,11 @@ type Props = {
   clientId: number
   exerciseId: number
   exerciseName: string
+  inputKind: InputKind
   onBack: () => void
 }
 
-export function ExerciseHistoryPage({ clientId, exerciseId, exerciseName, onBack }: Props) {
+export function ExerciseHistoryPage({ clientId, exerciseId, exerciseName, inputKind, onBack }: Props) {
   const [entries, setEntries] = useState<ExerciseHistoryEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -74,7 +88,8 @@ export function ExerciseHistoryPage({ clientId, exerciseId, exerciseName, onBack
       .finally(() => setLoading(false))
   }, [clientId, exerciseId])
 
-  const chartPoints = buildChartPoints(entries)
+  const chartPoints = buildChartPoints(inputKind, entries)
+  const unit = chartUnit(inputKind)
 
   return (
     <div className="clients-screen">
@@ -96,7 +111,7 @@ export function ExerciseHistoryPage({ clientId, exerciseId, exerciseName, onBack
         <>
           {chartPoints.length > 1 && (
             <div className="exercise-chart-wrap">
-              <ExerciseChart points={chartPoints} />
+              <ExerciseChart points={chartPoints} unit={unit} />
             </div>
           )}
 
@@ -107,7 +122,12 @@ export function ExerciseHistoryPage({ clientId, exerciseId, exerciseName, onBack
                 <div className="exercise-history-sets">
                   {entry.sets.map((set, index) => (
                     <span key={set.id} className="exercise-history-set">
-                      {index + 1}: {set.fact_weight_kg ?? '—'} кг × {set.fact_reps ?? '—'}
+                      {index + 1}:{' '}
+                      {inputKind === null && `${set.fact_weight_kg ?? '—'} кг × ${set.fact_reps ?? '—'}`}
+                      {inputKind === 'distance' &&
+                        `${set.fact_duration_min ?? '—'} мин × ${set.fact_distance_km ?? '—'} км`}
+                      {inputKind === 'reps' &&
+                        `${set.fact_duration_min ?? '—'} мин × ${set.fact_reps ?? '—'} прыжков`}
                     </span>
                   ))}
                 </div>

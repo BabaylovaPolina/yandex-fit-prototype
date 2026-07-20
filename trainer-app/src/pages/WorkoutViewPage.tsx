@@ -1,10 +1,29 @@
 import { useEffect, useState } from 'react'
-import { getWorkout, deleteWorkout, type WorkoutWithExercises } from '../lib/workouts'
+import { getWorkout, deleteWorkout, type WorkoutWithExercises, type WorkoutSet } from '../lib/workouts'
 import { logEvent } from '../lib/analytics'
+import type { InputKind } from '../lib/exercises'
 
 const statusLabel: Record<WorkoutWithExercises['status'], string> = {
   planned: 'Запланирована',
   done: 'Выполнена',
+}
+
+function unitsFor(inputKind: InputKind): { first: string; second: string } {
+  if (inputKind === 'distance') return { first: 'мин', second: 'км' }
+  if (inputKind === 'reps') return { first: 'мин', second: 'прыжков' }
+  return { first: 'кг', second: 'повт.' }
+}
+
+function planValues(inputKind: InputKind, set: WorkoutSet): [number | null, number | null] {
+  if (inputKind === null) return [set.plan_weight_kg, set.plan_reps]
+  if (inputKind === 'distance') return [set.plan_duration_min, set.plan_distance_km]
+  return [set.plan_duration_min, set.plan_reps]
+}
+
+function factValues(inputKind: InputKind, set: WorkoutSet): [number | null, number | null] {
+  if (inputKind === null) return [set.fact_weight_kg, set.fact_reps]
+  if (inputKind === 'distance') return [set.fact_duration_min, set.fact_distance_km]
+  return [set.fact_duration_min, set.fact_reps]
 }
 
 function formatDateRu(dateKey: string): string {
@@ -25,7 +44,7 @@ type Props = {
   onStart: () => void
   onDeleted: () => void
   onBack: () => void
-  onOpenExerciseHistory: (exerciseId: number, exerciseName: string) => void
+  onOpenExerciseHistory: (exerciseId: number, exerciseName: string, inputKind: InputKind) => void
 }
 
 export function WorkoutViewPage({
@@ -132,67 +151,79 @@ export function WorkoutViewPage({
           <div className="clients-placeholder">Упражнений нет</div>
         )}
 
-        {workout.exercises.map((exercise) => (
-          <div key={exercise.id} className="workout-exercise-block">
-            <button
-              type="button"
-              className="workout-exercise-name workout-exercise-name-button"
-              onClick={() => onOpenExerciseHistory(exercise.exercise_id, exercise.exercise_name)}
-            >
-              {exercise.exercise_name}
-            </button>
+        {workout.exercises.map((exercise) => {
+          const units = unitsFor(exercise.input_kind)
 
-            {exercise.sets.length > 0 && (
-              <div className="workout-view-sets-grid">
-                <div className="workout-view-sets-capsule index">
-                  <div className="workout-view-sets-capsule-header">
-                    <span className="workout-set-group-label">Подход</span>
-                    <div className="workout-set-pair">
-                      <span className="workout-set-unit-label">&nbsp;</span>
-                    </div>
-                  </div>
-                  {exercise.sets.map((set) => (
-                    <span key={set.id} className="workout-set-index">
-                      {set.position + 1}
-                    </span>
-                  ))}
-                </div>
+          return (
+            <div key={exercise.id} className="workout-exercise-block">
+              <button
+                type="button"
+                className="workout-exercise-name workout-exercise-name-button"
+                onClick={() =>
+                  onOpenExerciseHistory(exercise.exercise_id, exercise.exercise_name, exercise.input_kind)
+                }
+              >
+                {exercise.exercise_name}
+              </button>
 
-                <div className="workout-view-sets-capsule plan">
-                  <div className="workout-view-sets-capsule-header">
-                    <span className="workout-set-group-label">План</span>
-                    <div className="workout-set-pair">
-                      <span className="workout-set-unit-label">кг</span>
-                      <span className="workout-set-unit-label">повт.</span>
+              {exercise.sets.length > 0 && (
+                <div className="workout-view-sets-grid">
+                  <div className="workout-view-sets-capsule index">
+                    <div className="workout-view-sets-capsule-header">
+                      <span className="workout-set-group-label">Подход</span>
+                      <div className="workout-set-pair">
+                        <span className="workout-set-unit-label">&nbsp;</span>
+                      </div>
                     </div>
+                    {exercise.sets.map((set) => (
+                      <span key={set.id} className="workout-set-index">
+                        {set.position + 1}
+                      </span>
+                    ))}
                   </div>
-                  {exercise.sets.map((set) => (
-                    <div key={set.id} className="workout-set-pair">
-                      <span>{set.plan_weight_kg ?? '—'}</span>
-                      <span>{set.plan_reps ?? '—'}</span>
-                    </div>
-                  ))}
-                </div>
 
-                <div className="workout-view-sets-capsule fact">
-                  <div className="workout-view-sets-capsule-header">
-                    <span className="workout-set-group-label">Факт</span>
-                    <div className="workout-set-pair">
-                      <span className="workout-set-unit-label">кг</span>
-                      <span className="workout-set-unit-label">повт.</span>
+                  <div className="workout-view-sets-capsule plan">
+                    <div className="workout-view-sets-capsule-header">
+                      <span className="workout-set-group-label">План</span>
+                      <div className="workout-set-pair">
+                        <span className="workout-set-unit-label">{units.first}</span>
+                        <span className="workout-set-unit-label">{units.second}</span>
+                      </div>
                     </div>
+                    {exercise.sets.map((set) => {
+                      const [first, second] = planValues(exercise.input_kind, set)
+                      return (
+                        <div key={set.id} className="workout-set-pair">
+                          <span>{first ?? '—'}</span>
+                          <span>{second ?? '—'}</span>
+                        </div>
+                      )
+                    })}
                   </div>
-                  {exercise.sets.map((set) => (
-                    <div key={set.id} className="workout-set-pair">
-                      <span>{set.fact_weight_kg ?? '—'}</span>
-                      <span>{set.fact_reps ?? '—'}</span>
+
+                  <div className="workout-view-sets-capsule fact">
+                    <div className="workout-view-sets-capsule-header">
+                      <span className="workout-set-group-label">Факт</span>
+                      <div className="workout-set-pair">
+                        <span className="workout-set-unit-label">{units.first}</span>
+                        <span className="workout-set-unit-label">{units.second}</span>
+                      </div>
                     </div>
-                  ))}
+                    {exercise.sets.map((set) => {
+                      const [first, second] = factValues(exercise.input_kind, set)
+                      return (
+                        <div key={set.id} className="workout-set-pair">
+                          <span>{first ?? '—'}</span>
+                          <span>{second ?? '—'}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          )
+        })}
       </div>
 
       <button
