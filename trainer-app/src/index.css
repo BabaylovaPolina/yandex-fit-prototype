@@ -449,6 +449,18 @@ button:disabled {
   flex: 1;
 }
 
+.copy-load-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.copy-load-actions button {
+  flex: 1;
+  padding: 8px 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .btn-secondary {
   background: var(--surface);
   color: var(--text);

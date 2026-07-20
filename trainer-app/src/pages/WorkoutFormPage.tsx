@@ -4,6 +4,7 @@ import {
   updateWorkout,
   deleteWorkout,
   getWorkout,
+  buildCopyDraft,
   type WorkoutStatus,
   type SetInput,
 } from '../lib/workouts'
@@ -38,15 +39,27 @@ function emptyExercise(name: string): ExerciseDraft {
   return { key: nextKey(), exerciseName: name, sets: [emptySet()] }
 }
 
+function roundToStep(value: number, step: number): number {
+  return Math.round(value / step) * step
+}
+
 type Props = {
   clientId: number
   workoutId?: number
+  copyFromWorkoutId?: number
   initialDate?: string
   onSaved: () => void
   onCancel: () => void
 }
 
-export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onCancel }: Props) {
+export function WorkoutFormPage({
+  clientId,
+  workoutId,
+  copyFromWorkoutId,
+  initialDate,
+  onSaved,
+  onCancel,
+}: Props) {
   const [workoutDate, setWorkoutDate] = useState(
     () => initialDate ?? new Date().toISOString().slice(0, 10),
   )
@@ -58,7 +71,7 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [loading, setLoading] = useState(workoutId !== undefined)
+  const [loading, setLoading] = useState(workoutId !== undefined || copyFromWorkoutId !== undefined)
   const [pickerOpen, setPickerOpen] = useState(false)
 
   useEffect(() => {
@@ -90,6 +103,55 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
       .catch((err) => setError(err instanceof Error ? err.message : 'Не удалось загрузить тренировку'))
       .finally(() => setLoading(false))
   }, [workoutId])
+
+  useEffect(() => {
+    if (copyFromWorkoutId === undefined) return
+    getWorkout(copyFromWorkoutId)
+      .then((source) => {
+        setNotes(source.notes ?? '')
+        const draft = buildCopyDraft(source)
+        setExercises(
+          draft.map((ex) => ({
+            key: nextKey(),
+            exerciseName: ex.exercise_name,
+            sets:
+              ex.sets.length === 0
+                ? [emptySet()]
+                : ex.sets.map((s) => ({ key: nextKey(), ...s })),
+          })),
+        )
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : 'Не удалось загрузить тренировку'))
+      .finally(() => setLoading(false))
+  }, [copyFromWorkoutId])
+
+  function resetWeightsAndReps() {
+    setExercises((prev) =>
+      prev.map((ex) => ({
+        ...ex,
+        sets: ex.sets.map((s) => ({
+          ...s,
+          plan_weight_kg: null,
+          plan_reps: null,
+          fact_weight_kg: null,
+          fact_reps: null,
+        })),
+      })),
+    )
+  }
+
+  function adjustLoad(factor: number) {
+    setExercises((prev) =>
+      prev.map((ex) => ({
+        ...ex,
+        sets: ex.sets.map((s) =>
+          s.plan_weight_kg === null
+            ? s
+            : { ...s, plan_weight_kg: roundToStep(s.plan_weight_kg * factor, 2.5) },
+        ),
+      })),
+    )
+  }
 
   function updateSet(exerciseKey: string, setKey: string, patch: Partial<SetDraft>) {
     setExercises((prev) =>
@@ -193,7 +255,13 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
   return (
     <div className="form-screen">
       <header className="home-header">
-        <span>{workoutId === undefined ? 'Новая тренировка' : 'Тренировка'}</span>
+        <span>
+          {workoutId !== undefined
+            ? 'Тренировка'
+            : copyFromWorkoutId !== undefined
+              ? 'Копия тренировки'
+              : 'Новая тренировка'}
+        </span>
         {workoutId !== undefined && (
           <button
             type="button"
@@ -252,6 +320,20 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
           Заметки
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
         </label>
+
+        {copyFromWorkoutId !== undefined && (
+          <div className="copy-load-actions">
+            <button type="button" className="btn-secondary" onClick={resetWeightsAndReps}>
+              Сбросить веса и подходы
+            </button>
+            <button type="button" className="btn-secondary" onClick={() => adjustLoad(0.95)}>
+              −5% нагрузка
+            </button>
+            <button type="button" className="btn-secondary" onClick={() => adjustLoad(1.05)}>
+              +5% нагрузка
+            </button>
+          </div>
+        )}
 
         <div className="workout-exercises">
           {exercises.map((exercise) => (
