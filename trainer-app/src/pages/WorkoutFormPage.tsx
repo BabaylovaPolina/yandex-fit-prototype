@@ -48,6 +48,17 @@ function roundToStep(value: number, step: number): number {
   return Math.round(value / step) * step
 }
 
+const MONTHS_RU = [
+  'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+  'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря',
+]
+
+function formatDateRuLong(dateKey: string): string {
+  const [year, month, day] = dateKey.split('-')
+  const monthIndex = Number(month) - 1
+  return `${Number(day)} ${MONTHS_RU[monthIndex]} ${year}`
+}
+
 type Props = {
   clientId: number
   workoutId?: number
@@ -298,6 +309,7 @@ export function WorkoutFormPage({
             value={workoutDate}
             onChange={(e) => setWorkoutDate(e.target.value)}
           />
+          {workoutDate && <span className="date-input-hint">{formatDateRuLong(workoutDate)}</span>}
         </label>
 
         <div className="form-row">
