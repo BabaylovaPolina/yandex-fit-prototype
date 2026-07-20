@@ -1122,6 +1122,15 @@ button:disabled {
   background: var(--surface);
 }
 
+.live-workout-set-card.active {
+  border: 2px solid var(--accent);
+  background: rgba(255, 204, 0, 0.08);
+}
+
+.live-workout-set-card.confirmed {
+  opacity: 0.55;
+}
+
 .live-workout-set-header {
   display: flex;
   align-items: center;
@@ -1181,26 +1190,11 @@ button:disabled {
   font-weight: 700;
 }
 
-.live-workout-set-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.live-workout-set-actions button {
-  flex: 1;
+.live-workout-set-done {
   padding: 8px;
   font-size: 13px;
   font-weight: 600;
   border-radius: 10px;
-}
-
-.live-workout-as-plan {
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-
-.live-workout-set-done {
   background: var(--accent);
   color: var(--accent-text);
 }

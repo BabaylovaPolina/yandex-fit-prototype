@@ -62,11 +62,34 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
   const [restRemaining, setRestRemaining] = useState<number | null>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [finishing, setFinishing] = useState(false)
+  const [confirmedSetIds, setConfirmedSetIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     logEvent('live_workout_started', { workout_id: workoutId })
     getWorkout(workoutId)
-      .then(setWorkout)
+      .then((data) => {
+        const prefilled: WorkoutWithExercises = {
+          ...data,
+          exercises: data.exercises.map((ex) => {
+            const { first, second } = stepperFields(ex.input_kind)
+            return {
+              ...ex,
+              sets: ex.sets.map((set) => {
+                const needsFirst = set[first.fact] === null && set[first.plan] !== null
+                const needsSecond = set[second.fact] === null && set[second.plan] !== null
+                if (!needsFirst && !needsSecond) return set
+
+                const patch: Partial<Record<FactField, number | null>> = {}
+                if (needsFirst) patch[first.fact] = set[first.plan]
+                if (needsSecond) patch[second.fact] = set[second.plan]
+                updateSetFact(set.id, patch).catch(() => {})
+                return { ...set, ...patch }
+              }),
+            }
+          }),
+        }
+        setWorkout(prefilled)
+      })
       .catch((err) => setError(err instanceof Error ? err.message : 'Не удалось загрузить тренировку'))
       .finally(() => setLoading(false))
   }, [workoutId])
@@ -120,18 +143,6 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
     }
   }
 
-  function handleSetAsPlan(setId: number) {
-    if (!exercise) return
-    const set = exercise.sets.find((s) => s.id === setId)
-    if (!set) return
-    const { first, second } = stepperFields(exercise.input_kind)
-    handleFactChange(setId, {
-      [first.fact]: set[first.plan],
-      [second.fact]: set[second.plan],
-    })
-    setRestRemaining(REST_SECONDS)
-  }
-
   function handleStep(setId: number, field: FactField, delta: number) {
     const set = exercise?.sets.find((s) => s.id === setId)
     if (!set) return
@@ -140,7 +151,8 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
     handleFactChange(setId, { [field]: next })
   }
 
-  function handleSetDone() {
+  function handleConfirmSet(setId: number) {
+    setConfirmedSetIds((prev) => new Set(prev).add(setId))
     setRestRemaining(REST_SECONDS)
   }
 
@@ -249,57 +261,72 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
           )}
 
           <div className="live-workout-sets">
-            {exercise.sets.map((set, index) => {
-              const { first, second } = stepperFields(exercise.input_kind)
-              return (
-                <div key={set.id} className="live-workout-set-card">
-                  <div className="live-workout-set-header">
-                    <span>Подход {index + 1}</span>
-                    <span className="live-workout-set-plan">
-                      План: {set[first.plan] ?? '—'} {first.label} × {set[second.plan] ?? '—'}{' '}
-                      {second.label}
-                    </span>
-                  </div>
+            {(() => {
+              const activeSetId = exercise.sets.find((s) => !confirmedSetIds.has(s.id))?.id
+              return exercise.sets.map((set, index) => {
+                const { first, second } = stepperFields(exercise.input_kind)
+                const isActive = set.id === activeSetId
+                const isConfirmed = confirmedSetIds.has(set.id)
+                return (
+                  <div
+                    key={set.id}
+                    className={
+                      isActive
+                        ? 'live-workout-set-card active'
+                        : isConfirmed
+                          ? 'live-workout-set-card confirmed'
+                          : 'live-workout-set-card'
+                    }
+                  >
+                    <div className="live-workout-set-header">
+                      <span>Подход {index + 1}</span>
+                      <span className="live-workout-set-plan">
+                        План: {set[first.plan] ?? '—'} {first.label} × {set[second.plan] ?? '—'}{' '}
+                        {second.label}
+                      </span>
+                    </div>
 
-                  <div className="live-workout-steppers">
-                    <div className="live-workout-stepper">
-                      <span className="live-workout-stepper-label">{first.label}</span>
-                      <div className="live-workout-stepper-controls">
-                        <button type="button" onClick={() => handleStep(set.id, first.fact, -first.step)}>
-                          −
-                        </button>
-                        <span className="live-workout-stepper-value">{set[first.fact] ?? '—'}</span>
-                        <button type="button" onClick={() => handleStep(set.id, first.fact, first.step)}>
-                          +
-                        </button>
+                    <div className="live-workout-steppers">
+                      <div className="live-workout-stepper">
+                        <span className="live-workout-stepper-label">{first.label}</span>
+                        <div className="live-workout-stepper-controls">
+                          <button type="button" onClick={() => handleStep(set.id, first.fact, -first.step)}>
+                            −
+                          </button>
+                          <span className="live-workout-stepper-value">{set[first.fact] ?? '—'}</span>
+                          <button type="button" onClick={() => handleStep(set.id, first.fact, first.step)}>
+                            +
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="live-workout-stepper">
+                        <span className="live-workout-stepper-label">{second.label}</span>
+                        <div className="live-workout-stepper-controls">
+                          <button type="button" onClick={() => handleStep(set.id, second.fact, -second.step)}>
+                            −
+                          </button>
+                          <span className="live-workout-stepper-value">{set[second.fact] ?? '—'}</span>
+                          <button type="button" onClick={() => handleStep(set.id, second.fact, second.step)}>
+                            +
+                          </button>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="live-workout-stepper">
-                      <span className="live-workout-stepper-label">{second.label}</span>
-                      <div className="live-workout-stepper-controls">
-                        <button type="button" onClick={() => handleStep(set.id, second.fact, -second.step)}>
-                          −
-                        </button>
-                        <span className="live-workout-stepper-value">{set[second.fact] ?? '—'}</span>
-                        <button type="button" onClick={() => handleStep(set.id, second.fact, second.step)}>
-                          +
-                        </button>
-                      </div>
-                    </div>
+                    {isActive && (
+                      <button
+                        type="button"
+                        className="live-workout-set-done"
+                        onClick={() => handleConfirmSet(set.id)}
+                      >
+                        Готово, отдых
+                      </button>
+                    )}
                   </div>
-
-                  <div className="live-workout-set-actions">
-                    <button type="button" className="live-workout-as-plan" onClick={() => handleSetAsPlan(set.id)}>
-                      ✓ Как план
-                    </button>
-                    <button type="button" className="live-workout-set-done" onClick={handleSetDone}>
-                      Готово, отдых
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })
+            })()}
           </div>
 
           <button type="button" className="live-workout-add-set" onClick={handleAddSet}>
