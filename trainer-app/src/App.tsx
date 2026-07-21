@@ -7,6 +7,8 @@ import { ClientDetailPage } from './pages/ClientDetailPage'
 import { WorkoutFormPage } from './pages/WorkoutFormPage'
 import { SchedulePage } from './pages/SchedulePage'
 import { PickClientPage } from './pages/PickClientPage'
+import { AnalyticsPage } from './pages/AnalyticsPage'
+import { ProgressFormPage } from './pages/ProgressFormPage'
 import { TabBar } from './components/TabBar'
 import { ClientCardPage } from './pages/ClientCardPage'
 import { getClient, type Client } from './lib/clients'
@@ -25,6 +27,8 @@ type View =
     }
   | { name: 'schedule' }
   | { name: 'pick-client'; workoutDate: string }
+  | { name: 'analytics' }
+  | { name: 'progress-form'; clientId: number; date?: string }
 
 function TrainerHome() {
   const [view, setView] = useState<View>({ name: 'list' })
@@ -103,6 +107,44 @@ function TrainerHome() {
     )
   }
 
+  if (view.name === 'progress-form') {
+    return (
+      <ProgressFormPage
+        clientId={view.clientId}
+        initialDate={view.date}
+        onSaved={() => {
+          setWorkoutsRefreshKey((key) => key + 1)
+          setView({ name: 'analytics' })
+        }}
+        onCancel={() => setView({ name: 'analytics' })}
+      />
+    )
+  }
+
+  if (view.name === 'analytics') {
+    return (
+      <>
+        <AnalyticsPage
+          key={workoutsRefreshKey}
+          onAddProgress={(clientId) => setView({ name: 'progress-form', clientId })}
+          refreshKey={workoutsRefreshKey}
+        />
+        <TabBar
+          active="analytics"
+          onSelectTab={(tab) => {
+            if (tab === 'clients') {
+              setView({ name: 'list' })
+            } else if (tab === 'schedule') {
+              setView({ name: 'schedule' })
+            } else if (tab === 'analytics') {
+              setView({ name: 'analytics' })
+            }
+          }}
+        />
+      </>
+    )
+  }
+
   if (view.name === 'schedule') {
     return (
       <>
@@ -122,7 +164,15 @@ function TrainerHome() {
         {clientLoadError && <p className="auth-error">{clientLoadError}</p>}
         <TabBar
           active="schedule"
-          onSelectTab={(tab) => setView(tab === 'clients' ? { name: 'list' } : { name: 'schedule' })}
+          onSelectTab={(tab) => {
+            if (tab === 'clients') {
+              setView({ name: 'list' })
+            } else if (tab === 'schedule') {
+              setView({ name: 'schedule' })
+            } else if (tab === 'analytics') {
+              setView({ name: 'analytics' })
+            }
+          }}
         />
       </>
     )
@@ -136,7 +186,18 @@ function TrainerHome() {
         onEditClient={(client) => setView({ name: 'edit-client', client })}
         refreshKey={clientsRefreshKey}
       />
-      <TabBar active="clients" onSelectTab={(tab) => setView(tab === 'schedule' ? { name: 'schedule' } : { name: 'list' })} />
+      <TabBar
+        active="clients"
+        onSelectTab={(tab) => {
+          if (tab === 'clients') {
+            setView({ name: 'list' })
+          } else if (tab === 'schedule') {
+            setView({ name: 'schedule' })
+          } else if (tab === 'analytics') {
+            setView({ name: 'analytics' })
+          }
+        }}
+      />
     </>
   )
 }

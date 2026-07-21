@@ -3,7 +3,7 @@ export type TabKey = 'clients' | 'schedule' | 'analytics' | 'profile'
 const TABS: { key: TabKey; icon: string; label: string; enabled: boolean }[] = [
   { key: 'clients', icon: '👥', label: 'Клиенты', enabled: true },
   { key: 'schedule', icon: '📅', label: 'Расписание', enabled: true },
-  { key: 'analytics', icon: '📊', label: 'Аналитика', enabled: false },
+  { key: 'analytics', icon: '📊', label: 'Аналитика', enabled: true },
   { key: 'profile', icon: '⚙️', label: 'Профиль', enabled: false },
 ]
 
