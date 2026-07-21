@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { updateClientRecord, type Client, type Gender } from '../lib/clients'
+import { updateClientRecord, type Client, type Gender } from '../db/clients'
 import { logEvent } from '../lib/analytics'
 
 type Props = {

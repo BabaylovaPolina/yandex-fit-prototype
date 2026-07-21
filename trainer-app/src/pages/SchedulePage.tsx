@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { listWorkoutsForDate, type WorkoutWithClientName } from '../lib/workouts'
+import { listWorkoutsForDate, type WorkoutWithClientName } from '../db/workouts'
 import { logEvent } from '../lib/analytics'
-import { MonthPickerSheet } from './MonthPickerSheet'
+import { MonthPickerSheet } from '../components/MonthPickerSheet'
 
 const DAY_LABELS = ['ВС', 'ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ']
 const HOURS = Array.from({ length: 24 }, (_, i) => i)

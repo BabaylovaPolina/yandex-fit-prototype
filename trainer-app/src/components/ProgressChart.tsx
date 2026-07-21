@@ -1,6 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import type { ProgressRecord } from '../lib/progress'
-import type { CustomMetricValue } from '../lib/progress'
+import type { ProgressRecord } from '../db/progress'
+import type { CustomMetricValue } from '../db/progress'
 
 type MetricType =
   | 'weight'

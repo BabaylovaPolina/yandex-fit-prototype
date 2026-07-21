@@ -7,10 +7,10 @@ import {
   buildCopyDraft,
   type WorkoutStatus,
   type SetInput,
-} from '../lib/workouts'
+} from '../db/workouts'
 import { logEvent } from '../lib/analytics'
-import { ExercisePickerSheet } from './ExercisePickerSheet'
-import type { Exercise, InputKind } from '../lib/exercises'
+import { ExercisePickerSheet } from '../components/ExercisePickerSheet'
+import type { Exercise, InputKind } from '../db/exercises'
 
 type SetDraft = SetInput & { key: string }
 type ExerciseDraft = {

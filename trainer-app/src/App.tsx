@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AuthProvider, useAuth } from './lib/AuthContext'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { AuthPage } from './pages/AuthPage'
 import { ClientsListPage } from './pages/ClientsListPage'
 import { AddClientPage } from './pages/AddClientPage'
@@ -15,8 +15,8 @@ import { ProgressFormPage } from './pages/ProgressFormPage'
 import { TabBar, type TabKey } from './components/TabBar'
 import { ClientCardPage } from './pages/ClientCardPage'
 import { ProfilePage } from './pages/ProfilePage'
-import { getClient, type Client } from './lib/clients'
-import type { InputKind } from './lib/exercises'
+import { getClient, type Client } from './db/clients'
+import type { InputKind } from './db/exercises'
 
 type View =
   | { name: 'list' }

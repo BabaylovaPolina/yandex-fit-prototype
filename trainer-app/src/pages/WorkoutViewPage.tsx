@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { getWorkout, deleteWorkout, type WorkoutWithExercises, type WorkoutSet } from '../lib/workouts'
+import { getWorkout, deleteWorkout, type WorkoutWithExercises, type WorkoutSet } from '../db/workouts'
 import { logEvent } from '../lib/analytics'
-import type { InputKind } from '../lib/exercises'
+import type { InputKind } from '../db/exercises'
 
 const statusLabel: Record<WorkoutWithExercises['status'], string> = {
   planned: 'Запланирована',
