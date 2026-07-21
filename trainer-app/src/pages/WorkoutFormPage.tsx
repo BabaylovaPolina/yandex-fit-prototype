@@ -481,6 +481,17 @@ export function WorkoutFormPage({
             {saving ? 'Сохранение…' : 'Сохранить'}
           </button>
         </div>
+
+        {workoutId !== undefined && (
+          <button
+            type="button"
+            className="btn-delete"
+            disabled={deleting}
+            onClick={handleDelete}
+          >
+            {deleting ? 'Удаление…' : 'Удалить тренировку'}
+          </button>
+        )}
       </form>
 
       {pickerOpen && (

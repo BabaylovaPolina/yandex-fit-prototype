@@ -228,11 +228,6 @@ export async function updateWorkout(workoutId: number, input: WorkoutInput): Pro
   await writeExercises(workoutId, input.exercises)
 }
 
-export async function deleteWorkout(workoutId: number): Promise<void> {
-  const { error } = await supabase.from('workouts').delete().eq('id', workoutId)
-  if (error) throw error
-}
-
 export async function updateSetFact(
   setId: number,
   fact: Partial<{
@@ -385,6 +380,20 @@ export async function getExerciseHistory(
       }
     })
     .sort((a, b) => a.workout_date.localeCompare(b.workout_date))
+}
+
+export async function deleteWorkout(workoutId: number): Promise<void> {
+  const { error: exercisesError } = await supabase
+    .from('workout_exercises')
+    .delete()
+    .eq('workout_id', workoutId)
+  if (exercisesError) throw exercisesError
+
+  const { error: workoutError } = await supabase
+    .from('workouts')
+    .delete()
+    .eq('id', workoutId)
+  if (workoutError) throw workoutError
 }
 
 async function writeExercises(workoutId: number, exercises: ExerciseInput[]) {

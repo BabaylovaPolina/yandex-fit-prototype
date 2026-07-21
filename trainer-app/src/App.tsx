@@ -10,6 +10,8 @@ import { LiveWorkoutPage } from './pages/LiveWorkoutPage'
 import { ExerciseHistoryPage } from './pages/ExerciseHistoryPage'
 import { SchedulePage } from './pages/SchedulePage'
 import { PickClientPage } from './pages/PickClientPage'
+import { AnalyticsPage } from './pages/AnalyticsPage'
+import { ProgressFormPage } from './pages/ProgressFormPage'
 import { TabBar, type TabKey } from './components/TabBar'
 import { ClientCardPage } from './pages/ClientCardPage'
 import { ProfilePage } from './pages/ProfilePage'
@@ -52,10 +54,13 @@ type View =
     }
   | { name: 'schedule' }
   | { name: 'pick-client'; workoutDate: string }
+  | { name: 'analytics' }
+  | { name: 'progress-form'; clientId: number; date?: string }
   | { name: 'profile' }
 
 function tabViewFor(tab: TabKey): View {
   if (tab === 'schedule') return { name: 'schedule' }
+  if (tab === 'analytics') return { name: 'analytics' }
   if (tab === 'profile') return { name: 'profile' }
   return { name: 'list' }
 }
@@ -205,6 +210,33 @@ function TrainerHome() {
         }
         onCancel={() => setView({ name: 'schedule' })}
       />
+    )
+  }
+
+  if (view.name === 'progress-form') {
+    return (
+      <ProgressFormPage
+        clientId={view.clientId}
+        initialDate={view.date}
+        onSaved={() => {
+          setWorkoutsRefreshKey((key) => key + 1)
+          setView({ name: 'analytics' })
+        }}
+        onCancel={() => setView({ name: 'analytics' })}
+      />
+    )
+  }
+
+  if (view.name === 'analytics') {
+    return (
+      <>
+        <AnalyticsPage
+          key={workoutsRefreshKey}
+          onAddProgress={(clientId) => setView({ name: 'progress-form', clientId })}
+          refreshKey={workoutsRefreshKey}
+        />
+        <TabBar active="analytics" onSelectTab={(tab) => setView(tabViewFor(tab))} />
+      </>
     )
   }
 

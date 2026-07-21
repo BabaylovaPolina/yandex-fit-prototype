@@ -124,6 +124,126 @@ button:disabled {
   min-height: 64px;
 }
 
+.date-picker {
+  position: relative;
+}
+
+.date-picker-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 16px;
+  text-align: left;
+  color: var(--text);
+}
+
+.date-picker-button:disabled {
+  opacity: 0.6;
+}
+
+.date-picker-icon {
+  font-size: 18px;
+}
+
+.date-picker-panel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+}
+
+.date-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.date-picker-header button {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.date-picker-title {
+  font-weight: 600;
+  font-size: 16px;
+  text-transform: capitalize;
+}
+
+.date-picker-weekdays,
+.date-picker-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.date-picker-weekdays span {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+
+.date-picker-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 15px;
+  background: none;
+  border: none;
+  color: var(--text);
+}
+
+.date-picker-day.outside {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.date-picker-day.selected {
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.date-picker-day.today:not(.selected) {
+  border: 1px solid var(--accent);
+}
+
+.date-picker-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.date-picker-footer button {
+  background: none;
+  color: var(--accent-text);
+  text-decoration: underline;
+  font-size: 14px;
+  padding: 6px;
+}
+
 .auth-error {
   color: var(--error);
   font-size: 14px;
@@ -484,6 +604,13 @@ button:disabled {
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
+}
+
+.btn-delete {
+  background: var(--error);
+  color: var(--accent-text);
+  width: 100%;
+  margin-top: 12px;
 }
 
 .tab-bar {
@@ -903,6 +1030,322 @@ button:disabled {
   padding: 8px 12px;
 }
 
+/* Progress Chart Styles */
+.progress-chart-container {
+  padding: 16px 20px;
+  background: var(--surface);
+}
+
+.progress-chart-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.progress-chart-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.progress-tooltip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tooltip-value {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 0;
+  color: var(--text);
+}
+
+.tooltip-date {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 2px 0 0 0;
+}
+
+/* Progress Metric Tabs */
+.progress-metric-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 0 20px 12px;
+  overflow-x: auto;
+  flex-wrap: wrap;
+}
+
+.metric-tab {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.metric-tab.active {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+/* Analytics Page */
+.analytics-client-selector {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.analytics-client-selector label {
+  display: block;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.dropdown-wrapper {
+  position: relative;
+}
+
+.dropdown-button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.dropdown-item {
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  border-radius: 0;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item.active {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.dropdown-item:hover:not(.active) {
+  background: var(--bg);
+}
+
+/* Analytics Section */
+.analytics-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 16px 0;
+}
+
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.progress-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.btn-add-progress {
+  flex-shrink: 0;
+  font-size: 13px;
+  padding: 10px 14px;
+  white-space: nowrap;
+}
+
+/* Custom Metric Modal */
+.metric-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-end;
+  z-index: 20;
+}
+
+.metric-modal {
+  width: 100%;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  max-height: 75%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.metric-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.metric-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: none;
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.metric-modal-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.metric-tab {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.metric-tab.active {
+  background: none;
+  border-bottom: 2px solid var(--accent);
+  color: var(--text);
+}
+
+.metric-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.suggested-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metric-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.metric-item:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.metric-name {
+  font-weight: 500;
+}
+
+.metric-unit {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.metric-item:hover .metric-unit {
+  color: var(--accent-text);
+}
+
+.metric-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 24px 0;
+}
+
+.custom-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.custom-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label-text {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.custom-form input {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  font: inherit;
+  color: var(--text);
+}
+
 .profile-body {
   display: flex;
   flex-direction: column;
@@ -925,6 +1368,22 @@ button:disabled {
   background: var(--surface);
   font: inherit;
   color: var(--text);
+}
+
+.custom-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.custom-form-actions button {
+  flex: 1;
+}
+
+.metric-error {
+  color: var(--error);
+  font-size: 13px;
+  margin: 0;
 }
 
 .profile-field {
