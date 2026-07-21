@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { listWorkoutsWithSummary, type WorkoutWithSummary } from '../db/workouts'
 import { type Client } from '../db/clients'
 import { MUSCLE_GROUP_LABELS } from '../db/exercises'
+import { computeClientStats, pluralDays } from '../lib/clientStats'
 import { logEvent } from '../lib/analytics'
 
 const genderLabel: Record<Client['gender'], string> = {
@@ -67,6 +68,10 @@ export function ClientDetailPage({
   const history = useMemo(
     () => workouts.filter((w) => w.workout_date < todayKey() || w.status === 'done'),
     [workouts],
+  )
+  const stats = useMemo(
+    () => computeClientStats(workouts, client.created_at, todayKey()),
+    [workouts, client.created_at],
   )
 
   function renderCopyButton(workout: WorkoutWithSummary) {
@@ -134,6 +139,36 @@ export function ClientDetailPage({
         <div className="client-detail-meta">
           {genderLabel[client.gender]}, {client.age} лет · {client.height_cm} см · {client.weight_kg} кг
         </div>
+
+        {!loading && !error && (
+          <div className="client-stats">
+            {stats.needsAttention && (
+              <div className="client-stats-attention">⚠ Давно не тренировался</div>
+            )}
+            <div className="client-stats-grid">
+              <div className="client-stat">
+                <span className="client-stat-value">{stats.doneCount}</span>
+                <span className="client-stat-label">тренировок</span>
+              </div>
+              <div className="client-stat">
+                <span className="client-stat-value">
+                  {stats.completionPercent === null ? '—' : `${stats.completionPercent}%`}
+                </span>
+                <span className="client-stat-label">выполнено</span>
+              </div>
+              <div className="client-stat">
+                <span className="client-stat-value">
+                  {stats.lastWorkoutDate ? formatDateRu(stats.lastWorkoutDate) : '—'}
+                </span>
+                <span className="client-stat-label">последняя</span>
+              </div>
+              <div className="client-stat">
+                <span className="client-stat-value">{stats.daysInWork}</span>
+                <span className="client-stat-label">{pluralDays(stats.daysInWork)} в работе</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="client-detail-actions">
           {todaysWorkout ? (
