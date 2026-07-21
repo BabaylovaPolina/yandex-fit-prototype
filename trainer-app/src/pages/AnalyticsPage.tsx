@@ -36,6 +36,7 @@ export function AnalyticsPage({ onAddProgress, refreshKey }: Props) {
       loadProgress()
       logEvent('analytics_opened', { client_id: selectedClient.id })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedClient, refreshKey])
 
   async function loadClients() {

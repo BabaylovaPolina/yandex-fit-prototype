@@ -41,6 +41,7 @@ export function ProgressFormPage({ clientId, initialDate, onSaved, onCancel }: P
     if (initialDate) {
       loadExistingProgress()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId, initialDate])
 
   async function loadCustomMetrics() {
