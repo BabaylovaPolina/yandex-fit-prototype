@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { listClients, type Client } from '../api/clients'
+import { listClients, type Client } from '../db/clients'
 import { logEvent } from '../lib/analytics'
 
 const genderLabel: Record<Client['gender'], string> = {

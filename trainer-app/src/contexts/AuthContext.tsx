@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
-import { createProfile } from '../api/profile'
-import { seedDefaultExercises } from '../api/exercises'
+import { createProfile } from '../db/profile'
+import { seedDefaultExercises } from '../db/exercises'
 
 type AuthContextValue = {
   session: Session | null

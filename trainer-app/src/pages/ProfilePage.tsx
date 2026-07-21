@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { getProfile, updateProfile } from '../api/profile'
-import { listClients } from '../api/clients'
+import { getProfile, updateProfile } from '../db/profile'
+import { listClients } from '../db/clients'
 import { supabase } from '../lib/supabase'
 import { logEvent } from '../lib/analytics'
 

@@ -8,7 +8,7 @@ import {
   type Exercise,
   type MuscleGroup,
   type InputKind,
-} from '../api/exercises'
+} from '../db/exercises'
 
 type Category = 'all' | MuscleGroup
 

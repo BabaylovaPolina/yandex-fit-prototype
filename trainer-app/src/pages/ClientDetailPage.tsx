@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { listWorkoutsWithSummary, type WorkoutWithSummary } from '../api/workouts'
-import { type Client } from '../api/clients'
-import { MUSCLE_GROUP_LABELS } from '../api/exercises'
+import { listWorkoutsWithSummary, type WorkoutWithSummary } from '../db/workouts'
+import { type Client } from '../db/clients'
+import { MUSCLE_GROUP_LABELS } from '../db/exercises'
 import { logEvent } from '../lib/analytics'
 
 const genderLabel: Record<Client['gender'], string> = {

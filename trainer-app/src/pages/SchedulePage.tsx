@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { listWorkoutsForDate, type WorkoutWithClientName } from '../api/workouts'
+import { listWorkoutsForDate, type WorkoutWithClientName } from '../db/workouts'
 import { logEvent } from '../lib/analytics'
 import { MonthPickerSheet } from '../components/MonthPickerSheet'
 

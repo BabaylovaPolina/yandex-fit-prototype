@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { getExerciseHistory, type ExerciseHistoryEntry, type WorkoutSet } from '../api/workouts'
+import { getExerciseHistory, type ExerciseHistoryEntry, type WorkoutSet } from '../db/workouts'
 import { logEvent } from '../lib/analytics'
-import type { InputKind } from '../api/exercises'
+import type { InputKind } from '../db/exercises'
 
 function formatDateRu(dateKey: string): string {
   const [year, month, day] = dateKey.split('-')

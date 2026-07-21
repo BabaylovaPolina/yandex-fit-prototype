@@ -7,11 +7,11 @@ import {
   addSetToExercise,
   type WorkoutWithExercises,
   type WorkoutExercise,
-} from '../api/workouts'
+} from '../db/workouts'
 import { logEvent } from '../lib/analytics'
 import { playGong } from '../lib/gong'
 import { ExercisePickerSheet } from '../components/ExercisePickerSheet'
-import type { Exercise, InputKind } from '../api/exercises'
+import type { Exercise, InputKind } from '../db/exercises'
 
 const REST_SECONDS = 90
 

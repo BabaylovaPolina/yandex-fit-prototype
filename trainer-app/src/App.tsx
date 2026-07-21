@@ -15,8 +15,8 @@ import { ProgressFormPage } from './pages/ProgressFormPage'
 import { TabBar, type TabKey } from './components/TabBar'
 import { ClientCardPage } from './pages/ClientCardPage'
 import { ProfilePage } from './pages/ProfilePage'
-import { getClient, type Client } from './api/clients'
-import type { InputKind } from './api/exercises'
+import { getClient, type Client } from './db/clients'
+import type { InputKind } from './db/exercises'
 
 type View =
   | { name: 'list' }
