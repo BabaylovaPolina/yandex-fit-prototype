@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SUGGESTED_CUSTOM_METRICS } from '../lib/progress'
+import { SUGGESTED_CUSTOM_METRICS } from '../db/progress'
 
 type Props = {
   existingMetrics: string[]

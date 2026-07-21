@@ -8,7 +8,7 @@ import {
   addCustomMetricValue,
   updateCustomMetricValue,
   type CustomMetric,
-} from '../lib/progress'
+} from '../db/progress'
 import { CustomMetricModal } from '../components/CustomMetricModal'
 import { DatePicker } from '../components/DatePicker'
 import { logEvent } from '../lib/analytics'

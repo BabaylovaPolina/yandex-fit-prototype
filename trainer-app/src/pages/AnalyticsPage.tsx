@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { listClients, type Client } from '../lib/clients'
-import { listProgress, listCustomMetrics, type ProgressRecord, type CustomMetric } from '../lib/progress'
+import { listClients, type Client } from '../db/clients'
+import { listProgress, listCustomMetrics, type ProgressRecord, type CustomMetric } from '../db/progress'
 import { ProgressChart } from '../components/ProgressChart'
 import { logEvent } from '../lib/analytics'
 
