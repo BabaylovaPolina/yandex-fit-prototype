@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { listClients, type Client } from '../lib/clients'
 import { logEvent } from '../lib/analytics'
-import { supabase } from '../lib/supabase'
 
 const genderLabel: Record<Client['gender'], string> = {
   male: 'М',
@@ -34,9 +33,6 @@ export function ClientsListPage({ onAddClient, onOpenClient, onEditClient, refre
       <header className="home-header">
         <button type="button" onClick={onAddClient}>
           + Клиент
-        </button>
-        <button type="button" onClick={() => supabase.auth.signOut()}>
-          Выйти
         </button>
       </header>
 

@@ -4,7 +4,7 @@ const TABS: { key: TabKey; icon: string; label: string; enabled: boolean }[] = [
   { key: 'clients', icon: '👥', label: 'Клиенты', enabled: true },
   { key: 'schedule', icon: '📅', label: 'Расписание', enabled: true },
   { key: 'analytics', icon: '📊', label: 'Аналитика', enabled: true },
-  { key: 'profile', icon: '⚙️', label: 'Профиль', enabled: false },
+  { key: 'profile', icon: '⚙️', label: 'Профиль', enabled: true },
 ]
 
 type Props = {

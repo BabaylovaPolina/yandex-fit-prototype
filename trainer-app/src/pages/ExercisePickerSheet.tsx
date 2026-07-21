@@ -4,8 +4,10 @@ import {
   listExercises,
   MUSCLE_GROUP_LABELS,
   MUSCLE_GROUPS,
+  INPUT_KIND_LABELS,
   type Exercise,
   type MuscleGroup,
+  type InputKind,
 } from '../lib/exercises'
 
 type Category = 'all' | MuscleGroup
@@ -23,7 +25,8 @@ export function ExercisePickerSheet({ onPick, onClose }: Props) {
   const [search, setSearch] = useState('')
   const [creating, setCreating] = useState(false)
   const [newName, setNewName] = useState('')
-  const [newGroup, setNewGroup] = useState<MuscleGroup>('other')
+  const [newGroup, setNewGroup] = useState<MuscleGroup | null>(null)
+  const [newInputKind, setNewInputKind] = useState<InputKind>('distance')
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -43,11 +46,11 @@ export function ExercisePickerSheet({ onPick, onClose }: Props) {
   }, [exercises, category, search])
 
   async function handleCreate() {
-    if (newName.trim() === '') return
+    if (newName.trim() === '' || newGroup === null) return
     setSaving(true)
     setError(null)
     try {
-      const exercise = await createExercise(newName, newGroup)
+      const exercise = await createExercise(newName, newGroup, newGroup === 'cardio' ? newInputKind : null)
       onPick(exercise)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось создать упражнение')
@@ -91,12 +94,27 @@ export function ExercisePickerSheet({ onPick, onClose }: Props) {
               ))}
             </div>
 
+            {newGroup === 'cardio' && (
+              <div className="picker-cats">
+                {(Object.keys(INPUT_KIND_LABELS) as (keyof typeof INPUT_KIND_LABELS)[]).map((kind) => (
+                  <button
+                    key={kind}
+                    type="button"
+                    className={kind === newInputKind ? 'picker-cat active' : 'picker-cat'}
+                    onClick={() => setNewInputKind(kind)}
+                  >
+                    {INPUT_KIND_LABELS[kind]}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {error && <p className="auth-error">{error}</p>}
 
             <button
               type="button"
               className="picker-create-save"
-              disabled={saving || newName.trim() === ''}
+              disabled={saving || newName.trim() === '' || newGroup === null}
               onClick={handleCreate}
             >
               {saving ? 'Сохранение…' : 'Сохранить упражнение'}

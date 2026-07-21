@@ -9,7 +9,7 @@ type Props = {
 
 export function AddClientPage({ onSaved, onCancel }: Props) {
   const [fullName, setFullName] = useState('')
-  const [gender, setGender] = useState<Gender>('male')
+  const [gender, setGender] = useState<Gender | null>(null)
   const [age, setAge] = useState('')
   const [heightCm, setHeightCm] = useState('')
   const [weightKg, setWeightKg] = useState('')
@@ -21,6 +21,10 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     setError(null)
+    if (!gender) {
+      setError('Выберите пол')
+      return
+    }
     setSaving(true)
     try {
       await createClientRecord({

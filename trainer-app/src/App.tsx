@@ -5,13 +5,18 @@ import { ClientsListPage } from './pages/ClientsListPage'
 import { AddClientPage } from './pages/AddClientPage'
 import { ClientDetailPage } from './pages/ClientDetailPage'
 import { WorkoutFormPage } from './pages/WorkoutFormPage'
+import { WorkoutViewPage } from './pages/WorkoutViewPage'
+import { LiveWorkoutPage } from './pages/LiveWorkoutPage'
+import { ExerciseHistoryPage } from './pages/ExerciseHistoryPage'
 import { SchedulePage } from './pages/SchedulePage'
 import { PickClientPage } from './pages/PickClientPage'
 import { AnalyticsPage } from './pages/AnalyticsPage'
 import { ProgressFormPage } from './pages/ProgressFormPage'
-import { TabBar } from './components/TabBar'
+import { TabBar, type TabKey } from './components/TabBar'
 import { ClientCardPage } from './pages/ClientCardPage'
+import { ProfilePage } from './pages/ProfilePage'
 import { getClient, type Client } from './lib/clients'
+import type { InputKind } from './lib/exercises'
 
 type View =
   | { name: 'list' }
@@ -19,16 +24,46 @@ type View =
   | { name: 'edit-client'; client: Client }
   | { name: 'client-detail'; client: Client }
   | {
+      name: 'workout-view'
+      client: Client
+      workoutId: number
+      returnTo: 'client-detail' | 'schedule'
+    }
+  | {
+      name: 'live-workout'
+      client: Client
+      workoutId: number
+      returnTo: 'client-detail' | 'schedule'
+    }
+  | {
+      name: 'exercise-history'
+      client: Client
+      workoutId: number
+      exerciseId: number
+      exerciseName: string
+      inputKind: InputKind
+      returnTo: 'client-detail' | 'schedule'
+    }
+  | {
       name: 'workout-form'
       client: Client
       workoutId?: number
+      copyFromWorkoutId?: number
       workoutDate?: string
-      returnTo: 'client-detail' | 'schedule'
+      returnTo: 'client-detail' | 'schedule' | 'workout-view'
     }
   | { name: 'schedule' }
   | { name: 'pick-client'; workoutDate: string }
   | { name: 'analytics' }
   | { name: 'progress-form'; clientId: number; date?: string }
+  | { name: 'profile' }
+
+function tabViewFor(tab: TabKey): View {
+  if (tab === 'schedule') return { name: 'schedule' }
+  if (tab === 'analytics') return { name: 'analytics' }
+  if (tab === 'profile') return { name: 'profile' }
+  return { name: 'list' }
+}
 
 function TrainerHome() {
   const [view, setView] = useState<View>({ name: 'list' })
@@ -71,26 +106,97 @@ function TrainerHome() {
           setView({ name: 'workout-form', client: view.client, returnTo: 'client-detail' })
         }
         onOpenWorkout={(workoutId) =>
-          setView({ name: 'workout-form', client: view.client, workoutId, returnTo: 'client-detail' })
+          setView({ name: 'workout-view', client: view.client, workoutId, returnTo: 'client-detail' })
+        }
+        onCopyWorkout={(workoutId) =>
+          setView({
+            name: 'workout-form',
+            client: view.client,
+            copyFromWorkoutId: workoutId,
+            returnTo: 'client-detail',
+          })
         }
       />
     )
   }
 
+  if (view.name === 'workout-view') {
+    const { client, workoutId, returnTo } = view
+    return (
+      <WorkoutViewPage
+        key={workoutId}
+        workoutId={workoutId}
+        onBack={() => setView(returnTo === 'schedule' ? { name: 'schedule' } : { name: 'client-detail', client })}
+        onEdit={() =>
+          setView({ name: 'workout-form', client, workoutId, returnTo: 'workout-view' })
+        }
+        onStart={() => setView({ name: 'live-workout', client, workoutId, returnTo })}
+        onDeleted={() => {
+          setWorkoutsRefreshKey((key) => key + 1)
+          setView(returnTo === 'schedule' ? { name: 'schedule' } : { name: 'client-detail', client })
+        }}
+        onOpenExerciseHistory={(exerciseId, exerciseName, inputKind) =>
+          setView({
+            name: 'exercise-history',
+            client,
+            workoutId,
+            exerciseId,
+            exerciseName,
+            inputKind,
+            returnTo,
+          })
+        }
+      />
+    )
+  }
+
+  if (view.name === 'exercise-history') {
+    const { client, workoutId, exerciseId, exerciseName, inputKind, returnTo } = view
+    return (
+      <ExerciseHistoryPage
+        clientId={client.id}
+        exerciseId={exerciseId}
+        exerciseName={exerciseName}
+        inputKind={inputKind}
+        onBack={() => setView({ name: 'workout-view', client, workoutId, returnTo })}
+      />
+    )
+  }
+
+  if (view.name === 'live-workout') {
+    const { client, workoutId, returnTo } = view
+    return (
+      <LiveWorkoutPage
+        key={workoutId}
+        workoutId={workoutId}
+        onFinished={() => {
+          setWorkoutsRefreshKey((key) => key + 1)
+          setView({ name: 'workout-view', client, workoutId, returnTo })
+        }}
+        onCancel={() => setView({ name: 'workout-view', client, workoutId, returnTo })}
+      />
+    )
+  }
+
   if (view.name === 'workout-form') {
-    const { client, workoutId, workoutDate, returnTo } = view
+    const { client, workoutId, copyFromWorkoutId, workoutDate, returnTo } = view
+    const backView: View =
+      returnTo === 'workout-view' && workoutId !== undefined
+        ? { name: 'workout-view', client, workoutId, returnTo: 'client-detail' }
+        : returnTo === 'schedule'
+          ? { name: 'schedule' }
+          : { name: 'client-detail', client }
     return (
       <WorkoutFormPage
         clientId={client.id}
         workoutId={workoutId}
+        copyFromWorkoutId={copyFromWorkoutId}
         initialDate={workoutDate}
         onSaved={() => {
           setWorkoutsRefreshKey((key) => key + 1)
-          setView(returnTo === 'schedule' ? { name: 'schedule' } : { name: 'client-detail', client })
+          setView(backView)
         }}
-        onCancel={() =>
-          setView(returnTo === 'schedule' ? { name: 'schedule' } : { name: 'client-detail', client })
-        }
+        onCancel={() => setView(backView)}
       />
     )
   }
@@ -129,18 +235,7 @@ function TrainerHome() {
           onAddProgress={(clientId) => setView({ name: 'progress-form', clientId })}
           refreshKey={workoutsRefreshKey}
         />
-        <TabBar
-          active="analytics"
-          onSelectTab={(tab) => {
-            if (tab === 'clients') {
-              setView({ name: 'list' })
-            } else if (tab === 'schedule') {
-              setView({ name: 'schedule' })
-            } else if (tab === 'analytics') {
-              setView({ name: 'analytics' })
-            }
-          }}
-        />
+        <TabBar active="analytics" onSelectTab={(tab) => setView(tabViewFor(tab))} />
       </>
     )
   }
@@ -162,18 +257,16 @@ function TrainerHome() {
           refreshKey={workoutsRefreshKey}
         />
         {clientLoadError && <p className="auth-error">{clientLoadError}</p>}
-        <TabBar
-          active="schedule"
-          onSelectTab={(tab) => {
-            if (tab === 'clients') {
-              setView({ name: 'list' })
-            } else if (tab === 'schedule') {
-              setView({ name: 'schedule' })
-            } else if (tab === 'analytics') {
-              setView({ name: 'analytics' })
-            }
-          }}
-        />
+        <TabBar active="schedule" onSelectTab={(tab) => setView(tabViewFor(tab))} />
+      </>
+    )
+  }
+
+  if (view.name === 'profile') {
+    return (
+      <>
+        <ProfilePage />
+        <TabBar active="profile" onSelectTab={(tab) => setView(tabViewFor(tab))} />
       </>
     )
   }
@@ -186,18 +279,7 @@ function TrainerHome() {
         onEditClient={(client) => setView({ name: 'edit-client', client })}
         refreshKey={clientsRefreshKey}
       />
-      <TabBar
-        active="clients"
-        onSelectTab={(tab) => {
-          if (tab === 'clients') {
-            setView({ name: 'list' })
-          } else if (tab === 'schedule') {
-            setView({ name: 'schedule' })
-          } else if (tab === 'analytics') {
-            setView({ name: 'analytics' })
-          }
-        }}
-      />
+      <TabBar active="clients" onSelectTab={(tab) => setView(tabViewFor(tab))} />
     </>
   )
 }

@@ -4,17 +4,19 @@ import {
   updateWorkout,
   deleteWorkout,
   getWorkout,
+  buildCopyDraft,
   type WorkoutStatus,
   type SetInput,
 } from '../lib/workouts'
 import { logEvent } from '../lib/analytics'
 import { ExercisePickerSheet } from './ExercisePickerSheet'
-import type { Exercise } from '../lib/exercises'
+import type { Exercise, InputKind } from '../lib/exercises'
 
 type SetDraft = SetInput & { key: string }
 type ExerciseDraft = {
   key: string
   exerciseName: string
+  inputKind: InputKind
   sets: SetDraft[]
 }
 
@@ -31,22 +33,49 @@ function emptySet(): SetDraft {
     plan_reps: null,
     fact_weight_kg: null,
     fact_reps: null,
+    plan_duration_min: null,
+    plan_distance_km: null,
+    fact_duration_min: null,
+    fact_distance_km: null,
   }
 }
 
-function emptyExercise(name: string): ExerciseDraft {
-  return { key: nextKey(), exerciseName: name, sets: [emptySet()] }
+function emptyExercise(name: string, inputKind: InputKind): ExerciseDraft {
+  return { key: nextKey(), exerciseName: name, inputKind, sets: [emptySet()] }
+}
+
+function roundToStep(value: number, step: number): number {
+  return Math.round(value / step) * step
+}
+
+const MONTHS_RU = [
+  'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+  'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря',
+]
+
+function formatDateRuLong(dateKey: string): string {
+  const [year, month, day] = dateKey.split('-')
+  const monthIndex = Number(month) - 1
+  return `${Number(day)} ${MONTHS_RU[monthIndex]} ${year}`
 }
 
 type Props = {
   clientId: number
   workoutId?: number
+  copyFromWorkoutId?: number
   initialDate?: string
   onSaved: () => void
   onCancel: () => void
 }
 
-export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onCancel }: Props) {
+export function WorkoutFormPage({
+  clientId,
+  workoutId,
+  copyFromWorkoutId,
+  initialDate,
+  onSaved,
+  onCancel,
+}: Props) {
   const [workoutDate, setWorkoutDate] = useState(
     () => initialDate ?? new Date().toISOString().slice(0, 10),
   )
@@ -58,7 +87,7 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [loading, setLoading] = useState(workoutId !== undefined)
+  const [loading, setLoading] = useState(workoutId !== undefined || copyFromWorkoutId !== undefined)
   const [pickerOpen, setPickerOpen] = useState(false)
 
   useEffect(() => {
@@ -74,6 +103,7 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
           workout.exercises.map((ex) => ({
             key: nextKey(),
             exerciseName: ex.exercise_name,
+            inputKind: ex.input_kind,
             sets:
               ex.sets.length === 0
                 ? [emptySet()]
@@ -83,6 +113,10 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
                     plan_reps: s.plan_reps,
                     fact_weight_kg: s.fact_weight_kg,
                     fact_reps: s.fact_reps,
+                    plan_duration_min: s.plan_duration_min,
+                    plan_distance_km: s.plan_distance_km,
+                    fact_duration_min: s.fact_duration_min,
+                    fact_distance_km: s.fact_distance_km,
                   })),
           })),
         )
@@ -90,6 +124,60 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
       .catch((err) => setError(err instanceof Error ? err.message : 'Не удалось загрузить тренировку'))
       .finally(() => setLoading(false))
   }, [workoutId])
+
+  useEffect(() => {
+    if (copyFromWorkoutId === undefined) return
+    getWorkout(copyFromWorkoutId)
+      .then((source) => {
+        setNotes(source.notes ?? '')
+        const draft = buildCopyDraft(source)
+        setExercises(
+          draft.map((ex) => ({
+            key: nextKey(),
+            exerciseName: ex.exercise_name,
+            inputKind: ex.input_kind,
+            sets:
+              ex.sets.length === 0
+                ? [emptySet()]
+                : ex.sets.map((s) => ({ key: nextKey(), ...s })),
+          })),
+        )
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : 'Не удалось загрузить тренировку'))
+      .finally(() => setLoading(false))
+  }, [copyFromWorkoutId])
+
+  function resetWeightsAndReps() {
+    setExercises((prev) =>
+      prev.map((ex) => ({
+        ...ex,
+        sets: ex.sets.map((s) => ({
+          ...s,
+          plan_weight_kg: null,
+          plan_reps: null,
+          fact_weight_kg: null,
+          fact_reps: null,
+          plan_duration_min: null,
+          plan_distance_km: null,
+          fact_duration_min: null,
+          fact_distance_km: null,
+        })),
+      })),
+    )
+  }
+
+  function adjustLoad(factor: number) {
+    setExercises((prev) =>
+      prev.map((ex) => ({
+        ...ex,
+        sets: ex.sets.map((s) =>
+          s.plan_weight_kg === null
+            ? s
+            : { ...s, plan_weight_kg: roundToStep(s.plan_weight_kg * factor, 2.5) },
+        ),
+      })),
+    )
+  }
 
   function updateSet(exerciseKey: string, setKey: string, patch: Partial<SetDraft>) {
     setExercises((prev) =>
@@ -102,7 +190,7 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
   }
 
   function handlePickExercise(exercise: Exercise) {
-    setExercises((prev) => [...prev, emptyExercise(exercise.name)])
+    setExercises((prev) => [...prev, emptyExercise(exercise.name, exercise.input_kind)])
     setPickerOpen(false)
   }
 
@@ -166,7 +254,7 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
   }
 
   async function handleDelete() {
-    if (!workoutId) return
+    if (workoutId === undefined) return
     if (!window.confirm('Вы уверены? Тренировка будет удалена безвозвратно.')) return
 
     setError(null)
@@ -193,7 +281,13 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
   return (
     <div className="form-screen">
       <header className="home-header">
-        <span>{workoutId === undefined ? 'Новая тренировка' : 'Тренировка'}</span>
+        <span>
+          {workoutId !== undefined
+            ? 'Тренировка'
+            : copyFromWorkoutId !== undefined
+              ? 'Копия тренировки'
+              : 'Новая тренировка'}
+        </span>
         {workoutId !== undefined && (
           <button
             type="button"
@@ -215,6 +309,7 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
             value={workoutDate}
             onChange={(e) => setWorkoutDate(e.target.value)}
           />
+          {workoutDate && <span className="date-input-hint">{formatDateRuLong(workoutDate)}</span>}
         </label>
 
         <div className="form-row">
@@ -253,78 +348,123 @@ export function WorkoutFormPage({ clientId, workoutId, initialDate, onSaved, onC
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
         </label>
 
-        <div className="workout-exercises">
-          {exercises.map((exercise) => (
-            <div key={exercise.key} className="workout-exercise-block">
-              <div className="workout-exercise-header">
-                <span className="workout-exercise-name">{exercise.exerciseName}</span>
-                <button type="button" onClick={() => removeExercise(exercise.key)}>
-                  Удалить
-                </button>
-              </div>
+        {copyFromWorkoutId !== undefined && (
+          <div className="copy-load-actions">
+            <button type="button" className="btn-secondary" onClick={resetWeightsAndReps}>
+              Сбросить веса и подходы
+            </button>
+            <button type="button" className="btn-secondary" onClick={() => adjustLoad(0.95)}>
+              −5% нагрузка
+            </button>
+            <button type="button" className="btn-secondary" onClick={() => adjustLoad(1.05)}>
+              +5% нагрузка
+            </button>
+          </div>
+        )}
 
-              {exercise.sets.length > 0 && (
-                <div className="workout-set-row workout-set-row-labels">
-                  <span />
-                  <span className="workout-set-group-label">План</span>
-                  <span className="workout-set-group-label">Факт</span>
-                  <span />
-                </div>
-              )}
-              {exercise.sets.map((set, index) => (
-                <div key={set.key} className="workout-set-row">
-                  <span className="workout-set-index">#{index + 1}</span>
-                  <div className="workout-set-pair">
-                    <input
-                      type="number"
-                      placeholder="кг"
-                      value={set.plan_weight_kg ?? ''}
-                      onChange={(e) =>
-                        updateSet(exercise.key, set.key, {
-                          plan_weight_kg: numberOrNull(e.target.value),
-                        })
-                      }
-                    />
-                    <input
-                      type="number"
-                      placeholder="повт."
-                      value={set.plan_reps ?? ''}
-                      onChange={(e) =>
-                        updateSet(exercise.key, set.key, { plan_reps: numberOrNull(e.target.value) })
-                      }
-                    />
-                  </div>
-                  <div className="workout-set-pair">
-                    <input
-                      type="number"
-                      placeholder="кг"
-                      value={set.fact_weight_kg ?? ''}
-                      onChange={(e) =>
-                        updateSet(exercise.key, set.key, {
-                          fact_weight_kg: numberOrNull(e.target.value),
-                        })
-                      }
-                    />
-                    <input
-                      type="number"
-                      placeholder="повт."
-                      value={set.fact_reps ?? ''}
-                      onChange={(e) =>
-                        updateSet(exercise.key, set.key, { fact_reps: numberOrNull(e.target.value) })
-                      }
-                    />
-                  </div>
-                  <button type="button" onClick={() => removeSet(exercise.key, set.key)}>
-                    ×
+        <div className="workout-exercises">
+          {exercises.map((exercise) => {
+            const units =
+              exercise.inputKind === 'distance'
+                ? { first: 'мин', second: 'км' }
+                : exercise.inputKind === 'reps'
+                  ? { first: 'мин', second: 'прыжков' }
+                  : { first: 'кг', second: 'повт.' }
+            const planFirstKey =
+              exercise.inputKind === null ? 'plan_weight_kg' : 'plan_duration_min'
+            const planSecondKey =
+              exercise.inputKind === 'distance' ? 'plan_distance_km' : 'plan_reps'
+            const factFirstKey =
+              exercise.inputKind === null ? 'fact_weight_kg' : 'fact_duration_min'
+            const factSecondKey =
+              exercise.inputKind === 'distance' ? 'fact_distance_km' : 'fact_reps'
+
+            return (
+              <div key={exercise.key} className="workout-exercise-block">
+                <div className="workout-exercise-header">
+                  <span className="workout-exercise-name">{exercise.exerciseName}</span>
+                  <button type="button" onClick={() => removeExercise(exercise.key)}>
+                    Удалить
                   </button>
                 </div>
-              ))}
 
-              <button type="button" onClick={() => addSet(exercise.key)}>
-                + Подход
-              </button>
-            </div>
-          ))}
+                {exercise.sets.length > 0 && (
+                  <>
+                    <div className="workout-set-row workout-set-row-labels">
+                      <span />
+                      <span className="workout-set-group-label">План</span>
+                      <span className="workout-set-group-label">Факт</span>
+                      <span />
+                    </div>
+                    <div className="workout-set-row workout-set-row-sublabels">
+                      <span />
+                      <div className="workout-set-pair">
+                        <span className="workout-set-unit-label">{units.first}</span>
+                        <span className="workout-set-unit-label">{units.second}</span>
+                      </div>
+                      <div className="workout-set-pair">
+                        <span className="workout-set-unit-label">{units.first}</span>
+                        <span className="workout-set-unit-label">{units.second}</span>
+                      </div>
+                      <span />
+                    </div>
+                  </>
+                )}
+                {exercise.sets.map((set, index) => (
+                  <div key={set.key} className="workout-set-row">
+                    <span className="workout-set-index">#{index + 1}</span>
+                    <div className="workout-set-pair workout-set-pair-plan">
+                      <input
+                        type="number"
+                        value={set[planFirstKey] ?? ''}
+                        onChange={(e) =>
+                          updateSet(exercise.key, set.key, {
+                            [planFirstKey]: numberOrNull(e.target.value),
+                          })
+                        }
+                      />
+                      <input
+                        type="number"
+                        value={set[planSecondKey] ?? ''}
+                        onChange={(e) =>
+                          updateSet(exercise.key, set.key, {
+                            [planSecondKey]: numberOrNull(e.target.value),
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="workout-set-pair workout-set-pair-fact">
+                      <input
+                        type="number"
+                        value={set[factFirstKey] ?? ''}
+                        onChange={(e) =>
+                          updateSet(exercise.key, set.key, {
+                            [factFirstKey]: numberOrNull(e.target.value),
+                          })
+                        }
+                      />
+                      <input
+                        type="number"
+                        value={set[factSecondKey] ?? ''}
+                        onChange={(e) =>
+                          updateSet(exercise.key, set.key, {
+                            [factSecondKey]: numberOrNull(e.target.value),
+                          })
+                        }
+                      />
+                    </div>
+                    <button type="button" onClick={() => removeSet(exercise.key, set.key)}>
+                      ×
+                    </button>
+                  </div>
+                ))}
+
+                <button type="button" onClick={() => addSet(exercise.key)}>
+                  + Подход
+                </button>
+              </div>
+            )
+          })}
 
           <button type="button" onClick={() => setPickerOpen(true)}>
             + Упражнение
