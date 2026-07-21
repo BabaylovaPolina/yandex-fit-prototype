@@ -1049,6 +1049,24 @@ button:disabled {
   color: var(--text-muted);
 }
 
+.progress-chart-empty button {
+  margin-top: 12px;
+}
+
+.progress-chart-range {
+  font-weight: 400;
+}
+
+.progress-chart-drag-area {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.progress-chart-drag-area.dragging {
+  cursor: grabbing;
+}
+
 .progress-tooltip {
   background: var(--surface);
   border: 1px solid var(--border);

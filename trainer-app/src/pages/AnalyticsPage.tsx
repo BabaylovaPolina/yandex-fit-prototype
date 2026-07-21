@@ -22,6 +22,7 @@ export function AnalyticsPage({ onAddProgress, refreshKey }: Props) {
   const [progress, setProgress] = useState<ProgressRecord[]>([])
   const [customMetrics, setCustomMetrics] = useState<CustomMetric[]>([])
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('weight')
+  const [windowEnd, setWindowEnd] = useState<string | null>(null)
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -66,6 +67,7 @@ export function AnalyticsPage({ onAddProgress, refreshKey }: Props) {
       setProgress(progressData)
       setCustomMetrics(customData.filter((m) => m.is_active))
       setSelectedMetric('weight')
+      setWindowEnd(null)
     } catch (err) {
       console.error('Error loading progress:', err)
       setError(err instanceof Error ? err.message : 'Ошибка при загрузке прогресса')
@@ -203,6 +205,8 @@ export function AnalyticsPage({ onAddProgress, refreshKey }: Props) {
               <ProgressChart
                 data={progress}
                 metric={selectedMetric}
+                windowEnd={windowEnd}
+                onWindowChange={setWindowEnd}
               />
             </>
           )}
