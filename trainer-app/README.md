@@ -44,3 +44,29 @@ redirect.
 4. Add the app's own URLs (e.g. `http://localhost:5173`, and the deployed
    URL) to Authentication → URL Configuration → Redirect URLs, so Supabase
    is allowed to send users back to the app after login.
+
+## iOS build (Capacitor)
+
+The web app is wrapped as a native iOS shell via
+[Capacitor](https://capacitorjs.com) — no code fork, the same React app runs
+inside a WKWebView. Native project lives in `ios/` (committed, minus build
+output/Pods — see `ios/.gitignore`).
+
+1. Install Xcode and CocoaPods (`brew install cocoapods`) if you don't have
+   them.
+2. `npm install`
+3. Make sure `.env.local` has real Supabase credentials — the iOS build
+   bakes them in at build time same as the web build, and the app renders
+   blank with no error if they're missing.
+4. `npm run ios:open` — builds the web app, syncs it into `ios/`, and opens
+   the Xcode project. Run from Xcode onto a simulator or device from there.
+5. After any change to `src/`, rerun `npm run ios:sync` (or `ios:open`) to
+   refresh the native project — Xcode does not rebuild the web bundle on its
+   own.
+
+**Known limitation:** Google sign-in does not currently work in the iOS
+build. Google blocks OAuth inside embedded WebViews
+(`disallowed_useragent`), so `signInWithOAuth` needs to be re-routed through
+the system browser (`@capacitor/browser`) with a custom URL scheme
+redirect back into the app — not implemented yet. Email/password sign-in
+works normally.
