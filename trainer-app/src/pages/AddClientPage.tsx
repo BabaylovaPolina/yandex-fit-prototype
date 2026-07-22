@@ -48,6 +48,9 @@ export function AddClientPage({ onSaved, onCancel }: Props) {
   return (
     <div className="form-screen">
       <header className="home-header">
+        <button type="button" onClick={onCancel}>
+          Назад
+        </button>
         <span>Новый клиент</span>
       </header>
 

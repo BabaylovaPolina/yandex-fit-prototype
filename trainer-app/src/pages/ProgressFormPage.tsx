@@ -142,6 +142,9 @@ export function ProgressFormPage({ clientId, initialDate, onSaved, onCancel }: P
   return (
     <div className="form-screen">
       <header className="home-header">
+        <button type="button" onClick={onCancel}>
+          Назад
+        </button>
         <span>{initialDate ? 'Редактировать прогресс' : 'Добавить прогресс'}</span>
       </header>
 

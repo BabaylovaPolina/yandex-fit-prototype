@@ -281,6 +281,9 @@ export function WorkoutFormPage({
   return (
     <div className="form-screen">
       <header className="home-header">
+        <button type="button" onClick={onCancel}>
+          Назад
+        </button>
         <span>
           {workoutId !== undefined
             ? 'Тренировка'

@@ -45,6 +45,9 @@ export function ClientCardPage({ client, onSaved, onCancel }: Props) {
   return (
     <div className="form-screen">
       <header className="home-header">
+        <button type="button" onClick={onCancel}>
+          Назад
+        </button>
         <span>Карточка клиента</span>
       </header>
 
