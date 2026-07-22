@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   getWorkout,
   updateSetFact,
   updateWorkoutStatus,
   addExerciseToWorkout,
   addSetToExercise,
+  deleteSet,
   type WorkoutWithExercises,
   type WorkoutExercise,
 } from '../db/workouts'
@@ -58,8 +59,10 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
   const [error, setError] = useState<string | null>(null)
 
   const [exerciseIndex, setExerciseIndex] = useState(0)
+  const startedAtRef = useRef<number>(Date.now())
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [restRemaining, setRestRemaining] = useState<number | null>(null)
+  const restEndsAtRef = useRef<number | null>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [finishing, setFinishing] = useState(false)
   const [confirmedSetIds, setConfirmedSetIds] = useState<Set<number>>(new Set())
@@ -94,21 +97,36 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
       .finally(() => setLoading(false))
   }, [workoutId])
 
+  // Both timers derive from wall-clock timestamps so they stay correct
+  // even when the tab is backgrounded and setInterval is throttled.
   useEffect(() => {
-    const timer = setInterval(() => setElapsedSeconds((s) => s + 1), 1000)
+    function tick() {
+      setElapsedSeconds(Math.floor((Date.now() - startedAtRef.current) / 1000))
+      if (restEndsAtRef.current !== null) {
+        const left = Math.ceil((restEndsAtRef.current - Date.now()) / 1000)
+        if (left <= 0) {
+          restEndsAtRef.current = null
+          setRestRemaining(null)
+          playGong()
+        } else {
+          setRestRemaining(left)
+        }
+      }
+    }
+    tick()
+    const timer = setInterval(tick, 500)
     return () => clearInterval(timer)
   }, [])
 
-  useEffect(() => {
-    if (restRemaining === null) return
-    if (restRemaining <= 0) {
-      playGong()
-      setRestRemaining(null)
-      return
-    }
-    const timer = setTimeout(() => setRestRemaining((s) => (s === null ? null : s - 1)), 1000)
-    return () => clearTimeout(timer)
-  }, [restRemaining])
+  function startRest() {
+    restEndsAtRef.current = Date.now() + REST_SECONDS * 1000
+    setRestRemaining(REST_SECONDS)
+  }
+
+  function stopRest() {
+    restEndsAtRef.current = null
+    setRestRemaining(null)
+  }
 
   const exercise = workout?.exercises[exerciseIndex] ?? null
   const isLastExercise = workout ? exerciseIndex === workout.exercises.length - 1 : false
@@ -153,7 +171,7 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
 
   function handleConfirmSet(setId: number) {
     setConfirmedSetIds((prev) => new Set(prev).add(setId))
-    setRestRemaining(REST_SECONDS)
+    startRest()
   }
 
   async function handleAddSet() {
@@ -163,6 +181,21 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
       updateExerciseInState({ ...exercise, sets: [...exercise.sets, newSet] })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось добавить подход')
+    }
+  }
+
+  async function handleDeleteSet(setId: number) {
+    if (!exercise) return
+    try {
+      await deleteSet(setId)
+      updateExerciseInState({ ...exercise, sets: exercise.sets.filter((s) => s.id !== setId) })
+      setConfirmedSetIds((prev) => {
+        const next = new Set(prev)
+        next.delete(setId)
+        return next
+      })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Не удалось удалить подход')
     }
   }
 
@@ -178,8 +211,18 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
   }
 
   function goNext() {
-    setRestRemaining(null)
+    stopRest()
     setExerciseIndex((i) => i + 1)
+  }
+
+  function goPrev() {
+    stopRest()
+    setExerciseIndex((i) => Math.max(0, i - 1))
+  }
+
+  function handleFinishEarly() {
+    if (!window.confirm('Завершить тренировку? Введённые данные сохранятся.')) return
+    handleFinish()
   }
 
   async function handleFinish() {
@@ -254,7 +297,7 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
           {restRemaining !== null && (
             <div className="live-workout-rest">
               <span>Отдых: {formatDuration(restRemaining)}</span>
-              <button type="button" className="live-workout-rest-skip" onClick={() => setRestRemaining(null)}>
+              <button type="button" className="live-workout-rest-skip" onClick={stopRest}>
                 Пропустить
               </button>
             </div>
@@ -284,6 +327,16 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
                         План: {set[first.plan] ?? '—'} {first.label} × {set[second.plan] ?? '—'}{' '}
                         {second.label}
                       </span>
+                      {exercise.sets.length > 1 && (
+                        <button
+                          type="button"
+                          className="live-workout-set-delete"
+                          aria-label="Удалить подход"
+                          onClick={() => handleDeleteSet(set.id)}
+                        >
+                          ×
+                        </button>
+                      )}
                     </div>
 
                     <div className="live-workout-steppers">
@@ -333,9 +386,19 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
             + Подход
           </button>
 
-          <button type="button" className="live-workout-next" onClick={goNext}>
-            {isLastExercise ? 'Завершить упражнения' : 'Следующее упражнение'}
-          </button>
+          <div className="live-workout-nav">
+            <button
+              type="button"
+              className="live-workout-nav-prev"
+              disabled={exerciseIndex === 0}
+              onClick={goPrev}
+            >
+              ← Предыдущее
+            </button>
+            <button type="button" className="live-workout-next" onClick={goNext}>
+              {isLastExercise ? 'К завершению →' : 'Следующее →'}
+            </button>
+          </div>
         </div>
       ) : (
         <div className="live-workout-body">
@@ -344,15 +407,20 @@ export function LiveWorkoutPage({ workoutId, onFinished, onCancel }: Props) {
             + Добавить упражнение
           </button>
           <button type="button" className="live-workout-next" onClick={goNext}>
-            Завершить упражнения
+            К завершению →
           </button>
         </div>
       )}
 
       {!showSummary && (
-        <button type="button" className="live-workout-add-exercise" onClick={() => setPickerOpen(true)}>
-          + Ещё упражнение
-        </button>
+        <>
+          <button type="button" className="live-workout-add-exercise" onClick={() => setPickerOpen(true)}>
+            + Ещё упражнение
+          </button>
+          <button type="button" className="live-workout-finish-early" onClick={handleFinishEarly}>
+            Завершить тренировку
+          </button>
+        </>
       )}
 
       {pickerOpen && (

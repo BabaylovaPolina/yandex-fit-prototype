@@ -312,6 +312,11 @@ export async function addSetToExercise(workoutExerciseId: number): Promise<Worko
   }
 }
 
+export async function deleteSet(setId: number): Promise<void> {
+  const { error } = await supabase.from('workout_sets').delete().eq('id', setId)
+  if (error) throw error
+}
+
 export function buildCopyDraft(source: WorkoutWithExercises): CopyExerciseDraft[] {
   return source.exercises.map((exercise) => ({
     exercise_name: exercise.exercise_name,
