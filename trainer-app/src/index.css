@@ -1482,6 +1482,14 @@ button:disabled {
   gap: 8px;
 }
 
+.workout-view-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
 .workout-view-summary {
   display: flex;
   align-items: center;
