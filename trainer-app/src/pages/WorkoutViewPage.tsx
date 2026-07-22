@@ -125,6 +125,7 @@ export function WorkoutViewPage({
         </button>
       </header>
 
+      <div className="workout-view-scroll">
       <div className="workout-view-summary">
         <div className="workout-view-datetime">
           {formatDateRu(workout.workout_date)}
@@ -234,6 +235,7 @@ export function WorkoutViewPage({
       >
         {deleting ? 'Удаление…' : 'Удалить тренировку'}
       </button>
+      </div>
     </div>
   )
 }
